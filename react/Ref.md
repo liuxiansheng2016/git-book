@@ -105,4 +105,4 @@ const ParentComponent = () => {
 
 export default ParentComponent;
 ```
-
+在这个例子中，我们通过 useRef 创建了一个 ref，并将其传递给了 MyInput 组件。这样，我们就可以在父组件中通过 inputRef 访问到 MyInput 组件的 DOM 节点，并对其进行操作。
