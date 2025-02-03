@@ -148,7 +148,144 @@ function App() {
 
 export default App;
 ```
+
+由于我们在每个需要访问 Redux store 的组件中直接导入并使用了 store（例如通过 import store from './store';），
+因此无需使用 <Provider> 来将 store 注入到 React 组件树中。这种方法适用于小规模的应用或仅需在少数几个组件中直接管理状态的情况。
+```
+// index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
+```
+
 ### 使用 useSelector 和 useDispatch
 
 useSelector 是一个 React Hook，用于从 Redux Store 中选择状态的一部分。在这里，我们选择 count 的值。
 useDispatch 是另一个 React Hook，用于获取 Redux 的 dispatch 函数，以便分发动作。
+
+**定义 Action Types**
+
+首先，定义一些常量来表示不同的 action 类型。
+```
+// actionTypes.js
+export const INCREMENT = 'INCREMENT';
+export const DECREMENT = 'DECREMENT';
+```
+**创建 Actions**
+
+接下来，创建 action creator 函数，这些函数返回带有特定 type 属性的对象。
+```
+// actions.js
+import { INCREMENT, DECREMENT } from './actionTypes';
+
+export const increment = () => ({
+  type: INCREMENT,
+});
+
+export const decrement = () => ({
+  type: DECREMENT,
+});
+```
+
+**编写 Reducer**
+编写 reducer 函数，它接收当前状态和一个 action，并根据 action 的类型返回新的状态。
+```
+// reducer.js
+import { INCREMENT, DECREMENT } from './actionTypes';
+
+const initialState = {
+  count: 0,
+};
+
+function counterReducer(state = initialState, action) {
+  switch (action.type) {
+    case INCREMENT:
+      return { ...state, count: state.count + 1 };
+    case DECREMENT:
+      return { ...state, count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+export default counterReducer;
+```
+**创建 Store**
+
+使用 createStore 函数创建 Redux store，并传入之前定义的 reducer。
+```
+// store.js
+import { createStore } from 'redux';
+import counterReducer from './reducer';
+
+const store = createStore(counterReducer);
+
+export default store;
+```
+**配置 Provider**
+
+在应用的入口文件中（例如 index.js 或 App.js），使用 <Provider> 将 store 提供给整个应用。
+```
+// index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import store from './store';
+import App from './App';
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
+```
+**使用 useSelector 和 useDispatch**
+
+现在，在组件内部使用 useSelector 来读取状态，使用 useDispatch 来分发 actions。
+```
+// Counter.js
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { increment, decrement } from './actions';
+
+function Counter() {
+  // 获取状态
+  const count = useSelector((state) => state.count);
+  
+  // 获取 dispatch 方法
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={() => dispatch(increment())}>Increment</button>
+      <button onClick={() => dispatch(decrement())}>Decrement</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+**在主应用中使用 Counter 组件**
+
+```
+// App.js
+import React from 'react';
+import Counter from './Counter';
+
+function App() {
+  return (
+    <div className="App">
+      <Counter />
+    </div>
+  );
+}
+
+export default App;
+```
