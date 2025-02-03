@@ -22,7 +22,9 @@ Store.subscribe() 设置监听函数，一旦 state 发生变化，就自动执�
 **State 是只读的**：唯一改变 state 的方法就是触发 action，action 是一个用于描述已发生事情的普通对象。
 
 **使用纯函数来执行修改**：为了描述 action 如何改变 state tree，你需要编写纯的 reducers。
-定义 Action Types 和 Actions
+
+**定义 Action Types 和 Actions**
+
 定义常量来表示不同的 action 类型，并创建相应的 action creator 函数。
 ```
 // actionTypes.js
@@ -40,7 +42,8 @@ export const decrement = () => ({
   type: DECREMENT,
 });
 ```
-创建 Reducer
+**创建 Reducer**
+
 Reducer 根据当前状态和接收到的 action 返回新的状态。
 ```
 import { INCREMENT, DECREMENT } from './actionTypes';
@@ -62,7 +65,8 @@ function counterReducer(state = initialState, action) {
 
 export default counterReducer;
 ```
-创建 Store
+**创建 Store**
+
 使用 createStore 来创建 Redux store，并且可以结合 applyMiddleware 使用中间件如 redux-thunk 或 redux-saga。
 ```
 // store.js
@@ -73,64 +77,63 @@ const store = createStore(counterReducer);
 
 export default store;
 ```
-在 React 中使用 Redux
-接下来，在 React 应用中使用 react-redux 提供的 <Provider> 组件将 store 提供给整个应用，并使用 useSelector 和 useDispatch Hooks 来访问状态和分发 actions。
+**在 React 组件中使用 Redux Store**
 
-配置 Provider
-在应用的入口文件中（例如 index.js 或 App.js），使用 <Provider> 将 store 传递给应用。
-```
-// index.js or App.js
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import store from './store';
-import App from './App';
-
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.getElementById('root')
-);
-```
-store的使用
+Counter 组件
 ```
 // Counter.js
-import React, { useEffect } from 'react';
+import React, { Component } from 'react';
 import store from './store';
 import { increment, decrement } from './actions';
 
-function Counter() {
-  // 使用 getState 获取初始状态
-  console.log('Initial State:', store.getState());
-
-  // 订阅状态变化
-  useEffect(() => {
-    const unsubscribe = store.subscribe(() => {
-      console.log('State changed:', store.getState());
-    });
-
-    // 清理订阅
-    return () => {
-      unsubscribe();
+class Counter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: store.getState().count,
     };
-  }, []);
+  }
 
-  // 分发 action
-  const handleIncrement = () => store.dispatch(increment());
-  const handleDecrement = () => store.dispatch(decrement());
+  componentDidMount() {
+    // 订阅状态变化
+    this.unsubscribe = store.subscribe(() => {
+      this.setState({
+        count: store.getState().count,
+      });
+    });
+  }
 
-  return (
-    <div>
-      <h1>Count: {store.getState().count}</h1>
-      <button onClick={handleIncrement}>Increment</button>
-      <button onClick={handleDecrement}>Decrement</button>
-    </div>
-  );
+  componentWillUnmount() {
+    // 清理订阅
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
+  handleIncrement = () => {
+    store.dispatch(increment());
+  };
+
+  handleDecrement = () => {
+    store.dispatch(decrement());
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>Count: {this.state.count}</h1>
+        <button onClick={this.handleIncrement}>Increment</button>
+        <button onClick={this.handleDecrement}>Decrement</button>
+      </div>
+    );
+  }
 }
 
 export default Counter;
+```
+**在主应用组件中使用 Counter 组件**
 
+```
 // App.js
 import React from 'react';
 import Counter from './Counter';
@@ -145,7 +148,6 @@ function App() {
 
 export default App;
 ```
-
 ### 使用 useSelector 和 useDispatch
 
 useSelector 是一个 React Hook，用于从 Redux Store 中选择状态的一部分。在这里，我们选择 count 的值。
