@@ -289,3 +289,106 @@ function App() {
 
 export default App;
 ```
+
+**connect 函数**
+
+connect 是 react-redux 提供的一个高阶组件（HOC），它用于将 React 组件与 Redux store 连接起来。通过 connect，你可以让 UI 组件订阅 Redux store 的更新，并且能够 dispatch actions 来更新 store。
+
+**mapStateToProps**
+
+mapStateToProps 是一个函数，用来指定哪些 state 需要映射到当前组件的 props 中。这样，当 store 的状态发生变化时，相应的 props 也会更新，从而触发组件重新渲染。
+
+**mapDispatchToProps**
+
+mapDispatchToProps 可以是一个函数或对象，用于定义哪些 action creators 应该被绑定到组件的 props 上。如果是函数，则允许你手动 dispatch actions；如果是对象，则会自动绑定每个 action creator 到 dispatch 方法上。
+
+**定义 Action Types 和 Actions**
+```
+// actionTypes.js
+export const INCREMENT = 'INCREMENT';
+export const DECREMENT = 'DECREMENT';
+
+// actions.js
+import { INCREMENT, DECREMENT } from './actionTypes';
+
+export const increment = () => ({
+  type: INCREMENT,
+});
+
+export const decrement = () => ({
+  type: DECREMENT,
+});
+```
+**编写 Reducer**
+```
+// reducer.js
+import { INCREMENT, DECREMENT } from './actionTypes';
+
+const initialState = {
+  count: 0,
+};
+
+function counterReducer(state = initialState, action) {
+  switch (action.type) {
+    case INCREMENT:
+      return { ...state, count: state.count + 1 };
+    case DECREMENT:
+      return { ...state, count: state.count - 1 };
+    default:
+      return state;
+  }
+}
+
+export default counterReducer;
+```
+**创建 Store**
+```
+// store.js
+import { createStore } from 'redux';
+import counterReducer from './reducer';
+
+const store = createStore(counterReducer);
+
+export default store;
+```
+
+**使用 connect 连接 UI 组件**
+现在，我们创建一个纯 UI 组件，并使用 connect 将其与 Redux store 连接起来。
+
+```
+// CounterUI.js
+import React from 'react';
+
+function CounterUI({ count, onIncrement, onDecrement }) {
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={onIncrement}>Increment</button>
+      <button onClick={onDecrement}>Decrement</button>
+    </div>
+  );
+}
+
+export default CounterUI;
+```
+**然后，使用 connect 将这个 UI 组件转换为容器组件**
+```
+// connectCounter.js
+import { connect } from 'react-redux';
+import { increment, decrement } from './actions';
+import CounterUI from './CounterUI';
+
+// 将 state 映射到 props
+const mapStateToProps = (state) => ({
+  count: state.count,
+});
+
+// 将 action 映射到 props
+const mapDispatchToProps = {
+  onIncrement: increment,
+  onDecrement: decrement,
+};
+
+// 使用 connect 连接 UI 组件和 Redux store
+export default connect(mapStateToProps, mapDispatchToProps)(CounterUI);
+```
