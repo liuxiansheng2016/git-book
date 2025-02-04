@@ -25,3 +25,12 @@
 
 
 
+### 搭建步骤
+腾讯云 NPM 镜像：
+npm config set registry https://mirrors.cloud.tencent.com/npm/
+
+1 npm install -g create-react-app （npm uninstall -g create-react-app before install）
+
+2 npx create-react-app my-app (if use ts, npx create-react-app my-app --template typescript)
+
+3 cd my-app
