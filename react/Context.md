@@ -72,6 +72,7 @@ function CounterConsumer() {
 export default CounterConsumer;
 ```
 **使用 useContext Hook**
+```
 // CounterHook.js
 import React, { useContext } from 'react';
 import CountContext from './CountContext';
@@ -89,6 +90,7 @@ function CounterHook() {
 }
 
 export default CounterHook;
+```
 #### 4. 在主应用中使用这些组件
 最后，在主应用组件中使用这两个组件中的任何一个（或两者）来显示和操作计数器。
 ```
