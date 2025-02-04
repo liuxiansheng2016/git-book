@@ -686,3 +686,67 @@ React context
 
 useState 返回一个数组而不是对象的主要原因是，数组的解构赋值更加灵活。这样，你可以自由地命名你的状态变量和更新函数，而不是被迫使用像 this.state 和 this.setState 这样的命名。
 
+### setState
+异步更新：setState 是异步的，这意味着它不会立即更新状态。如果你试图在调用 setState 后立即访问最新的状态值，你可能会得到旧的状态值 25。
+```
+changeText() {
+  this.setState({
+    message: "你好啊"
+  })
+  console.log(this.state.message); // Hello World
+}
+```
+在上面的例子中，最终打印的结果为 Hello World，而不是 "你好啊"，因为在执行完 setState 之后并不能立刻拿到最新的 state 结果。
+回调函数：为了在状态更新后立即获取最新的状态值，可以传递一个回调函数作为 setState 的第二个参数。这个回调函数会在状态更新完成后执行 10。
+```
+changeText() {
+  this.setState({
+    message: "你好啊"
+  }, () => {
+    console.log(this.state.message); // 你好啊
+  });
+}
+```
+合并状态更新：如果在同一个事件循环中多次调用 setState 来更新相同的状态属性，React 会将这些更新合并，并只应用最后一次更新 1。
+```
+handleClick = () => {
+  this.setState({
+    count: this.state.count + 1,
+  })
+  console.log(this.state.count) // 1
+  
+  this.setState({
+    count: this.state.count + 1,
+  })
+  console.log(this.state.count) // 1
+  
+  this.setState({
+    count: this.state.count + 1,
+  })
+  console.log(this.state.count) // 1
+}
+```
+实际上等价于如下操作：
+```
+Object.assign(
+  previousState,
+  {count: state.count + 1},
+  {count: state.count + 1},
+  ...
+)
+```
+因为后面的数据会覆盖前面的更改，所以最终只增加了一次。
+批处理更新：对于依赖前一个状态的情况，推荐给 setState 传入一个函数，这样每次更新都会基于最新的状态进行 7。
+```
+onClick = () => {
+  this.setState((prevState, props) => {
+    return {count: prevState.count + 1};
+  });
+  
+  this.setState((prevState, props) => {
+    return {count: prevState.count + 1};
+  });
+}
+```
+通过这种方式，你可以确保每次更新都是基于最新的状态进行的，从而避免了由于状态合并导致的问题。此外，这种做法也支持 React 的批处理机制，有助于提高性能并减少不必要的渲染次数。
+
