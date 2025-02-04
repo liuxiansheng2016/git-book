@@ -230,3 +230,183 @@ function ExampleApplication() {
 不安全的生命周期
 
 过时 API
+
+### UseEffect 和 useLayoutEffect
+
+**执行时机**
+
+useEffect：在浏览器绘制之后执行。
+useLayoutEffect：在浏览器绘制之前同步执行。
+
+**阻塞性**
+
+useEffect：不会阻塞浏览器更新屏幕，因此更适合用于不需要立即更新 DOM 的副作用操作。
+useLayoutEffect：会阻塞浏览器更新屏幕，因此更适合用于需要在浏览器绘制之前读取或修改 DOM 的副作用操作。
+
+**性能影响**
+useEffect：由于不会阻塞浏览器更新屏幕，对性能的影响较小。
+
+useLayoutEffect：由于会阻塞浏览器更新屏幕，可能会导致性能下降，特别是当副作用操作复杂或耗时较长时。
+
+useEffect 导致屏幕闪烁或布局抖动的主要原因是它在浏览器绘制之后执行，这意味着在 useEffect 中进行的 DOM 操作或状态更新可能会在用户已经看到初始渲染结果之后发生，从而导致视觉上的不连贯或闪烁。
+
+**优化 useEffect 的使用**
+
+如果必须使用 useEffect，可以通过以下方法来减少闪烁或抖动的影响：
+
+延迟更新：
+```
+import React, { useEffect, useState } from 'react';
+
+function MyComponent() {
+  const [value, setValue] = useState(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      // 这里可以放置你需要执行的操作，比如从服务器获取数据
+      // 模拟异步操作
+      setTimeout(() => {
+        setValue('New Value');
+      }, 1000);
+    });
+  }, []); // 空数组意味着这个 effect 只会在组件挂载和卸载时运行
+
+  return (
+    <div>
+      {value === null ? 'Loading...' : value}
+    </div>
+  );
+}
+
+export default MyComponent;
+```
+
+使用 requestAnimationFrame 来延迟 DOM 更新，确保在下一个浏览器绘制周期中进行更新。
+
+条件渲染：
+```
+import React, { useEffect, useState } from 'react';
+
+function MyComponent() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 模拟数据获取
+    setTimeout(() => {
+      setData({ title: 'Hello World' });
+      setLoading(false);
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      <h1>{data.title}</h1>
+    </div>
+  );
+}
+
+export default MyComponent;
+```
+
+在初始渲染时显示一个占位符或加载状态，确保在 useEffect 中完成所有必要的操作后再显示最终内容。
+
+为什么 useLayoutEffect 在 SSR 中不可用？
+
+**缺少浏览器环境**：服务器端没有浏览器环境，因此无法访问 DOM，也无法执行与 DOM 相关的操作。
+
+**同步执行**：useLayoutEffect 需要在浏览器绘制之前同步执行，而服务器端渲染是在服务器上完成的，没有浏览器绘制的概念
+
+### React 事件传参数
+
+**使用箭头函数**
+
+箭头函数可以方便地将额外的参数传递给事件处理函数。下面是一个例子：
+```
+<button onClick={(event) => this.handleClick(id, event)}>点击我</button>
+```
+在这个例子中，handleClick 函数接收 id 和 event 作为参数。
+
+**使用 bind 方法**
+
+另一种方法是使用 Function.prototype.bind() 来预设部分参数：
+```
+<button onClick={this.handleClick.bind(this, id)}>点击我</button>
+```
+
+### React 事件绑定
+
+**1. 在构造函数中使用 bind 方法**
+
+这是 React 官方推荐的方法之一，它是在组件的构造函数中对需要使用的类方法进行 this 绑定。这样做的好处是性能较好，因为绑定只会在组件实例化时发生一次。
+
+```
+class MyComponent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    console.log('Clicked!');
+  }
+
+  render() {
+    return <button onClick={this.handleClick}>Click Me</button>;
+  }
+}
+```
+**3. 定义阶段使用箭头函数绑定**
+
+而当你使用属性初始化器来定义类方法时，比如：
+```
+class MyComponent extends React.Component {
+  handleClick = () => {
+    console.log('Clicked!');
+  };
+
+  render() {
+    return <button onClick={this.handleClick}>Click Me</button>;
+  }
+}
+```
+在这种情况下，handleClick 是作为一个类的字段（Field）来定义的，它在组件实例化时就被创建了一次，并且不会在每次渲染时重新创建。这使得它比直接在 JSX 中定义匿名箭头函数更高效。
+
+**3. 在 JSX 中使用箭头函数**
+
+当你直接在 JSX 的事件处理属性中定义一个匿名的箭头函数时，例如：
+```
+class MyComponent extends React.Component {
+  render() {
+    return <button onClick={() => this.handleClick()}>Click Me</button>;
+  }
+
+  handleClick() {
+    console.log('Clicked!');
+  }
+}
+```
+这种做法每次组件渲染时都会创建一个新的函数实例，因为匿名箭头函数是在 render 方法内定义的。这样做可能导致性能问题，尤其是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染。
+
+**4. 在 JSX 中直接使用 bind**
+
+你可以在 JSX 的事件属性中直接使用 bind 方法来绑定事件处理函数。例如：
+
+```
+class MyComponent extends React.Component {
+  handleClick() {
+    console.log('Clicked!');
+  }
+
+  render() {
+    return <button onClick={this.handleClick.bind(this)}>Click Me</button>;
+  }
+}
+```
+这种方法的问题在于每次组件重新渲染时都会创建一个新的函数实例，这可能会导致性能问题，特别是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染15。
+
+
