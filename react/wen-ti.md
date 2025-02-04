@@ -201,3 +201,32 @@ element 其实就基本就可以解释为 Virtual DOM
 
 #### Component
 ReactComponent 则是可以接收参数输入并且返回某个 ReactElement 的函数或者类.
+
+### React 严格模式
+React.StrictMode
+
+严格模式检查仅仅在开发模式运行。
+```
+import React from 'react';
+
+function ExampleApplication() {
+  return (
+    <div>
+      <Header />
+      {/* 使用 StrictMode 包裹部分子组件 */}
+      <React.StrictMode>
+        <div>
+          <ComponentOne />
+          <ComponentTwo />
+        </div>
+      </React.StrictMode>
+      <Footer />
+    </div>
+  );
+}
+```
+在上述的示例中，不会对 Header 和 Footer 组件运行严格模式检查。但是，ComponentOne 和 ComponentTwo 以及它们的所有后代元素都将进行检查。
+
+不安全的生命周期
+
+过时 API
