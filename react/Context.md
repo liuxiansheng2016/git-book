@@ -1,3 +1,5 @@
+https://zh-hans.legacy.reactjs.org/docs/context.html
+
 ### Context
 创建 Context：使用 React.createContext 创建一个上下文对象。
 
@@ -119,6 +121,34 @@ export default App;
 Consumer：每次 Context 值变化时，Consumer 组件会重新渲染。如果组件树很深，可能会导致性能问题。
 
 useContext：React 会优化 useContext 的性能，只有当 Context 值变化时，使用 useContext 的组件才会重新渲染。
+
+### 在类组件中使用 contextType
+接下来，在类组件中使用 contextType 来访问上下文。你需要将 contextType 设置为对应的 Context 对象，并且可以通过 this.context 访问上下文中的值。
+```
+// CounterClassComponent.js
+import React from 'react';
+import { CountContext } from './CountContext';
+
+class CounterClassComponent extends React.Component {
+  // 使用 static contextType 指定要使用的 Context
+  static contextType = CountContext;
+
+  render() {
+    // 通过 this.context 访问 Context 中的数据和方法
+    const { count, increment, decrement } = this.context;
+    
+    return (
+      <div>
+        <h1>Count (Class Component): {count}</h1>
+        <button onClick={increment}>Increment</button>
+        <button onClick={decrement}>Decrement</button>
+      </div>
+    );
+  }
+}
+
+export default CounterClassComponent;
+```
 
 ### Redux 和 context 对比
 
