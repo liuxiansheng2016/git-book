@@ -2,6 +2,11 @@
 
 ## 基本写法
 
+### 何时使用类组件和函数组件?
+
+如果组件需要使用**状态或生命周期方法**，那么使用类组件，否则使用函数组件。
+
+
 ### 函数组件
 
 <pre class="language-javascript"><code class="lang-javascript">Import react from “react”
