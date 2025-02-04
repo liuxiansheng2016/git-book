@@ -650,7 +650,288 @@ ReactDOM.render(<MyComponentWithPersistentData />, document.getElementById('root
 
 ### 受控组件
 类似于表单元素会维护自身的状态，基于用户输入更新
-在使用表单来收集用户输入时，例如<input><select><textearea>等元素都要绑定一个 change 事件，当表单的状态发生变化，就会触发 onChange 事件，更新组件的 state。这种组件在 React 中被称为受控组件
+在使用表单来收集用户输入时，例如\<input>\<select>\<textearea>等元素都要绑定一个 change 事件，当表单的状态发生变化，就会触发 onChange 事件，更新组件的 state。这种组件在 React 中被称为受控组件
+
+### Purecomponent
+React 创建了 PureComponent 组件创建了默认的 shouldComponentUpdate 行为。
+这个默认的 shouldComponentUpdate 行为会一一比较 props 和 state 中所有的属性，只有当其中任意一项发生改变是，才会进行重绘。
+
+需要注意的是，PureComponent 使用浅比较判断组件是否需要重绘
+
+因此，下面对数据的修改并不会导致重绘（假设 Table 也是 PureComponent)
+```
+options.push(new Option())
+
+options.splice(0, 1)
+
+options[i].name = "Hello"
+```
+这些例子都是在原对象上进行修改，由于浅比较是比较指针的异同，所以会认为不需要进行重绘。
 
 
 
+### 传递数据
+
+Props 传递参数
+
+Props 传递方法
+
+Ref 获取组件的实例
+
+Redux
+
+React context
+
+发布订阅
+
+### 为什么 useState 要使用数组而不是对象 ？
+useState 返回一个数组而不是对象的主要原因是，数组的解构赋值更加灵活。这样，你可以自由地命名你的状态变量和更新函数，而不是被迫使用像 this.state 和 this.setState 这样的命名。
+
+### setState
+异步更新：setState 是异步的，这意味着它不会立即更新状态。如果你试图在调用 setState 后立即访问最新的状态值，你可能会得到旧的状态值 25。
+```
+changeText() {
+  this.setState({
+    message: "你好啊"
+  })
+  console.log(this.state.message); // Hello World
+}
+```
+在上面的例子中，最终打印的结果为 Hello World，而不是 "你好啊"，因为在执行完 setState 之后并不能立刻拿到最新的 state 结果。
+回调函数：为了在状态更新后立即获取最新的状态值，可以传递一个回调函数作为 setState 的第二个参数。这个回调函数会在状态更新完成后执行 10。
+```
+changeText() {
+  this.setState({
+    message: "你好啊"
+  }, () => {
+    console.log(this.state.message); // 你好啊
+  });
+}
+```
+合并状态更新：如果在同一个事件循环中多次调用 setState 来更新相同的状态属性，React 会将这些更新合并，并只应用最后一次更新 1。
+```
+handleClick = () => {
+  this.setState({
+    count: this.state.count + 1,
+  })
+  console.log(this.state.count) // 1
+  
+  this.setState({
+    count: this.state.count + 1,
+  })
+  console.log(this.state.count) // 1
+  
+  this.setState({
+    count: this.state.count + 1,
+  })
+  console.log(this.state.count) // 1
+}
+```
+实际上等价于如下操作：
+```
+Object.assign(
+  previousState,
+  {count: state.count + 1},
+  {count: state.count + 1},
+  ...
+)
+```
+因为后面的数据会覆盖前面的更改，所以最终只增加了一次。
+批处理更新：对于依赖前一个状态的情况，推荐给 setState 传入一个函数，这样每次更新都会基于最新的状态进行 7。
+```
+onClick = () => {
+  this.setState((prevState, props) => {
+    return {count: prevState.count + 1};
+  });
+  
+  this.setState((prevState, props) => {
+    return {count: prevState.count + 1};
+  });
+}
+```
+通过这种方式，你可以确保每次更新都是基于最新的状态进行的，从而避免了由于状态合并导致的问题。此外，这种做法也支持 React 的批处理机制，有助于提高性能并减少不必要的渲染次数。
+
+### 组件间通信
+1. 父组件向子组件传递
+   props
+2. 子组件向父组件传递
+  父组件向子组件传一个函数，然后通过这个函数的回调
+3.兄弟组件之间的通信
+  则父组件作为中间层来实现数据的互通，通过使用父组件传递
+4.父组件向后代组件传递
+  使用 context 提供了组件之间通讯的一种方式
+5.非关系组件传递
+ 建议将数据进行一个全局资源管理 redux
+
+### ErrorBoundary
+组件内异常，也就是异常边界组件能够捕获的异常，主要包括：
+
+1. 渲染过程中异常；
+2. 生命周期方法中的异常；
+3. 子组件树中各组件的 constructor 构造函数中异常。
+   
+不能捕获的异常，主要是异步及服务端触发异常：
+1.事件处理器中的异常；
+  处理方法： 使用 try/catch 代码进行捕获
+2. 异步任务异常，如 setTiemout，ajax 请求异常等；
+   处理方法：使用全局事件 window.addEventListener 捕获
+3. 服务端渲染异常；
+4. 异常边界组件自身内的异常；
+  处理方法：将边界组件和业务组件分离，各司其职，不能在边界组件中处理逻辑代码，也不能在业务组件中使用 didcatch
+
+**错误边界（Error Boundaries）:**
+
+错误边界是在 React 16 中引入的一个特性，它允许你捕捉发生在其子组件树任何位置的 JavaScript 错误，并且不会让整个组件树崩溃。错误边界可以是任何类组件或函数组件，只要它们定义了特定的生命周期方法或 hook。
+
+形成错误边界组件的两个条件：
+
+使用了 static getDerivedStateFromError()
+
+使用了 componentDidCatch()
+
+抛出错误后，请使用 static getDerivedStateFromError() 渲染备用 UI ，使用 componentDidCatch() 处理错误
+
+### Key
+提供唯一的 key 可以帮助 React 更快地识别和更新元素，从而提高性能。当列表中有大量元素时，这一点尤为重要。
+
+1.使用唯一标识符：确保提供的 key 是唯一的，并且在每次渲染时都保持一致。
+
+2.避免使用索引作为 key：如果列表项的位置可能会改变，避免使用索引作为 key，因为这会导致不必要的重新渲染。
+
+3.使用稳定的标识符：如果可能，使用来自数据源的稳定标识符（如数据库 ID）作为 key。
+
+
+### 展示组件和 容器组件
+展示组件更关心 UI
+
+容器组件 更关心组件如何运作的，通常是有状态的
+
+### Fiber
+在 React 16 中引入了 Fiber 架构，这一架构是为了解决原有实现的一些限制和问题。
+
+#### 为什么采用 Fiber 架构？
+1. 并发渲染（Concurrency）
+React 之前的实现是基于 Stack（栈）驱动的，这意味着在渲染期间，如果有一个长任务正在进行，那么整个 UI 都会被阻塞，直到这个任务完成。这对于用户体验来说是非常不利的，特别是在大型应用中，长任务可能会导致应用变得无响应。Fiber 架构的设计是为了支持并发渲染，即在渲染过程中能够中断并恢复，从而允许 React 在渲染过程中插入其他工作，如处理用户输入，使应用更加流畅。
+
+2. 更好的错误处理
+Fiber 结构提供了更好的错误处理机制。每个 Fiber 节点都有一个指向父节点的指针，这使得错误处理更加容易，因为可以在树的任意位置中断渲染，捕获错误，并且可以选择性地重试。
+
+3. 细粒度的更新
+Fiber 架构使得 React 可以更好地追踪每个组件的状态，因为每个 Fiber 节点都可以保存其自己的工作进度。这意味着 React 可以在需要的时候回溯到之前的某个状态，或者在某个点暂停渲染，稍后再继续。
+
+4. 改进的性能
+Fiber 结构通过将工作分解成更小的任务来改进性能。每个 Fiber 节点代表一个单独的工作单元，React 可以根据优先级调度这些单元，这样就可以优先处理重要的更新，而将次要的更新推迟。
+
+5. 更灵活的更新逻辑
+由于 Fiber 结构的引入，React 可以更灵活地管理更新逻辑。例如，通过 getDerivedStateFromProps 和 getSnapshotBeforeUpdate 生命周期方法，React 可以在渲染的不同阶段收集信息并做出决策。
+
+6. 可中断性和优先级
+Fiber 结构允许 React 在渲染过程中中断，这意味着 React 可以根据优先级来安排渲染任务，比如先渲染高优先级的任务，然后再处理低优先级的任务。
+
+#### fiber 架构的工作原理
+Fiber 架构的核心思想是将工作分割成更小的单位，并且可以中断这些单位的工作，以便在需要时恢复。
+
+**下面是一个简化的 Fiber 架构的工作原理概述：**
+
+Fiber 节点结构
+每个 Fiber 节点都是一个对象，包含以下属性：
+
+**Type**: 表示节点的类型，如类组件、函数组件、DOM 元素等。
+
+**Key**: 用于唯一标识兄弟节点。
+
+**State Node**: 实际的 DOM 节点或组件实例。
+
+**Child/Sibling/Return**: 指向子节点、同级节点以及父节点的指针。
+
+**Work In Progress**: 当前正在执行的工作副本。
+
+**Flags/Effects**: 记录当前节点的副作用，如需要添加、删除或更新 DOM。
+
+**Priority**: 工作的优先级。
+
+**Tag**: 标记节点的类型，如同步、异步等。
+
+#### 工作循环（Work Loop）
+
+React 使用一个工作循环来处理渲染任务。这个循环是可中断的，意味着它可以被中断并在后续的时间片中恢复。工作循环的基本步骤如下：
+
+**初始化**：当需要更新组件时，React 创建一个根 Fiber 节点，并启动工作循环。
+
+**调度**：React 使用调度器（Scheduler）来确定何时执行渲染工作。调度器考虑优先级和其他系统负载来决定何时执行工作。
+
+**执行**：在每个时间片内，React 处理一小部分工作，例如，遍历虚拟 DOM 树的一部分，计算差异，等等。
+
+**中断**：如果时间片结束或有更高优先级的任务到来，React 会中断当前的工作，并保存所有的工作进度。
+
+**恢复**：当再次获得执行时间时，React 会从中断的地方恢复工作，直到所有的工作都完成。
+
+**提交**：当所有的工作都完成时，React 会执行提交阶段，将实际的 DOM 更新操作应用到界面上。
+
+#### 主要阶段
+Fiber 架构的工作流程主要包括以下两个主要阶段：
+
+**1. Render Phase（渲染阶段）**
+在渲染阶段，React 会根据最新的状态和属性构建新的虚拟 DOM 树。这个阶段涉及到：
+
+**递归遍历**：遍历整个虚拟 DOM 树，为每个节点创建或更新对应的 Fiber 节点。
+
+**计算差异**：比较新的虚拟 DOM 树与旧的虚拟 DOM 树之间的差异。
+
+**中断与恢复**：如果需要，中断当前的工作并在下一个时间片恢复。
+
+**2. Commit Phase（提交阶段）**
+提交阶段是在新的虚拟 DOM 树构建完成后发生的，它涉及到：
+
+**更新 DOM**：将计算出的差异应用到真实的 DOM 上。
+
+**执行副作用**：如调用生命周期方法、执行回调等。
+
+**清理工作**：清理不再需要的 Fiber 节点。
+
+### useImperativeHandle
+useImperativeHandle 是 React Hooks 中的一个 Hook，它用于自定义父组件通过 ref 访问子组件实例时的行为。这个 Hook 可以让你指定当一个父组件获取一个子组件的 ref 时，希望暴露哪些方法或值给父组件。这样可以让你控制父组件如何与子组件交互。
+
+useImperativeHandle 的用途
+**暴露方法**：允许子组件向父组件暴露方法，以便父组件可以调用这些方法。
+**定制 ref 行为**：让你能够自定义暴露给父组件的 ref 对象的值或方法，使得父组件能够按照预期的方式与子组件交互。
+useImperativeHandle 的基本用法
+useImperativeHandle(ref, createHandle, [input])
+**
+ref**：由父组件传递给子组件的 ref 对象。
+createHandle：一个函数，返回一个对象，该对象包含了希望暴露给父组件的方法或值。
+input：可选的依赖数组，用于确定何时重新创建 createHandle 函数的结果。
+使用示例
+```
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
+
+const ChildComponent = forwardRef((props, ref) => {
+  const [count, setCount] = useState(0);
+
+  useImperativeHandle(ref, () => ({
+    increment: () => setCount(prevCount => prevCount + 1),
+    getCount: () => count,
+  }));
+
+  return <div>Count: {count}</div>;
+});
+
+export default ChildComponent;
+
+import React, { useRef } from 'react';
+import ChildComponent from './ChildComponent';
+
+const ParentComponent = () => {
+  const childRef = useRef();
+
+  return (
+    <div>
+      <ChildComponent ref={childRef} />
+      <button onClick={() => childRef.current.increment()}>Increment</button>
+      <button onClick={() => alert(childRef.current.getCount())}>Show Count</button>
+    </div>
+  );
+};
+
+export default ParentComponent;
+```
