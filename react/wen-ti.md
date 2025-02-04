@@ -530,3 +530,159 @@ Immutable 通过 is 方法则可以完成对比，而无需像一样通过深度
 父组件更新：如果组件的父组件发生更新，就会导致组件本身的更新，render 方法会被调用。
 
 强制更新：通过调用组件实例的 forceUpdate 方法可以强制组件进行更新，即使组件的 props 和 state 没有发生变化，render 方法也会执行。
+
+
+### React.createClass 和 extends Component 的区别
+React.createClass 和 extends Component 的 bai 区别主要在于：
+
+（1）语法区别
+
+createClass 本质上是一个工厂函数，extends 的方式更加接近最新的 ES6 规范的 class 写法。两种方式在语法上的差别主要体现在方法的定义和静态属性的声明上。
+
+createClass 方式的方法定义使用逗号，隔开，因为 creatClass 本质上是一个函数，传递给它的是一个 Object；而 class 的方式定义方法时务必谨记不要使用逗号隔开，这是 ES6 class 的语法规范。
+
+（2）propType 和 getDefaultProps
+
+React.createClass：通过 proTypes 对象和 getDefaultProps()方法来设置和获取 props.
+
+React.Component：通过设置两个属性 propTypes 和 defaultProps
+
+（3）状态的区别
+
+React.createClass：通过 getInitialState()方法返回一个包含初始值的对象
+
+React.Component：通过 constructor 设置初始状态
+
+（4）this 区别
+
+React.createClass：会正确绑定 this
+
+React.Component：由于使用了 ES6，这里会有些微不同，属性并不会自动绑定到 React 类的实例上。
+
+（5）Mixins
+
+React.createClass：使用 React.createClass 的话，可以在创建组件时添加一个叫做 mixins 的属性，并将可供混合的类的集合以数组的形式赋给 mixins。
+
+如果使用 ES6 的方式来创建组件，那么 React mixins 的特性将不能被使用了。
+
+```
+
+import React from 'react';
+
+let MyMixin = {
+   doSomething(){}
+}
+
+let TodoItem = React.createClass({
+   mixins: [MyMixin], // add mixin
+   render(){
+      return <div></div>
+  }
+})
+```
+
+### 为什么 reducer 是一个纯函数
+redux 源代码中将 oldState 和 newState（reducer 返回的结果）做比较，如果 reducer 为非纯函数，两者指向同一个地址，导致 react 认为 state 无变化，从而不更新页面。
+
+### 高阶组件
+一个高阶组件就是一个函数，接受一个组件作为输入，然后返回一个新的组件作为结果。
+
+1 重用代码
+
+2.修改现有组件的行为，， 比如使用第三方组件，独立于原有的组件，可以产生新组件，对原组件没有侵害。
+
+**约定**
+
+props 保持一致
+你不能在函数式（无状态）组件上使用 ref 属性，因为它没有实例
+不要以任何方式改变原始组件 WrappedComponent
+透传不相关 props 属性给被包裹的组件 WrappedComponent
+不要再 render() 方法中使用高阶组件
+使用 compose 组合高阶组件
+包装显示名字以便于调试
+
+```
+import React, { Component } from 'react';
+
+// 定义高阶组件 withPersistentData
+function withPersistentData(WrappedComponent, storageKey) {
+  return class extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        data: null,
+      };
+    }
+
+    componentDidMount() {
+      // 在组件挂载后尝试从 localStorage 获取数据
+      const data = localStorage.getItem(storageKey);
+      if (data !== null) {
+        this.setState({ data: JSON.parse(data) });
+      }
+    }
+
+    render() {
+      // 将数据通过 props 传递给被包裹的组件
+      return <WrappedComponent {...this.props} data={this.state.data} />;
+    }
+  };
+}
+
+// 定义一个简单的展示组件 MyComponent2
+class MyComponent2 extends React.Component {
+  render() {
+    const { data } = this.props;
+    return (
+      <div>
+        {data ? `Cached Data: ${data}` : 'No cached data found.'}
+      </div>
+    );
+  }
+}
+
+// 使用高阶组件包装 MyComponent2，指定存储键为 'myData'
+const MyComponentWithPersistentData = withPersistentData(MyComponent2, 'myData');
+
+// 渲染带有缓存功能的组件
+ReactDOM.render(<MyComponentWithPersistentData />, document.getElementById('root'));
+```
+
+
+### 受控组件
+类似于表单元素会维护自身的状态，基于用户输入更新
+
+在使用表单来收集用户输入时，例如<input><select><textearea>等元素都要绑定一个 change 事件，当表单的状态发生变化，就会触发 onChange 事件，更新组件的 state。这种组件在 React 中被称为受控组件
+
+### Purecoponnet
+React 创建了 PureComponent 组件创建了默认的 shouldComponentUpdate 行为。这个默认的 shouldComponentUpdate 行为会一一比较 props 和 state 中所有的属性，只有当其中任意一项发生改变是，才会进行重绘。
+
+需要注意的是，PureComponent 使用浅比较判断组件是否需要重绘
+
+因此，下面对数据的修改并不会导致重绘（假设 Table 也是 PureComponent)
+
+options.push(new Option())
+
+options.splice(0, 1)
+
+options[i].name = "Hello"
+
+这些例子都是在原对象上进行修改，由于浅比较是比较指针的异同，所以会认为不需要进行重绘。
+
+### 传递数据
+Props 传递参数
+
+Props 传递方法
+
+Ref 获取组件的实例
+
+Redux
+
+React context
+
+发布订阅
+
+### 为什么 useState 要使用数组而不是对象 ？
+
+useState 返回一个数组而不是对象的主要原因是，数组的解构赋值更加灵活。这样，你可以自由地命名你的状态变量和更新函数，而不是被迫使用像 this.state 和 this.setState 这样的命名。
+
