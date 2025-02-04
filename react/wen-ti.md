@@ -1,3 +1,5 @@
+# 问题
+
 ### ReactDOM
 **1. ReactDOM.render()**
 用途：这是最常用的 API 之一，用于将 React 元素渲染到提供的容器中并返回对 mounted 实例的引用。
@@ -192,3 +194,10 @@ const ParentComponent = () => {
 export default ParentComponent;
 ```
 在这个例子中，我们通过 useRef 创建了一个 ref，并将其传递给了 MyInput 组件。这样，我们就可以在父组件中通过 inputRef 访问到 MyInput 组件的 DOM 节点，并对其进行操作。
+
+### Element 和 componnet
+#### Element
+element 其实就基本就可以解释为 Virtual DOM
+
+#### Component
+ReactComponent 则是可以接收参数输入并且返回某个 ReactElement 的函数或者类.
