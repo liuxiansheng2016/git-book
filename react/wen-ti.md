@@ -409,4 +409,124 @@ class MyComponent extends React.Component {
 ```
 这种方法的问题在于每次组件重新渲染时都会创建一个新的函数实例，这可能会导致性能问题，特别是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染15。
 
+### React 事件机制
+React 并不是将 click 事件绑定到了 div 的真实 DOM 上，而是在 document 处监听了所有的事件，当事件发生并且冒泡到 document 处的时候，React 将事件内容封装并交由真正的处理函数运行。这样的方式不仅仅减少了内存的消耗，还能在组件挂在销毁时统一订阅和移除事件。
 
+除此之外，冒泡到 document 上的事件也不是原生的浏览器事件，而是由 react 自己实现的合成事件（SyntheticEvent）。因此如果不想要是事件冒泡的话
+
+应该调用 event.preventDefault()方法，而不是调用 event.stopProppagation()方法。
+
+**目的：**
+
+兼容所有浏览器，更好的跨平台；
+
+将事件统一存放在一个数组（事件池），避免频繁的新增与删除（垃圾回收）。
+
+方便 react 统一管理和事务机制。
+
+### React 的事件和普通的 HTML 事件有什么不同？
+对于事件名称命名方式，原生事件为全小写，react 事件采用小驼峰；
+
+对于事件函数处理语法，原生事件为字符串，react 事件为函数；
+
+react 事件不能采用 return false 的方式来阻止浏览器的默认行为，而必须要地明确地调用 preventDefault()来阻止默认行为。
+
+事件的执行顺序为原生事件先执行，合成事件后执行，合成事件会冒泡绑定到 document 上，所以尽量避免原生事件与合成事件混用，如果原生事件阻止冒泡，可能会导致合成事件不执行，因为需要冒泡到 document 上合成事件才会执行
+
+### React 组件中怎么做事件代理？它的原理是什么？
+React 基于 Virtual DOM 实现了一个 SyntheticEvent 层（合成事件层），定义的事件处理器会接收到一个合成事件对象的实例，它符合 W3C 标准，且与原生的浏览器事件拥有同样的接口，支持冒泡机制，所有的事件都自动绑定在最外层上。
+
+在 React 底层，主要对合成事件做了两件事：
+
+事件委派： React 会把所有的事件绑定到结构的最外层，使用统一的事件监听器，这个事件监听器上维持了一个映射来保存所有组件内部事件监听和处理函数。
+
+自动绑定： React 组件中，每个方法的上下文都会指向该组件的实例，即自动绑定 this 为当前组件
+
+### React-为什么不要直接改 state
+直接修改 react react 不会重新渲染，setstate 是异步的
+
+我们在改变 state 的时候，需要重新生成一个对象去代替原来的 state，而不是直接改原来的
+
+如果连续写多次 setState，会将多次 setState 的状态修改合并成一次状态修改。
+
+### 函数式组件没有生命周期
+没有继承 React.Component,由于生命周期函数是 React.Component 类的方法实现的,所以没继承这个类,自然就没法使用生命周期函数
+
+### 如何提高组件的渲染效率
+1.子组件执行 shouldcomponentUpdate 接收两个参数控制是否渲染
+
+使用 React.PureComponent
+3. React 提供了一个辅助对象来实现浅比较(shallowCompare)这种模式 - 继承自 React.PureComponent。当组件更新时，如果组件的 props 和 state 都没发生改变，render 方法就不会触发，省去 Virtual DOM 的生成和比对过程，达到提升性能的目的。
+
+4. immutable.js 不可突变的数据结构
+
+Immutable Data 就是一旦创建，就不能再被更改的数据。对 Immutable 对象的任何修改或添加删除操作都会返回一个新的 Immutable 对象。Immutable 实现的原理是 Persistent Data Structure（持久化数据结构），也就是使用旧数据创建新数据时，要保证旧数据同时可用且不变
+
+#### Immutable 的好处
+**可预测性**：由于不可变对象不会改变，因此它们的行为更加可预测。
+**易于调试**：状态不变意味着更容易追踪 bug，因为你可以确定某个状态在某个时间点的值。
+**性能优化**：React 利用浅比较（shallow comparison）来决定是否重新渲染组件。不可变数据结构可以提高这种优化的有效性。
+**并发安全**：不可变数据结构在多线程环境下更容易处理，因为不存在数据竞争（race conditions）的问题。
+**易于理解**：不可变数据使得代码更容易理解和维护
+最常用的库之一是 Immutable.js，它提供了一系列不可变的数据结构，如 Map, List, Set 等。
+
+##### 使用 Redux 与 Immutable 数据
+
+Redux 是一个流行的用于状态管理的库，可以结合 Immutable 数据结构来提高性能。
+
+在使用 redux 过程中也可以结合 Immutable，不使用 Immutable 前修改一个数据需要做一个深拷贝
+
+**初始化 Store：**
+
+当你创建 Redux store 时，需要使用 redux-immutable 提供的 combineReducers 函数代替原生的 Redux 版本。这是因为你需要确保整个 state tree 都是由 Immutable.js 对象组成的。
+```
+import { combineReducers } from 'redux-immutable';
+import { createStore } from 'redux';
+import { Map } from 'immutable';
+
+const rootReducer = combineReducers({
+  // your reducers here
+});
+
+const initialState = Map();
+const store = createStore(rootReducer, initialState);
+```
+
+**编写 Reducers：**
+
+你的 reducers 需要返回 Immutable.js 的数据结构。例如，你可以使用 Map 和 List 来代替普通的 JavaScript 对象和数组。
+```
+function counter(state = Map({ count: 0 }), action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return state.set('count', state.get('count') + 1);
+    default:
+      return state;
+  }
+}
+```
+**连接 React 组件：**
+
+当你使用 react-redux 的 connect 函数将 React 组件与 Redux store 连接起来时，记得从 Immutable.js 对象中提取数据。例如，如果你的状态是一个 Map，你应该使用 .get() 方法而不是点操作符来访问属性。
+```
+const mapStateToProps = (state) => ({
+  count: state.get('count')
+});
+```
+在做 react 性能优化的时候，为了避免重复渲染，我们会在 shouldComponentUpdate()中做对比，当返回 true 执行 render 方法
+
+Immutable 通过 is 方法则可以完成对比，而无需像一样通过深度比较的方式比较
+
+### Render 方法调用
+
+当使用 this.setState()
+当你的组件收到新的 props
+当 this.forceUpdate()被叫时。
+
+初始化：当组件被创建并被插入到 DOM 中时，会触发初始渲染，render 方法会被调用。
+
+更新：当组件的 props 或 state 发生改变时，会触发组件的更新。在更新过程中，React 会检查组件之前的虚拟 DOM 数和当前的虚拟 DOM 树的差异，然后只更新发生变化的部分。在更新过程中，render 方法会再次被调用。
+
+父组件更新：如果组件的父组件发生更新，就会导致组件本身的更新，render 方法会被调用。
+
+强制更新：通过调用组件实例的 forceUpdate 方法可以强制组件进行更新，即使组件的 props 和 state 没有发生变化，render 方法也会执行。
