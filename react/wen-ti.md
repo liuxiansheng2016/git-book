@@ -885,7 +885,7 @@ return this.props.children
 
 3.使用稳定的标识符：如果可能，使用来自数据源的稳定标识符（如数据库 ID）作为 key。
 
- 数组中使用的键在其同级中应该是唯一的，但它们不需要是全局唯一的。也就是说，你可以在两个不同的数组中使用相同的键![Uploading image.png…]()
+ 数组中使用的键在其同级中应该是唯一的，但它们不需要是全局唯一的。也就是说，你可以在两个不同的数组中使用相同的键![image](https://github.com/user-attachments/assets/02006610-95d5-4e50-9f4c-d10e6e5e4d59)
 
 
 
@@ -1138,4 +1138,13 @@ class MyComponent extends React.Component {
   /* only rerenders if props change */
  });
 
-![Uploading image.png…]()
+
+### 严格模式有什么好处?
+
+     在下面的情况下，<StrictMode> 将有所帮助：
+
+     1. 使用 **unsafe lifecycle methods** 标识组件。
+     2. 有关 **legacy string ref** API 用法发出警告。
+     3. 检测无法预测的 **side effects**。
+     4. 检测 **legacy context** API。
+     5. 有关已弃用的 findDOMNode 用法的警告。![Uploading image.png…]()
