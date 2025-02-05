@@ -30,6 +30,19 @@ ReactDOM.unmountComponentAtNode(document.getElementById('root'));
 ```
 如果成功卸载了组件，则返回 true；如果没有组件被卸载，则返回 false。
 
+**4. ReactDOM.hydrate**
+专门设计用来配合 SSR 使用。它不会重新创建已经存在于页面上的 DOM 节点，而是尝试复用它们，并在此基础上添加事件监听器等交互逻辑，使静态页面变得动态和交互式。
+```
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App'; // 假设这是你的根组件
+
+// 客户端入口文件
+if (typeof document !== 'undefined') {
+  ReactDOM.hydrate(<App />, document.getElementById('root'));
+}
+```
+
 ### Fragments
 React 还提供了用于减少不必要嵌套的组件。
 
@@ -790,6 +803,40 @@ onClick = () => {
 使用了 componentDidCatch()
 
 抛出错误后，请使用 static getDerivedStateFromError() 渲染备用 UI ，使用 componentDidCatch() 处理错误
+  ```jsx 
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props)
+        this.state = { hasError: false }
+      }
+
+      componentDidCatch(error, info) {
+        // You can also log the error to an error reporting service
+        logErrorToMyService(error, info)
+      }
+
+      static getDerivedStateFromError(error) {
+         // Update state so the next render will show the fallback UI.
+         return { hasError: true };
+       }
+
+      render() {
+        if (this.state.hasError) {
+          // You can render any custom fallback UI
+          return <h1>{'Something went wrong.'}</h1>
+        }
+        return this.props.children
+      }
+    }
+    ```
+
+    之后，将其作为常规组件使用：
+
+    ```jsx 
+    <ErrorBoundary>
+      <MyWidget />
+    </ErrorBoundary>
+    ```
 
 ### Key
 提供唯一的 key 可以帮助 React 更快地识别和更新元素，从而提高性能。当列表中有大量元素时，这一点尤为重要。
@@ -893,8 +940,11 @@ Fiber 架构的工作流程主要包括以下两个主要阶段：
 useImperativeHandle 是 React Hooks 中的一个 Hook，它用于自定义父组件通过 ref 访问子组件实例时的行为。这个 Hook 可以让你指定当一个父组件获取一个子组件的 ref 时，希望暴露哪些方法或值给父组件。这样可以让你控制父组件如何与子组件交互。
 
 useImperativeHandle 的用途
+
 **暴露方法**：允许子组件向父组件暴露方法，以便父组件可以调用这些方法。
+
 **定制 ref 行为**：让你能够自定义暴露给父组件的 ref 对象的值或方法，使得父组件能够按照预期的方式与子组件交互。
+
 useImperativeHandle 的基本用法
 useImperativeHandle(ref, createHandle, [input])
 **
