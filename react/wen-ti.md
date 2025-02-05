@@ -42,6 +42,43 @@ if (typeof document !== 'undefined') {
   ReactDOM.hydrate(<App />, document.getElementById('root'));
 }
 ```
+### ReactDOMServer 是什么?
+
+    `ReactDOMServer` 对象使你能够将组件渲染为静态标记（通常用于 Node 服务器中），此对象主要用于服务端渲染（SSR）。以下方法可用于服务器和浏览器环境：
+
+    1. `renderToString()`
+    2. `renderToStaticMarkup()`
+
+    例如，你通常运行基于 Node 的 Web 服务器，如 Express，Hapi 或 Koa，然后你调用 `renderToString` 将根组件渲染为字符串，然后作为响应进行发送。
+
+    ```javascript
+    // using Express
+    import { renderToString } from 'react-dom/server'
+    import MyPage from './MyPage'
+
+    app.get('/', (req, res) => {
+      res.write('<!DOCTYPE html><html><head><title>My Page</title></head><body>')
+      res.write('<div id="content">')
+      res.write(renderToString(<MyPage/>))
+      res.write('</div></body></html>')
+      res.end()
+    })
+    ```
+### 在 React 中如何使用 innerHTML?
+
+    `dangerouslySetInnerHTML` 属性是 React 用来替代在浏览器 DOM 中使用 `innerHTML`。与 `innerHTML` 一样，考虑到跨站脚本攻击（XSS），使用此属性也是有风险的。使用时，你只需传递以 `__html` 作为键，而 HTML 文本作为对应值的对象。
+
+    在本示例中 MyComponent 组件使用 `dangerouslySetInnerHTML` 属性来设置 HTML 标记：
+
+    ```jsx 
+    function createMarkup() {
+      return { __html: 'First &middot; Second' }
+    }
+
+    function MyComponent() {
+      return <div dangerouslySetInnerHTML={createMarkup()} />
+    }
+    ```
 
 ### Fragments
 React 还提供了用于减少不必要嵌套的组件。
@@ -985,7 +1022,7 @@ const ParentComponent = () => {
 
 export default ParentComponent;
 ```
-在 React 中如何校验 props 属性?
+### 在 React 中如何校验 props 属性?
 
     当应用程序以开发模式运行的时，React 将会自动检查我们在组件上设置的所有属性，以确保它们具有正确的类型。如果类型不正确，React 将在控制台中生成警告信息。由于性能影响，它在生产模式下被禁用。使用 `isRequired` 定义必填属性。
 
@@ -1024,5 +1061,32 @@ export default ParentComponent;
       }
     }
     ```
+**注意:** 在 React v15.5 中，*PropTypes* 从 `React.PropTypes` 被移动到 `prop-types` 库中。
 
-    **注意:** 在 React v15.5 中，*PropTypes* 从 `React.PropTypes` 被移动到 `prop-types` 库中。
+### 在使用 ES6 类的 React 中 `super()` 和 `super(props)` 有什么区别?
+
+    当你想要在 `constructor()` 函数中访问 `this.props`，你需要将 props 传递给 `super()` 方法。
+
+    使用 `super(props)`:
+
+    ```javascript
+    class MyComponent extends React.Component {
+      constructor(props) {
+        super(props)
+        console.log(this.props) // { name: 'John', ... }
+      }
+    }
+    ```
+
+    使用 `super()`:
+
+    ```javascript
+    class MyComponent extends React.Component {
+      constructor(props) {
+        super()
+        console.log(this.props) // undefined
+      }
+    }
+    ```
+
+    在 `constructor()` 函数之外，访问 `this.props` 属性会显示相同的值。
