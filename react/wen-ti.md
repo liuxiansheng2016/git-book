@@ -14,12 +14,12 @@ ReactDOM.render(element, document.getElementById('root'));
 ```
 const modalRoot = document.getElementById('modal-root');
 class Modal extends React.Component {
-  render() {
-    return ReactDOM.createPortal(
-      this.props.children,
-      modalRoot
-    );
-  }
+render() {
+return ReactDOM.createPortal(
+  this.props.children,
+  modalRoot
+);
+}
 }
 ```
 **3. ReactDOM.unmountComponentAtNode()**
@@ -39,46 +39,46 @@ import App from './App'; // 假设这是你的根组件
 
 // 客户端入口文件
 if (typeof document !== 'undefined') {
-  ReactDOM.hydrate(<App />, document.getElementById('root'));
+ReactDOM.hydrate(<App />, document.getElementById('root'));
 }
 ```
 ### ReactDOMServer 是什么?
 
-    `ReactDOMServer` 对象使你能够将组件渲染为静态标记（通常用于 Node 服务器中），此对象主要用于服务端渲染（SSR）。以下方法可用于服务器和浏览器环境：
+`ReactDOMServer` 对象使你能够将组件渲染为静态标记（通常用于 Node 服务器中），此对象主要用于服务端渲染（SSR）。以下方法可用于服务器和浏览器环境：
 
-    1. `renderToString()`
-    2. `renderToStaticMarkup()`
+1. `renderToString()`
+2. `renderToStaticMarkup()`
 
-    例如，你通常运行基于 Node 的 Web 服务器，如 Express，Hapi 或 Koa，然后你调用 `renderToString` 将根组件渲染为字符串，然后作为响应进行发送。
+例如，你通常运行基于 Node 的 Web 服务器，如 Express，Hapi 或 Koa，然后你调用 `renderToString` 将根组件渲染为字符串，然后作为响应进行发送。
 
-    ```javascript
-    // using Express
-    import { renderToString } from 'react-dom/server'
-    import MyPage from './MyPage'
+```javascript
+// using Express
+import { renderToString } from 'react-dom/server'
+import MyPage from './MyPage'
 
-    app.get('/', (req, res) => {
-      res.write('<!DOCTYPE html><html><head><title>My Page</title></head><body>')
-      res.write('<div id="content">')
-      res.write(renderToString(<MyPage/>))
-      res.write('</div></body></html>')
-      res.end()
-    })
-    ```
+app.get('/', (req, res) => {
+  res.write('<!DOCTYPE html><html><head><title>My Page</title></head><body>')
+  res.write('<div id="content">')
+  res.write(renderToString(<MyPage/>))
+  res.write('</div></body></html>')
+  res.end()
+})
+```
 ### 在 React 中如何使用 innerHTML?
 
-    `dangerouslySetInnerHTML` 属性是 React 用来替代在浏览器 DOM 中使用 `innerHTML`。与 `innerHTML` 一样，考虑到跨站脚本攻击（XSS），使用此属性也是有风险的。使用时，你只需传递以 `__html` 作为键，而 HTML 文本作为对应值的对象。
+`dangerouslySetInnerHTML` 属性是 React 用来替代在浏览器 DOM 中使用 `innerHTML`。与 `innerHTML` 一样，考虑到跨站脚本攻击（XSS），使用此属性也是有风险的。使用时，你只需传递以 `__html` 作为键，而 HTML 文本作为对应值的对象。
 
-    在本示例中 MyComponent 组件使用 `dangerouslySetInnerHTML` 属性来设置 HTML 标记：
+在本示例中 MyComponent 组件使用 `dangerouslySetInnerHTML` 属性来设置 HTML 标记：
 
-    ```jsx 
-    function createMarkup() {
-      return { __html: 'First &middot; Second' }
-    }
+```jsx 
+function createMarkup() {
+  return { __html: 'First &middot; Second' }
+}
 
-    function MyComponent() {
-      return <div dangerouslySetInnerHTML={createMarkup()} />
-    }
-    ```
+function MyComponent() {
+  return <div dangerouslySetInnerHTML={createMarkup()} />
+}
+```
 
 ### Fragments
 React 还提供了用于减少不必要嵌套的组件。
@@ -91,13 +91,13 @@ React.Fragment
 
 ```
 render() {
-  return (
-    <React.Fragment>
-      <ChildA />
-      <ChildB />
-      <ChildC />
-    </React.Fragment>
-  );
+return (
+<React.Fragment>
+  <ChildA />
+  <ChildB />
+  <ChildC />
+</React.Fragment>
+);
 }
 ```
 
@@ -118,15 +118,15 @@ Suspense 使得组件可以等待某些操作结束后再渲染支持的场景�
 const OtherComponent = React.lazy(() => import('./OtherComponent'));
 
 function MyComponent() {
-  return (
-    // 使用 React.Suspense 包裹动态加载的组件
-    <React.Suspense fallback={<Spinner />}>
-      <div>
-        {/* 动态加载的 OtherComponent 组件 */}
-        <OtherComponent />
-      </div>
-    </React.Suspense>
-  );
+return (
+// 使用 React.Suspense 包裹动态加载的组件
+<React.Suspense fallback={<Spinner />}>
+  <div>
+    {/* 动态加载的 OtherComponent 组件 */}
+    <OtherComponent />
+  </div>
+</React.Suspense>
+);
 }
 ```
 
@@ -142,14 +142,14 @@ React 提供的一个 API，用于创建 refs，以便你可以直接访问 DOM 
 示例代码如下：
 ```
 class MyComponent extends React.Component {
-  constructor(props) {
-    super(props);
-    this.myRef = React.createRef();
-  }
+constructor(props) {
+super(props);
+this.myRef = React.createRef();
+}
 
-  render() {
-    return <div ref={this.myRef} />;
-  }
+render() {
+return <div ref={this.myRef} />;
+}
 }
 ```
 使用回调
@@ -157,30 +157,30 @@ class MyComponent extends React.Component {
 这种方式允许更精确地控制何时设置和移除 ref
 ```
 class MyComponent extends React.Component {
-  constructor(props) {
-    super(props);
-    // 初始化一个实例属性来存储 ref
-    this.inputElement = null;
-  }
+constructor(props) {
+super(props);
+// 初始化一个实例属性来存储 ref
+this.inputElement = null;
+}
 
-  handleFocus = () => {
-    if (this.inputElement) {
-      this.inputElement.focus();
-    }
-  }
+handleFocus = () => {
+if (this.inputElement) {
+  this.inputElement.focus();
+}
+}
 
-  render() {
-    return (
-      <div>
-        {/* 使用回调函数作为 ref */}
-        <input 
-          type="text" 
-          ref={(input) => { this.inputElement = input; }} 
-        />
-        <button onClick={this.handleFocus}>聚焦输入框</button>
-      </div>
-    );
-  }
+render() {
+return (
+  <div>
+    {/* 使用回调函数作为 ref */}
+    <input 
+      type="text" 
+      ref={(input) => { this.inputElement = input; }} 
+    />
+    <button onClick={this.handleFocus}>聚焦输入框</button>
+  </div>
+);
+}
 }
 ```
 ### React.forwardRef
@@ -206,9 +206,9 @@ import React, { forwardRef } from 'react';
 
 // 使用 forwardRef 包装组件，使得可以接收 ref 并将其转发给 input 元素
 const MyInput = forwardRef((props, ref) => {
-  return (
-    <input {...props} ref={ref} />
-  );
+return (
+<input {...props} ref={ref} />
+);
 });
 
 export default MyInput;
@@ -219,26 +219,26 @@ import MyInput from './MyInput'; // 假设 MyInput 和 ParentComponent 在同一
 
 const ParentComponent = () => {
 
-  // 创建一个 ref，初始值为 null
-  const inputRef = useRef(null);
+// 创建一个 ref，初始值为 null
+const inputRef = useRef(null);
 
-  const handleClick = () => {
-    if (inputRef.current) {
-      // 调用 focus 方法让输入框获得焦点
-      inputRef.current.focus();
-      // 打印输入框当前的值
-      console.log(inputRef.current.value);
-    }
-  };
+const handleClick = () => {
+if (inputRef.current) {
+  // 调用 focus 方法让输入框获得焦点
+  inputRef.current.focus();
+  // 打印输入框当前的值
+  console.log(inputRef.current.value);
+}
+};
 
-  return (
-    <div>
-      {/* 将 ref 传递给 MyInput 组件 */}
-      <MyInput ref={inputRef} type="text" placeholder="Enter something" />
-      {/* 点击按钮时执行 handleClick 函数 */}
-      <button onClick={handleClick}>Focus Input</button>
-    </div>
-  );
+return (
+<div>
+  {/* 将 ref 传递给 MyInput 组件 */}
+  <MyInput ref={inputRef} type="text" placeholder="Enter something" />
+  {/* 点击按钮时执行 handleClick 函数 */}
+  <button onClick={handleClick}>Focus Input</button>
+</div>
+);
 };
 
 export default ParentComponent;
@@ -260,19 +260,19 @@ React.StrictMode
 import React from 'react';
 
 function ExampleApplication() {
-  return (
+return (
+<div>
+  <Header />
+  {/* 使用 StrictMode 包裹部分子组件 */}
+  <React.StrictMode>
     <div>
-      <Header />
-      {/* 使用 StrictMode 包裹部分子组件 */}
-      <React.StrictMode>
-        <div>
-          <ComponentOne />
-          <ComponentTwo />
-        </div>
-      </React.StrictMode>
-      <Footer />
+      <ComponentOne />
+      <ComponentTwo />
     </div>
-  );
+  </React.StrictMode>
+  <Footer />
+</div>
+);
 }
 ```
 在上述的示例中，不会对 Header 和 Footer 组件运行严格模式检查。但是，ComponentOne 和 ComponentTwo 以及它们的所有后代元素都将进行检查。
@@ -309,23 +309,23 @@ useEffect 导致屏幕闪烁或布局抖动的主要原因是它在浏览器绘�
 import React, { useEffect, useState } from 'react';
 
 function MyComponent() {
-  const [value, setValue] = useState(null);
+const [value, setValue] = useState(null);
 
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      // 这里可以放置你需要执行的操作，比如从服务器获取数据
-      // 模拟异步操作
-      setTimeout(() => {
-        setValue('New Value');
-      }, 1000);
-    });
-  }, []); // 空数组意味着这个 effect 只会在组件挂载和卸载时运行
+useEffect(() => {
+requestAnimationFrame(() => {
+  // 这里可以放置你需要执行的操作，比如从服务器获取数据
+  // 模拟异步操作
+  setTimeout(() => {
+    setValue('New Value');
+  }, 1000);
+});
+}, []); // 空数组意味着这个 effect 只会在组件挂载和卸载时运行
 
-  return (
-    <div>
-      {value === null ? 'Loading...' : value}
-    </div>
-  );
+return (
+<div>
+  {value === null ? 'Loading...' : value}
+</div>
+);
 }
 
 export default MyComponent;
@@ -338,26 +338,26 @@ export default MyComponent;
 import React, { useEffect, useState } from 'react';
 
 function MyComponent() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const [data, setData] = useState(null);
+const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // 模拟数据获取
-    setTimeout(() => {
-      setData({ title: 'Hello World' });
-      setLoading(false);
-    }, 2000);
-  }, []);
+useEffect(() => {
+// 模拟数据获取
+setTimeout(() => {
+  setData({ title: 'Hello World' });
+  setLoading(false);
+}, 2000);
+}, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+if (loading) {
+return <div>Loading...</div>;
+}
 
-  return (
-    <div>
-      <h1>{data.title}</h1>
-    </div>
-  );
+return (
+<div>
+  <h1>{data.title}</h1>
+</div>
+);
 }
 
 export default MyComponent;
@@ -396,18 +396,18 @@ export default MyComponent;
 
 ```
 class MyComponent extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
+constructor(props) {
+super(props);
+this.handleClick = this.handleClick.bind(this);
+}
 
-  handleClick() {
-    console.log('Clicked!');
-  }
+handleClick() {
+console.log('Clicked!');
+}
 
-  render() {
-    return <button onClick={this.handleClick}>Click Me</button>;
-  }
+render() {
+return <button onClick={this.handleClick}>Click Me</button>;
+}
 }
 ```
 **3. 定义阶段使用箭头函数绑定**
@@ -415,13 +415,13 @@ class MyComponent extends React.Component {
 而当你使用属性初始化器来定义类方法时，比如：
 ```
 class MyComponent extends React.Component {
-  handleClick = () => {
-    console.log('Clicked!');
-  };
+handleClick = () => {
+console.log('Clicked!');
+};
 
-  render() {
-    return <button onClick={this.handleClick}>Click Me</button>;
-  }
+render() {
+return <button onClick={this.handleClick}>Click Me</button>;
+}
 }
 ```
 在这种情况下，handleClick 是作为一个类的字段（Field）来定义的，它在组件实例化时就被创建了一次，并且不会在每次渲染时重新创建。这使得它比直接在 JSX 中定义匿名箭头函数更高效。
@@ -431,13 +431,13 @@ class MyComponent extends React.Component {
 当你直接在 JSX 的事件处理属性中定义一个匿名的箭头函数时，例如：
 ```
 class MyComponent extends React.Component {
-  render() {
-    return <button onClick={() => this.handleClick()}>Click Me</button>;
-  }
+render() {
+return <button onClick={() => this.handleClick()}>Click Me</button>;
+}
 
-  handleClick() {
-    console.log('Clicked!');
-  }
+handleClick() {
+console.log('Clicked!');
+}
 }
 ```
 这种做法每次组件渲染时都会创建一个新的函数实例，因为匿名箭头函数是在 render 方法内定义的。这样做可能导致性能问题，尤其是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染。
@@ -448,13 +448,13 @@ class MyComponent extends React.Component {
 
 ```
 class MyComponent extends React.Component {
-  handleClick() {
-    console.log('Clicked!');
-  }
+handleClick() {
+console.log('Clicked!');
+}
 
-  render() {
-    return <button onClick={this.handleClick.bind(this)}>Click Me</button>;
-  }
+render() {
+return <button onClick={this.handleClick.bind(this)}>Click Me</button>;
+}
 }
 ```
 这种方法的问题在于每次组件重新渲染时都会创建一个新的函数实例，这可能会导致性能问题，特别是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染15。
@@ -535,7 +535,7 @@ import { createStore } from 'redux';
 import { Map } from 'immutable';
 
 const rootReducer = combineReducers({
-  // your reducers here
+// your reducers here
 });
 
 const initialState = Map();
@@ -547,12 +547,12 @@ const store = createStore(rootReducer, initialState);
 你的 reducers 需要返回 Immutable.js 的数据结构。例如，你可以使用 Map 和 List 来代替普通的 JavaScript 对象和数组。
 ```
 function counter(state = Map({ count: 0 }), action) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return state.set('count', state.get('count') + 1);
-    default:
-      return state;
-  }
+switch (action.type) {
+case 'INCREMENT':
+  return state.set('count', state.get('count') + 1);
+default:
+  return state;
+}
 }
 ```
 **连接 React 组件：**
@@ -560,7 +560,7 @@ function counter(state = Map({ count: 0 }), action) {
 当你使用 react-redux 的 connect 函数将 React 组件与 Redux store 连接起来时，记得从 Immutable.js 对象中提取数据。例如，如果你的状态是一个 Map，你应该使用 .get() 方法而不是点操作符来访问属性。
 ```
 const mapStateToProps = (state) => ({
-  count: state.get('count')
+count: state.get('count')
 });
 ```
 在做 react 性能优化的时候，为了避免重复渲染，我们会在 shouldComponentUpdate()中做对比，当返回 true 执行 render 方法
@@ -620,14 +620,14 @@ React.createClass：使用 React.createClass 的话，可以在创建组件时�
 import React from 'react';
 
 let MyMixin = {
-   doSomething(){}
+doSomething(){}
 }
 
 let TodoItem = React.createClass({
-   mixins: [MyMixin], // add mixin
-   render(){
-      return <div></div>
-  }
+mixins: [MyMixin], // add mixin
+render(){
+  return <div></div>
+}
 })
 ```
 
@@ -656,39 +656,39 @@ import React, { Component } from 'react';
 
 // 定义高阶组件 withPersistentData
 function withPersistentData(WrappedComponent, storageKey) {
-  return class extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        data: null,
-      };
-    }
-
-    componentDidMount() {
-      // 在组件挂载后尝试从 localStorage 获取数据
-      const data = localStorage.getItem(storageKey);
-      if (data !== null) {
-        this.setState({ data: JSON.parse(data) });
-      }
-    }
-
-    render() {
-      // 将数据通过 props 传递给被包裹的组件
-      return <WrappedComponent {...this.props} data={this.state.data} />;
-    }
+return class extends Component {
+constructor(props) {
+  super(props);
+  this.state = {
+    data: null,
   };
+}
+
+componentDidMount() {
+  // 在组件挂载后尝试从 localStorage 获取数据
+  const data = localStorage.getItem(storageKey);
+  if (data !== null) {
+    this.setState({ data: JSON.parse(data) });
+  }
+}
+
+render() {
+  // 将数据通过 props 传递给被包裹的组件
+  return <WrappedComponent {...this.props} data={this.state.data} />;
+}
+};
 }
 
 // 定义一个简单的展示组件 MyComponent2
 class MyComponent2 extends React.Component {
-  render() {
-    const { data } = this.props;
-    return (
-      <div>
-        {data ? `Cached Data: ${data}` : 'No cached data found.'}
-      </div>
-    );
-  }
+render() {
+const { data } = this.props;
+return (
+  <div>
+    {data ? `Cached Data: ${data}` : 'No cached data found.'}
+  </div>
+);
+}
 }
 
 // 使用高阶组件包装 MyComponent2，指定存储键为 'myData'
@@ -741,77 +741,77 @@ useState 返回一个数组而不是对象的主要原因是，数组的解构�
 异步更新：setState 是异步的，这意味着它不会立即更新状态。如果你试图在调用 setState 后立即访问最新的状态值，你可能会得到旧的状态值 25。
 ```
 changeText() {
-  this.setState({
-    message: "你好啊"
-  })
-  console.log(this.state.message); // Hello World
+this.setState({
+message: "你好啊"
+})
+console.log(this.state.message); // Hello World
 }
 ```
 在上面的例子中，最终打印的结果为 Hello World，而不是 "你好啊"，因为在执行完 setState 之后并不能立刻拿到最新的 state 结果。
 回调函数：为了在状态更新后立即获取最新的状态值，可以传递一个回调函数作为 setState 的第二个参数。这个回调函数会在状态更新完成后执行 10。
 ```
 changeText() {
-  this.setState({
-    message: "你好啊"
-  }, () => {
-    console.log(this.state.message); // 你好啊
-  });
+this.setState({
+message: "你好啊"
+}, () => {
+console.log(this.state.message); // 你好啊
+});
 }
 ```
 合并状态更新：如果在同一个事件循环中多次调用 setState 来更新相同的状态属性，React 会将这些更新合并，并只应用最后一次更新 1。
 ```
 handleClick = () => {
-  this.setState({
-    count: this.state.count + 1,
-  })
-  console.log(this.state.count) // 1
-  
-  this.setState({
-    count: this.state.count + 1,
-  })
-  console.log(this.state.count) // 1
-  
-  this.setState({
-    count: this.state.count + 1,
-  })
-  console.log(this.state.count) // 1
+this.setState({
+count: this.state.count + 1,
+})
+console.log(this.state.count) // 1
+
+this.setState({
+count: this.state.count + 1,
+})
+console.log(this.state.count) // 1
+
+this.setState({
+count: this.state.count + 1,
+})
+console.log(this.state.count) // 1
 }
 ```
 实际上等价于如下操作：
 ```
 Object.assign(
-  previousState,
-  {count: state.count + 1},
-  {count: state.count + 1},
-  ...
+previousState,
+{count: state.count + 1},
+{count: state.count + 1},
+...
 )
 ```
 因为后面的数据会覆盖前面的更改，所以最终只增加了一次。
 批处理更新：对于依赖前一个状态的情况，推荐给 setState 传入一个函数，这样每次更新都会基于最新的状态进行 7。
 ```
 onClick = () => {
-  this.setState((prevState, props) => {
-    return {count: prevState.count + 1};
-  });
-  
-  this.setState((prevState, props) => {
-    return {count: prevState.count + 1};
-  });
+this.setState((prevState, props) => {
+return {count: prevState.count + 1};
+});
+
+this.setState((prevState, props) => {
+return {count: prevState.count + 1};
+});
 }
 ```
 通过这种方式，你可以确保每次更新都是基于最新的状态进行的，从而避免了由于状态合并导致的问题。此外，这种做法也支持 React 的批处理机制，有助于提高性能并减少不必要的渲染次数。
 
 ### 组件间通信
 1. 父组件向子组件传递
-   props
+props
 2. 子组件向父组件传递
-  父组件向子组件传一个函数，然后通过这个函数的回调
+父组件向子组件传一个函数，然后通过这个函数的回调
 3.兄弟组件之间的通信
-  则父组件作为中间层来实现数据的互通，通过使用父组件传递
+则父组件作为中间层来实现数据的互通，通过使用父组件传递
 4.父组件向后代组件传递
-  使用 context 提供了组件之间通讯的一种方式
+使用 context 提供了组件之间通讯的一种方式
 5.非关系组件传递
- 建议将数据进行一个全局资源管理 redux
+建议将数据进行一个全局资源管理 redux
 
 ### ErrorBoundary
 组件内异常，也就是异常边界组件能够捕获的异常，主要包括：
@@ -819,15 +819,15 @@ onClick = () => {
 1. 渲染过程中异常；
 2. 生命周期方法中的异常；
 3. 子组件树中各组件的 constructor 构造函数中异常。
-   
+
 不能捕获的异常，主要是异步及服务端触发异常：
 1.事件处理器中的异常；
-  处理方法： 使用 try/catch 代码进行捕获
+处理方法： 使用 try/catch 代码进行捕获
 2. 异步任务异常，如 setTiemout，ajax 请求异常等；
-   处理方法：使用全局事件 window.addEventListener 捕获
+处理方法：使用全局事件 window.addEventListener 捕获
 3. 服务端渲染异常；
 4. 异常边界组件自身内的异常；
-  处理方法：将边界组件和业务组件分离，各司其职，不能在边界组件中处理逻辑代码，也不能在业务组件中使用 didcatch
+处理方法：将边界组件和业务组件分离，各司其职，不能在边界组件中处理逻辑代码，也不能在业务组件中使用 didcatch
 
 **错误边界（Error Boundaries）:**
 
@@ -843,28 +843,28 @@ onClick = () => {
 
 ```
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { hasError: false }
-  }
+constructor(props) {
+super(props)
+this.state = { hasError: false }
+}
 
-  componentDidCatch(error, info) {
-    // You can also log the error to an error reporting service
-    logErrorToMyService(error, info)
-  }
+componentDidCatch(error, info) {
+// You can also log the error to an error reporting service
+logErrorToMyService(error, info)
+}
 
-  static getDerivedStateFromError(error) {
-     // Update state so the next render will show the fallback UI.
-     return { hasError: true };
-   }
+static getDerivedStateFromError(error) {
+ // Update state so the next render will show the fallback UI.
+ return { hasError: true };
+}
 
-  render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>{'Something went wrong.'}</h1>
-    }
-    return this.props.children
-  }
+render() {
+if (this.state.hasError) {
+  // You can render any custom fallback UI
+  return <h1>{'Something went wrong.'}</h1>
+}
+return this.props.children
+}
 }
 ```
 
@@ -872,9 +872,9 @@ class ErrorBoundary extends React.Component {
 
 ```
 <ErrorBoundary>
-  <MyWidget />
+<MyWidget />
 </ErrorBoundary>
- ```
+```
 
 ### Key
 提供唯一的 key 可以帮助 React 更快地识别和更新元素，从而提高性能。当列表中有大量元素时，这一点尤为重要。
@@ -994,14 +994,14 @@ input：可选的依赖数组，用于确定何时重新创建 createHandle 函�
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
 const ChildComponent = forwardRef((props, ref) => {
-  const [count, setCount] = useState(0);
+const [count, setCount] = useState(0);
 
-  useImperativeHandle(ref, () => ({
-    increment: () => setCount(prevCount => prevCount + 1),
-    getCount: () => count,
-  }));
+useImperativeHandle(ref, () => ({
+increment: () => setCount(prevCount => prevCount + 1),
+getCount: () => count,
+}));
 
-  return <div>Count: {count}</div>;
+return <div>Count: {count}</div>;
 });
 
 export default ChildComponent;
@@ -1010,15 +1010,15 @@ import React, { useRef } from 'react';
 import ChildComponent from './ChildComponent';
 
 const ParentComponent = () => {
-  const childRef = useRef();
+const childRef = useRef();
 
-  return (
-    <div>
-      <ChildComponent ref={childRef} />
-      <button onClick={() => childRef.current.increment()}>Increment</button>
-      <button onClick={() => alert(childRef.current.getCount())}>Show Count</button>
-    </div>
-  );
+return (
+<div>
+  <ChildComponent ref={childRef} />
+  <button onClick={() => childRef.current.increment()}>Increment</button>
+  <button onClick={() => alert(childRef.current.getCount())}>Show Count</button>
+</div>
+);
 };
 
 export default ParentComponent;
@@ -1029,39 +1029,39 @@ export default ParentComponent;
 
 预定义的 prop 类型：
 
-    1. `PropTypes.number`
-    2. `PropTypes.string`
-    3. `PropTypes.array`
-    4. `PropTypes.object`
-    5. `PropTypes.func`
-    6. `PropTypes.node`
-    7. `PropTypes.element`
-    8. `PropTypes.bool`
-    9. `PropTypes.symbol`
-    10. `PropTypes.any`
+1. `PropTypes.number`
+2. `PropTypes.string`
+3. `PropTypes.array`
+4. `PropTypes.object`
+5. `PropTypes.func`
+6. `PropTypes.node`
+7. `PropTypes.element`
+8. `PropTypes.bool`
+9. `PropTypes.symbol`
+10. `PropTypes.any`
 
-    我们可以为 `User` 组件定义 `propTypes`，如下所示：
+我们可以为 `User` 组件定义 `propTypes`，如下所示：
 
- ```jsx 
-    import React from 'react'
-    import PropTypes from 'prop-types'
+```jsx 
+import React from 'react'
+import PropTypes from 'prop-types'
 
-    class User extends React.Component {
-      static propTypes = {
-        name: PropTypes.string.isRequired,
-        age: PropTypes.number.isRequired
-      }
+class User extends React.Component {
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    age: PropTypes.number.isRequired
+  }
 
-      render() {
-        return (
-          <>
-            <h1>{`Welcome, ${this.props.name}`}</h1>
-            <h2>{`Age, ${this.props.age}`}</h2>
-          </>
-        )
-      }
-    }
- ```
+  render() {
+    return (
+      <>
+        <h1>{`Welcome, ${this.props.name}`}</h1>
+        <h2>{`Age, ${this.props.age}`}</h2>
+      </>
+    )
+  }
+}
+```
 
 **注意:** 在 React v15.5 中，*PropTypes* 从 `React.PropTypes` 被移动到 `prop-types` 库中。
 
@@ -1069,26 +1069,70 @@ export default ParentComponent;
 
 当你想要在 `constructor()` 函数中访问 `this.props`，你需要将 props 传递给 `super()` 方法。
 
-    使用 `super(props)`:
+使用 `super(props)`:
 
-    ```javascript
-    class MyComponent extends React.Component {
-      constructor(props) {
-        super(props)
-        console.log(this.props) // { name: 'John', ... }
-      }
-    }
-    ```
+```javascript
+class MyComponent extends React.Component {
+  constructor(props) {
+    super(props)
+    console.log(this.props) // { name: 'John', ... }
+  }
+}
+```
 
-    使用 `super()`:
+使用 `super()`:
 
-    ```javascript
-    class MyComponent extends React.Component {
-      constructor(props) {
-        super()
-        console.log(this.props) // undefined
-      }
-    }
-    ```
+```javascript
+class MyComponent extends React.Component {
+  constructor(props) {
+    super()
+    console.log(this.props) // undefined
+  }
+}
+```
 
-    在 `constructor()` 函数之外，访问 `this.props` 属性会显示相同的值。
+在 `constructor()` 函数之外，访问 `this.props` 属性会显示相同的值。
+
+### 在 JSX 中如何进行循环?
+
+你只需使用带有 ES6 箭头函数语法的 `Array.prototype.map` 即可。例如，`items` 对象数组将会被映射成一个组件数组：
+
+```jsx 
+<tbody>
+  {items.map(item => <SomeComponent key={item.id} name={item.name} />)}
+</tbody>
+```
+
+你不能使用 `for` 循环进行迭代：
+
+```jsx 
+<tbody>
+  for (let i = 0; i < items.length; i++) {
+    <SomeComponent key={items[i].id} name={items[i].name} />
+  }
+</tbody>
+```
+
+### 在 React 状态中删除数组元素的推荐方法是什么?
+
+ 更好的方法是使用 `Array.prototype.filter()` 方法。
+
+ 例如，让我们创建用于更新状态的 `removeItem()` 方法。
+
+ ```javascript
+ removeItem(index) {
+   this.setState({
+     data: this.state.data.filter((item, i) => i !== index)
+   })
+ }
+ ```
+### React memo 函数是什么?
+
+ 当类组件的输入属性相同时，可以使用 **pureComponent** 或 **shouldComponentUpdate** 来避免组件的渲染。现在，你可以通过把函数组件包装在 **React.memo** 中来实现相同的功能。
+
+ ```jsx
+ const MyComponent = React.memo(function MyComponent(props) {
+  /* only rerenders if props change */
+ });
+
+![Uploading image.png…]()
