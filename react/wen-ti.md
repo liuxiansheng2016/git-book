@@ -840,40 +840,41 @@ onClick = () => {
 使用了 componentDidCatch()
 
 抛出错误后，请使用 static getDerivedStateFromError() 渲染备用 UI ，使用 componentDidCatch() 处理错误
-  ```jsx 
-    class ErrorBoundary extends React.Component {
-      constructor(props) {
-        super(props)
-        this.state = { hasError: false }
-      }
 
-      componentDidCatch(error, info) {
-        // You can also log the error to an error reporting service
-        logErrorToMyService(error, info)
-      }
+```
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
 
-      static getDerivedStateFromError(error) {
-         // Update state so the next render will show the fallback UI.
-         return { hasError: true };
-       }
+  componentDidCatch(error, info) {
+    // You can also log the error to an error reporting service
+    logErrorToMyService(error, info)
+  }
 
-      render() {
-        if (this.state.hasError) {
-          // You can render any custom fallback UI
-          return <h1>{'Something went wrong.'}</h1>
-        }
-        return this.props.children
-      }
+  static getDerivedStateFromError(error) {
+     // Update state so the next render will show the fallback UI.
+     return { hasError: true };
+   }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>{'Something went wrong.'}</h1>
     }
-    ```
+    return this.props.children
+  }
+}
+```
 
-    之后，将其作为常规组件使用：
+之后，将其作为常规组件使用：
 
-    ```jsx 
-    <ErrorBoundary>
-      <MyWidget />
-    </ErrorBoundary>
-    ```
+```
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>
+ ```
 
 ### Key
 提供唯一的 key 可以帮助 React 更快地识别和更新元素，从而提高性能。当列表中有大量元素时，这一点尤为重要。
@@ -1024,9 +1025,9 @@ export default ParentComponent;
 ```
 ### 在 React 中如何校验 props 属性?
 
-    当应用程序以开发模式运行的时，React 将会自动检查我们在组件上设置的所有属性，以确保它们具有正确的类型。如果类型不正确，React 将在控制台中生成警告信息。由于性能影响，它在生产模式下被禁用。使用 `isRequired` 定义必填属性。
+当应用程序以开发模式运行的时，React 将会自动检查我们在组件上设置的所有属性，以确保它们具有正确的类型。如果类型不正确，React 将在控制台中生成警告信息。由于性能影响，它在生产模式下被禁用。使用 `isRequired` 定义必填属性。
 
-    预定义的 prop 类型：
+预定义的 prop 类型：
 
     1. `PropTypes.number`
     2. `PropTypes.string`
@@ -1041,7 +1042,7 @@ export default ParentComponent;
 
     我们可以为 `User` 组件定义 `propTypes`，如下所示：
 
-    ```jsx 
+ ```jsx 
     import React from 'react'
     import PropTypes from 'prop-types'
 
@@ -1060,12 +1061,13 @@ export default ParentComponent;
         )
       }
     }
-    ```
+ ```
+
 **注意:** 在 React v15.5 中，*PropTypes* 从 `React.PropTypes` 被移动到 `prop-types` 库中。
 
 ### 在使用 ES6 类的 React 中 `super()` 和 `super(props)` 有什么区别?
 
-    当你想要在 `constructor()` 函数中访问 `this.props`，你需要将 props 传递给 `super()` 方法。
+当你想要在 `constructor()` 函数中访问 `this.props`，你需要将 props 传递给 `super()` 方法。
 
     使用 `super(props)`:
 
