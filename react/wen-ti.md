@@ -1,5 +1,7 @@
 # 问题
 
+https://github.com/semlinker/reactjs-interview-questions/blob/master/README.md#%E7%9B%AE%E5%BD%95
+
 ### ReactDOM
 **1. ReactDOM.render()**
 用途：这是最常用的 API 之一，用于将 React 元素渲染到提供的容器中并返回对 mounted 实例的引用。
