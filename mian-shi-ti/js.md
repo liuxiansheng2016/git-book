@@ -813,6 +813,23 @@ Any
 ```
 
 98\. Async/defer
+```
+async和defer的相同点
+
+都是异步加载script,加载的过程都不会阻塞html的解析。
+
+不同点
+
+1.async和defer的执行时机不同,async是在加载完后立即执行,执行的过程仍会阻塞后续html的解析。defer是在html解析完,DomCOntentLoaded之前执行。
+
+2.asyny不能保证script标签的执行顺序(谁先加载完谁先执行),await在html解析完之后按顺序执行。
+
+总结
+
+通常情况下defer的使用频率较高,它能保证script之间的变量依赖。
+
+需要注意的是:async script的资源请求时异步的,但script的执行仍然会阻塞后续渲染(单线程),defer是在html渲染完之后执行的所以不会阻塞后续html的解析。
+```
 
 99\. new.target
 
