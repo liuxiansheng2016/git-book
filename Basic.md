@@ -843,6 +843,152 @@ ViewModel：视图模型，可实现数据的双向绑定，连接View和Model�
 - **Nginx反向代理**
 - **Websocket**
 
+##### nodejs中间层代理
+利用http.request方法来转发请求
+
+```
+const http = require('http');
+
+// 创建一个HTTP服务器
+const proxyServer = http.createServer((req, res) => {
+    // 目标服务器的选项
+    const options = {
+        hostname: 'example.com', // 您希望代理访问的目标主机名
+        port: 80,                // 目标服务器端口
+        path: req.url,           // 请求路径
+        method: req.method,      // HTTP方法
+        headers: req.headers     // 原始请求头
+    };
+
+    // 向目标服务器发起请求
+    const proxyRequest = http.request(options, (proxyResponse) => {
+        // 将响应头转发给客户端
+        res.writeHead(proxyResponse.statusCode, proxyResponse.headers);
+        // 将响应数据流转发给客户端
+        proxyResponse.pipe(res);
+    });
+
+    // 处理错误情况
+    proxyRequest.on('error', (err) => {
+        console.error(`代理请求出错: ${err.message}`);
+        res.end();
+    });
+
+    // 将请求体（如果有）转发给目标服务器
+    req.pipe(proxyRequest);
+});
+
+// 监听端口
+const PORT = 3000;
+proxyServer.listen(PORT, () => {
+    console.log(`代理服务器正在监听端口 ${PORT}`);
+});
+```
+http-proxy-middleware 是一个非常流行的 Node.js 中间件，用于简化 HTTP 请求的代理
+```
+// 引入必要的模块
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
+// 创建一个Express应用程序
+const app = express();
+
+// 定义代理中间件
+const apiProxy = createProxyMiddleware({
+    target: 'http://example.com', // 目标服务器的地址
+    changeOrigin: true,           // 更改主机头为代理目标URL
+    pathRewrite: {
+        '^/api' : '/',           // 重写路径，例如将 /api 路径前缀移除
+    },
+    onProxyReq: (proxyReq, req, res) => {
+        console.log('发送请求到:', proxyReq.path);
+    },
+    onProxyRes: (proxyRes, req, res) => {
+        console.log('从目标接收响应:', proxyRes.statusCode);
+    },
+    onError: (err, req, res) => {
+        res.status(500).send('请求代理出错');
+    }
+});
+
+// 使用代理中间件
+app.use('/api', apiProxy); // 将所有以 /api 开头的请求代理到目标服务器
+
+// 启动服务器
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`代理服务器正在监听端口 ${PORT}`);
+});
+```
+##### Nginx 反向代理配置
+
+Nginx 是一个高性能的 HTTP 和反向代理服务器。使用 Nginx 作为反向代理，可以将客户端请求转发到后端服务器，并将响应返回给客户端，而客户端并不知道实际处理请求的服务器是哪一个。以下是配置 Nginx 反向代理的基本步骤和一个简单的例子。
+
+**步骤**
+1. 安装 Nginx：确保您的系统上已经安装了 Nginx。如果尚未安装，可以根据您操作系统的不同选择合适的方法进行安装。例如，在基于 Debian 的系统上（如 Ubuntu），可以通过以下命令安装：
+sudo apt update
+sudo apt install nginx
+
+2. 编辑 Nginx 配置文件：通常位于 /etc/nginx/nginx.conf 或者 /etc/nginx/sites-available/default。您可以直接编辑默认配置文件或者创建一个新的配置文件。
+
+3. 设置反向代理配置：在配置文件中添加或修改 server 块来定义如何处理特定域名或 IP 地址的请求。
+
+4. 测试配置并重启 Nginx：每次修改完配置文件后，建议先测试配置是否正确，然后重启 Nginx 使更改生效。
+
+bash
+sudo nginx -t
+sudo systemctl restart nginx
+
+**基本例子**
+下面是一个基本的例子，展示如何将所有对 yourdomain.com/api/ 的请求转发到运行在 localhost:3000 上的应用程序：
+```
+Nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location /api/ {
+        proxy_pass http://localhost:3000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 如果需要，还可以为其他路径设置不同的代理或其他处理方式
+    location / {
+        # 这里可以放置静态文件服务、另一个代理等
+        root /var/www/html;
+        index index.html;
+    }
+}
+```
+**在这个例子中：**
+
+listen 80; 表示监听标准HTTP端口80。
+server_name yourdomain.com; 定义了这个server块应该响应哪个域名的请求。
+location /api/ { ... } 块指定了对于以 /api/ 开头的所有请求，Nginx 应该将其转发到 http://localhost:3000/。注意这里的 proxy_pass URL 后面有一个斜杠 /，这意味着 /api/ 路径部分会被去掉后再拼接到目标URL后面。
+proxy_set_header 指令用于设置转发请求时添加或修改HTTP头部信息，以便后端服务器能够获取客户端的真实信息。
+
+**区别**
+设置 Access-Control-Allow-Origin 为 *：
+
+优点：简单快捷，适用于简单的应用场景。
+
+缺点：安全性较低，不适合涉及敏感数据的场景。
+
+Node 中间层代理：
+
+优点：灵活性高，可以在代理层进行复杂的逻辑处理。
+
+缺点：增加了一层代理，可能会引入性能开销，系统复杂性增加。
+
+Nginx 反向代理：
+
+优点：高性能，配置灵活，适合处理大量并发请求和静态资源。
+
+缺点：配置复杂，需要编写和维护配置文件
+
 ### WebSocket
 
 WebSocket是一种在单个TCP连接上进行全双工通信的协议。它被设计用于替代传统的HTTP请求/响应模型，以实现更高效、实时的通信。WebSocket使得服务器和客户端可以在建立连接后，双向发送数据，而无需每次发送数据前进行握手，这大大提高了数据传输的效率和速度。
