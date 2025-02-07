@@ -21,6 +21,24 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 
 `instanceof`运算符： 对象 `instanceof` 类 ，如果对象是这个类创建的，返回true，否则为false
 
+#### 值类型和引用类型
+
+**值类型：**
+
+1. 保存与复制的是值本身
+
+2. 使用typeof检测数据的类型
+
+3. 基本数据类型是值类型
+
+**引用类型：**
+
+1. 保存和赋值的是指向对象的一个指针。
+
+2. 使用instanceof检测数据类型
+
+3. 使用new()方法构造出的对象是引用型
+
 ### JavaScript 中的变量在内存中的具体存储形式是什么
 
 原始类型包括但不限于 number、string、boolean、null、undefined 和 bigint（ES10 引入的新类型）。这些类型的值在内存中直接存储。
@@ -291,55 +309,6 @@ Cookie在浏览器中有容量限制，有条数限制，每次网络请求都�
 
 JS中操作cookie的语句：document.cookie属性
 
-### HTTP网络通信协议
-
-TIP/IP：传输控制协议/网际协议 有很多子协议 http ftp https
-
-HTTP：超文本传输协议 简单说就是传输html数据的，HTTP协议是无连接，无状态的，客户端发出请求，连接服务器，得到响应，立即断开。
-
-请求request-响应response：必须由客户端主动发出请求，服务器才能产生响应，一般来说，请求是客户端向服务器端发送数据，而响应是服务器端向客户端发送数据
-
-如果请求的是一个静态资源，服务端会直接响应数据到客户端，如果请求的是一个动态资源，比如java,php,asp，服务器端会先在服务器端执行完毕这些动态内容，然后把执行的结果响应到客户端。
-
-#### HTTP请求的三部分组成：
-
-请求行：请求方法（GET POST PUT DELETE）请求的URI 协议和版本 例如http1.1
-
-消息报头：客户端的一些相关信息，例如语言，浏览器，操作系统，压缩方式......
-
-请求正文：GET请求没有请求正文，POST的请求正文存储了发送的数据
-
-#### 响应状态码：
-
-200 请求响应
-
-304 从浏览器本地缓存读取数据 (Last Modified)
-
-404 资源找不到
-
-405 无法请求对应的get和post处理程序
-
-429 limit
-
-401 unthrization
-
-403 forbidden
-
-500 服务器程序运行错误
-
-301 永久重定向
-
-302 暂时重定向
-
-#### 增删改查的四大操作（CRUD）：restful风格
-
-GET 查询
-
-POST 增加
-
-PUT 修改
-
-DELETE 删除
 
 ### 数据交换标准
 
@@ -478,6 +447,76 @@ hasOwnProperty方法：判断一个对象中（不包括原型对象）是否拥
 
 **propertyIsEnumerable**方法：判断对象的某个成员是否允许被遍历，默认的成员都是可以被遍历的，如果不想被遍历，需要对成员单独做特殊设置。
 
+### `call()`、`apply()` 和 `bind()` 的区别
+
+在 JavaScript 中，`call()`、`apply()` 和 `bind()` 都是用于控制函数执行时的 `this` 值的方法，但它们之间有一些关键的区别。
+
+**都是用来重定义 this 这个对象的！**
+
+#### `call()`
+
+- **用途**：立即调用一个函数，并允许你指定 `this` 的值（即函数运行时所使用的上下文），以及以参数列表的形式传递参数。
+- **语法**：`function.call(thisArg, arg1, arg2, ...)`
+- **示例**：
+    ```javascript
+    const obj = { num: 40 };
+    function add(a, b) {
+        return this.num + a + b;
+    }
+    console.log(add.call(obj, 1, 2)); // 输出 43
+    ```
+
+#### `apply()`
+
+- **用途**：与 `call()` 类似，但它接受一个数组或类数组对象作为参数列表传递给目标函数。
+- **语法**：`function.apply(thisArg, [argsArray])`
+- **示例**：
+    ```javascript
+    const obj = { num: 40 };
+    function add(a, b) {
+        return this.num + a + b;
+    }
+    console.log(add.apply(obj, [1, 2])); // 输出 43
+    ```
+- **注意**：第二个参数必须是一个数组或类数组对象。
+
+#### `bind()`
+
+- **用途**：不会立即执行函数，而是返回一个新的函数，并且可以预先设定原函数的 `this` 值以及部分或全部参数。这使得它非常适合用于创建函数的特定版本以便后续使用。
+- **语法**：`function.bind(thisArg[, arg1[, arg2[, ...]]])`
+- **示例**：
+    ```javascript
+    const obj = { num: 40 };
+    function add(a, b) {
+        return this.num + a + b;
+    }
+    const boundAdd = add.bind(obj, 1);
+    console.log(boundAdd(2)); // 输出 43
+    ```
+- **特点**：返回的是一个新的函数，因此可以在需要的时候延迟执行。
+
+#### 总结
+
+| 方法 | 是否立即执行 | 参数形式 | 主要用途 |
+| --- | --- | --- | --- |
+| `call()` | 是 | 参数列表 | 立即改变 `this` 并传入参数列表执行函数 |
+| `apply()` | 是 | 数组 | 立即改变 `this` 并通过数组传入参数执行函数 |
+| `bind()` | 否 | 参数列表 | 创建一个新函数，其 `this` 已被固定，并可预设部分参数 |
+
+每种方法都有其适用场景，理解它们之间的差异可以帮助您更灵活地控制函数的行为和上下文。
+
+#### 手写 bind
+
+多次绑定 bind 是无效的
+
+```
+Function.prototype.bind = function (context){
+    var self = this;
+    return function() {
+        self.apply(context, arguments);
+    }
+}
+```
 
 ### WEB本地存储
 
