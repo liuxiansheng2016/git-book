@@ -1,5 +1,11 @@
 ## CSS
 
+<https://codepen.io/jh3y/full/WNxBLbB>
+
+<https://dev.to/fabiogiolito/create-a-color-theme-with-these-upcoming-css-features-4o83>
+
+<https://segmentfault.com/a/1190000041826742>
+
 ### 盒子模型
 一个标准的盒子模型是由四部分组成，内容 padding（内边距）border（边框）margin（外边距）
 
@@ -98,3 +104,102 @@ CSS 伪元素用来选择和添加非内容产生的元素
   - `empty`：选择没有任何子元素（包括文本节点）的元素。
   - `:not(selector)`：否定伪类，选择不匹配给定选择器的所有元素。
   - `:root`：匹配文档的根元素，在HTML文档中通常是`<html>`标签
+
+## less和sass
+
+Less 和 Sass 都是 CSS 预处理器，它们扩展了 CSS 的功能，允许开发者使用变量、嵌套规则、混合（Mixins）、继承等功能来编写更易维护和扩展的样式代码。以下是 Less 和 Sass 对比 CSS 的一些关键特性：
+
+### 变量
+
+-   CSS: 在原生 CSS 中没有变量的概念，直到 CSS 变量（也称为自定义属性）被引入。
+-   Less/Sass: 两者都支持变量，可以存储颜色、字体和其他重复使用的值。例如，在 Less 中使用 @ 符号定义变量，而在 Sass 中则使用 $ 符号。
+  ```
+ / Less\
+@primary-color: #4D926F;\
+body { color: @primary-color; }
+
+// Sass\
+$primary-color: #4D926F;\
+body { color: $primary-color; }
+```
+### 嵌套
+
+-   CSS: 不支持选择器的嵌套，所有的选择器都需要独立声明。
+-   Less/Sass: 允许选择器嵌套，从而减少重复书写父级选择器的工作量，并且使代码结构更加清晰。
+```
+// Less\
+nav {\
+  ul {\
+    margin: 0;\
+    padding: 0;\
+    list-style: none;\
+  }\
+}
+
+// Sass\
+nav {\
+  ul {\
+    margin: 0;\
+    padding: 0;\
+    list-style: none;\
+  }\
+}
+```
+### 混合（Mixins）
+
+-   CSS: 没有直接等同于 Mixins 的概念。
+-   Less/Sass: Mixins 可以重用一组属性或样式规则，使得代码复用变得更加简单。
+```
+// Less\
+.border-radius(@radius) {\
+  -webkit-border-radius: @radius;\
+     -moz-border-radius: @radius;\
+          border-radius: @radius;\
+}\
+.box { .border-radius(10px); }
+
+// Sass\
+@mixin border-radius($radius) {\
+  -webkit-border-radius: $radius;\
+     -moz-border-radius: $radius;\
+          border-radius: $radius;\
+}\
+.box { @include border-radius(10px); }
+```
+### 继承
+
+-   CSS: 不支持类的继承。
+-   Sass: 提供了 @extend 指令，可以让一个选择器继承另一个选择器的所有样式。
+```
+// Sass\
+.error { border: 1px solid red; }\
+.badError { @extend .error; font-weight: bold; }
+```
+### 运算
+
+-   CSS: 不支持数学运算。
+-   Less/Sass: 支持基本的数学运算，如加法、减法、乘法和除法，可以直接在样式中进行计算。
+```
+// Less\
+@the-border: 1px;\
+@base-size: 10px;\
+@full-size: @base-size + @the-border * 2;
+
+// Sass\
+$the-border: 1px;\
+$base-size: 10px;\
+$full-size: $base-size + $the-border * 2;
+```
+### 控制指令（仅限 Sass）
+
+-   Sass: 提供条件语句（如 @if, @else）和循环结构（如 @for, @each, @while），使得样式表可以根据不同的条件动态生成。
+
+scss
+```
+// Sass\
+@if $type == warning {\
+  background-color: yellow;\
+} @else if $type == error {\
+  background-color: red;\
+}
+```
