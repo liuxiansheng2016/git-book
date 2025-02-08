@@ -213,7 +213,11 @@ const arrayLike = {  0: 'a',  1: 'b',  2: 'c',  length: 3,  [Symbol.iterator]() 
     };
   }
 };
-const array = Array.from(arrayLike);console.log(array); // 
+const array = Array.from(arrayLike);console.log(array); //
+
+slice 方法：slice 是 JavaScript 数组的一个原型方法，用于提取数组的一部分并返回一个新数组。默认情况下，它只能直接应用于真正的数组对象。
+call 方法：call 是 Function.prototype 上的一个方法，它可以改变函数执行时的上下文（即 this 的值）。这意味着你可以指定任意对象作为函数执行时的 this 值。
+应用到类数组对象：当你使用 Array.prototype.slice.call(arrayLike) 时，实际上是将 slice 方法的 this 绑定到了 arrayLike 对象上，使得 slice 方法能够像处理普通数组那样处理这个类数组对象。由于 slice 不修改原对象而是返回一个新的数组，所以结果是一个真正的数组，包含了从 arrayLike 提取的所有元素。
 ```
 
 19\. 说下你对 Reflect 的理解？为什么会有 Reflect 的出现？Proxy 也简单的说一下？
