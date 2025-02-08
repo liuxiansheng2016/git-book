@@ -221,6 +221,80 @@ call 方法：call 是 Function.prototype 上的一个方法，它可以改变�
 ```
 
 19\. 说下你对 Reflect 的理解？为什么会有 Reflect 的出现？Proxy 也简单的说一下？
+```
+Reflect 和 Proxy 都是用来控制和操作 JavaScript 对象，Reflect 提供了一组标准的方法来执行语言内部的操作，而 Proxy 则允许你自定义这些操作的行为
+
+Reflect对象上可以拿到语言内部的方法。
+
+- 1. 将 Object 对象一些内部的方法，放到 Reflect 对象上。比如 Object.defineProperty
+现阶段这些方法存在于 object 和 Reflect 对象上，未来只存在于 Reflect 对象上。
+
+意义：也就是说，从 Reflect 对象上可以拿到语言内部的方法。
+
+-2. 操作对象时出现报错返回 false
+比如：Object.defineProperty(obj,name,desc) 在无法定义属性时，会抛出一个错误，而Reflect.defineProperty(obj,name,desc)则会返回 false,这样会更合理一些。
+// 使用 Object.defineProperty
+try {
+  Object.defineProperty(obj, 'name', { value: 'value' });
+} catch (e) {
+  console.log(e);
+}
+
+// 使用 Reflect.defineProperty
+if (!Reflect.defineProperty(obj, 'name', { value: 'value' })) {
+  console.log('Failed to define property');
+}
+
+-3. 让操作对象的编程变为函数式编程
+说明：老写法有的是命令式编程，比如下面这个例子
+
+// 命令式编程
+'name' in obj;
+
+// 函数式编程
+Reflect.has(obj, 'name');
+
+-4. 保持和 Proxy 对象的方法一一对应
+
+说明：Reflect 对象的方法与 Proxy 对象的方法一一对应，只要是 Proxy 对象的方法，就能在 Reflect 对象上找到对应的方法。
+const handler = {
+    get(target, propertyKey, receiver) {
+        // 使用 Reflect.get 来获取目标对象的属性值
+        const result = Reflect.get(target, propertyKey, receiver);
+        
+        if (result === undefined) {
+            console.log(`属性 "${propertyKey}" 不存在，返回默认值`);
+            return '默认值';
+        }
+        
+        console.log(`访问了属性 "${propertyKey}"`);
+        return result;
+    },
+    set(target, propertyKey, value, receiver) {
+        // 使用 Reflect.set 来设置目标对象的属性值
+        const success = Reflect.set(target, propertyKey, value, receiver);
+        if (success) {
+            console.log(`设置了属性 "${propertyKey}" 的值为 "${value}"`);
+        } else {
+            console.log(`设置属性 "${propertyKey}" 失败`);
+        }
+        return success;
+    }
+};
+
+const target = { foo: 'bar' };
+const proxy = new Proxy(target, handler);
+
+console.log(proxy.foo); // 输出: 访问了属性 "foo" 和 "bar"
+proxy.newProp = 'newValue'; // 输出: 设置了属性 "newProp" 的值为 "newValue"
+console.log(proxy.nonExistent); // 输出: 属性 "nonExistent" 不存在，返回默认值 和 默认值
+
+Proxy 是一个构造函数，它能够创建一个代理对象，用于拦截并定义基本操作。
+
+用于修改某些操作的默认行为，等同于在语言层面做出修改。
+
+var proxy = new Proxy(target, handler);
+```
 
 20\. Webpack 打包 速度慢怎么办？
 
@@ -229,13 +303,13 @@ call 方法：call 是 Function.prototype 上的一个方法，它可以改变�
 ```
 微前端是一套架构体系，
 Module Federation 是webpack给出的技术方案
-1技术栈无关
+1. 技术栈无关
 主框架不限制接入应用的技术栈，微应用具备完全自主权
-2独立开发、独立部署
+2. 独立开发、独立部署
 微应用仓库独立，前后端可独立开发，部署完成后主框架自动完成同步更新
-3增量升级
+3. 增量升级
 在面对各种复杂场景时，我们通常很难对一个已经存在的系统做全量的技术栈升级或重构，而微前端是一种非常好的实施渐进式重构的手段和策略
-4独立运行时
+4. 独立运行时
 每个微应用之间状态隔离，运行时状态不共享
 ```
 
@@ -258,6 +332,19 @@ https://www.zhihu.com/question/433854153/answer/2925739518?utm_id=0
 24\. 项目开发你是怎么组织 CSS 的？
 
 25\. 性能优化
+```
+按需加载，懒加载，预加载，滚动加载，分页加载
+浏览器缓存和服务端缓存策略 减少资源的重复请求
+请求合并：利用API端点聚合整合多个服务的数据,
+
+异步加载JS资源
+减少重绘和回流
+利用节流防抖来处理高频操作
+避免JS渲染动画：使用CSS动画代替JavaScript动画，减少JavaScript的执行时间
+
+webpack 打包和压缩
+
+```
 
 26\. 按需加载
 
