@@ -1122,7 +1122,15 @@ Class 提供了更清晰、简洁和面向对象的语法，更适合现代开�
 调用方式的区别
 this的指向问题
 命名方式
-返回值
+返回值:
+   构造函数：如果构造函数没有显式返回任何对象，则默认返回新创建的对象。如果显式返回了一个对象，则返回该对象；但如果返回的是一个原始类型（如字符串、数字等），则忽略返回值，依旧返回新创建的对象。
+function SpecialThing() {
+    this.value = 42;
+    return { special: 'value' }; // 返回自定义对象
+}
+const obj = new SpecialThing(); // obj 是 { special: 'value' }
+普通函数：可以返回任意类型的值，包括原始类型和对象。如果不显式指定返回值，默认返回 undefined
+
 https://zhuanlan.zhihu.com/p/27093821
 ```
 
@@ -1228,6 +1236,16 @@ console.log(hasCircularReference(a)); // true
 <link rel="preload"> 是一种现代的预加载技术，它允许浏览器尽早开始加载特定的资源，如 JavaScript 文件、字体、图片
 <link rel="prefetch"> 类似于 <link rel="preload">，但它主要用于那些不是立即需要的资源
 Service Worker 可以拦截网络请求并缓存资源
+
+目的不同：
+preload 旨在尽早加载当前页面中必需的资源，以加快页面加载速度和响应时间。
+prefetch 更倾向于优化未来的导航或操作，预先获取那些暂时不需要但将来可能需要用到的资源。
+优先级不同：
+浏览器会给予 preload 资源更高的优先级，因为它们对当前页面至关重要。
+相比之下，prefetch 请求的优先级较低，浏览器只会在空闲时处理这些请求。
+时机不同：
+preload 在浏览器开始解析文档时就会触发资源下载。
+prefetch 可能在页面加载完成之后，当浏览器认为有足够的网络带宽时才会执行。
 ```
 {% endcode %}
 
@@ -1485,6 +1503,42 @@ manifest.json 文件通常用于 web 应用、浏览器扩展和 Node.js项目�
 ```
 {% endcode %}
 
+154\.New 和 Object.create
+```
+New操作符
+New操作符创建一个空对象，用this指代该对象。同时继承该函数的原型。属性和方法被加到this 
+（1）首先创建了一个新的空对象
 
+（2）设置原型，将对象的原型设置为函数的 prototype 对象。
+
+（3）让函数的 this 指向这个对象，执行构造函数的代码（为这个新对象添加属性）
+
+（4）判断函数的返回值类型，如果是值类型，返回创建的对象。如果是引用类型，就返回这个引用类型的对象。用的对象中。
+function myNew(fn, ...args) {
+    // 创建一个空对象，并将其原型设置为构造函数的 prototype 对象
+    const obj = {};
+    const result = fn.apply(obj,args);
+    obj.__proto__ = fn.prototype;
+    // 如果构造函数返回的是一个对象，则返回该对象；否则返回新创建的对象
+    return (result !== null && typeof result === 'object') ? result : obj;
+}
+
+构造函数：如果构造函数没有显式返回任何对象，则默认返回新创建的对象。如果显式返回了一个对象，则返回该对象；但如果返回的是一个原始类型（如字符串、数字等），则忽略返回值，依旧返回新创建的对象。
+function SpecialThing() {
+    this.value = 42;
+    return { special: 'value' }; // 返回自定义对象
+}
+const obj = new SpecialThing(); // obj 是 { special: 'value' }
+
+Object.create()
+Object.create = function (o) {
+
+   var F = function () {};
+
+   F.prototype = o;
+   return new F();
+
+};
+```
 
 [^1]: 
