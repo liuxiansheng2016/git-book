@@ -643,8 +643,30 @@ Tcp 开销大，拥塞机制，流量控制
 {% endcode %}
 
 59\. Websocket和http
+```
+WebSocket是一种在单个TCP连接上进行全双工通信的协议。它被设计用于替代传统的HTTP请求/响应模型，以实现更高效、实时的通信。
+WebSocket使得服务器和客户端可以在建立连接后，双向发送数据，而无需每次发送数据前进行握手，这大大提高了数据传输的效率和速度。
+
+1.2 WebSocket与HTTP的区别
+
+连接方式：HTTP是基于请求/响应的模型，每次通信都需要建立新的连接（无状态的交互），而WebSocket在连接建立后，可以持续进行双向通信。
+
+数据传输：HTTP传输数据时，需要封装成HTTP请求或响应，包含额外的头部信息，而WebSocket传输的数据更轻量(WebSocket 消息头较小)，没有HTTP头部的开销。
+
+实时性：由于WebSocket的持续连接特性，它能够实现真正的实时通信，而HTTP则需要轮询或长轮询来模拟实时性，效率较低。
+
+安全性：HTTPS：HTTP 可以通过 HTTPS 提供加密传输，确保数据的安全性。
+
+WebSocket 可以通过 WSS（WebSocket Secure）提供加密传输，确保数据的安全性。
+```
 
 60\. 对 JavaScript 执行上下文的理解 JavaScript
+```
+在全局执行上下文中，this的值指向全局对象
+
+在函数执行上下文中，this的值取决于该函数是如何被调用的，
+如果它被一个引用对象调用，那么this会被设置成那个对象，否则this的值被设置为全局对象或者undifined,
+```
 
 61\.  ES5 模拟实现一下 let、const（https://www.cnblogs.com/bxtfdxg/p/14885568.html）
 
