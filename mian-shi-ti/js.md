@@ -729,7 +729,11 @@ https://juejin.cn/post/6877507011769008135
 70\. 原型prototype
 
 ```
+每个类型（例如Date,Error,Array,Number……包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象
 _proto__任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象
+constructor属性的含义就是指向该对象的构造函数，所有函数（此时看成对象了）最终的构造函数都指向Function。
+
+f1.constructor === Foo
 ```
 
 71\. 原型链
@@ -843,10 +847,10 @@ Etag/If-None-Match
 
 {% code overflow="wrap" %}
 ```
-在执行过程中，同步和异步任务分别进入不同的执行场所，同步的是进入主线程，异步的进入Event Table并注册函数
-2指定的事情完成时，Event Tabel 会将这个函数移入Event Quene
-3主线程内的任务执行完毕时为空，会将Event Queue读取对应函数，进入主线程执行
-4以上过程重复时，就是Event Loop
+1. 在执行过程中，同步和异步任务分别进入不同的执行场所，同步的是进入主线程，异步的进入Event Table并注册回调函数
+2. 指定的事情完成时，Event Tabel 会将这个函数移入Event Quene
+3. 主线程内的任务执行完毕时为空，会将Event Queue读取对应函数，进入主线程执行
+4. 以上过程重复时，就是Event Loop
 ```
 {% endcode %}
 
@@ -873,6 +877,7 @@ Readystatechange：在页面的各个状态（包括加载数据等等的过程�
 ```
 1.箭头函数中的this是在定义函数的时候绑定，而不是在执行函数的时候绑定。
 2.导致内部的this就是外层代码块的this。正是因为它没有this，所以也就不能用作构造函数。
+3.箭头函数不支持 arguments 对象，但可以通过使用剩余参数（...）来实现类似的功能。
 ```
 
 87\. 块级作用域
