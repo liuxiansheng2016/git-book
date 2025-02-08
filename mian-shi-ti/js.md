@@ -1252,13 +1252,10 @@ prefetch 可能在页面加载完成之后，当浏览器认为有足够的网�
 124\. 如何优化大规模 dom 操作的场景？
 
 ```
-1.减少重绘（Repainting）和回流（Reflow）
-   合并修改：尽可能地合并多次DOM操作为一次，避免反复触发重绘或回流
-2.当你需要批量插入 DOM 元素时，可以先将这些元素添加到 DocumentFragment 中，然后再一次性插入到 DOM 中。
-3. 利用 Shadow DOM
-4. 使用虚拟 DOM
-5.使用 Web Workers
-6.懒加载
+缓存 DOM 对象，避免重复查询。
+使用文档片段（Document Fragment）进行批量操作，减少重绘和重排。
+使用虚拟 DOM 来进行高效的 DOM 操作。
+
 ```
 
 125\. 类组件也是function
