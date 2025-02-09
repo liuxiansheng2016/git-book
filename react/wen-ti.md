@@ -569,9 +569,9 @@ Immutable 通过 is 方法则可以完成对比，而无需像一样通过深度
 
 ### Render 方法调用
 
-当使用 this.setState()
-当你的组件收到新的 props
-当 this.forceUpdate()被叫时。
+- 当使用 this.setState()
+- 当你的组件收到新的 props
+-当 this.forceUpdate()被调用时。
 
 初始化：当组件被创建并被插入到 DOM 中时，会触发初始渲染，render 方法会被调用。
 
