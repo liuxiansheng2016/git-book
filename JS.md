@@ -1271,4 +1271,64 @@ console.log(curryingAdd(1)(2)); // 输出: 3
 
 更多内容可以参考 [这篇文章](https://www.jianshu.com/p/2975c25e4d71)。
 
+### async defer
+
+#### async和defer的相同点
+
+都是异步加载script，加载的过程都不会阻塞html的解析。
+
+#### 不同点
+
+1. async和defer的执行时机不同，async是在加载完后立即执行，执行的过程仍会阻塞后续html的解析。defer是在html解析完，DomContentLoaded之前执行。
+2. async不能保证script标签的执行顺序（谁先加载完谁先执行），defer在html解析完之后按顺序执行。
+
+#### 总结
+
+通常情况下defer的使用频率较高，它能保证script之间的变量依赖。
+
+需要注意的是：async script的资源请求时异步的，但script的执行仍然会阻塞后续渲染（单线程），defer是在html渲染完之后执行的所以不会阻塞后续html的解析。
+
+### BOM
+
+Browser Object Model
+
+- Window是它的顶级对象 window.open/close
+- History
+- Document
+- Location
+- Navigator
+- Screen
+- Cookie
+- setTimeout
+
+### REM
+
+css中的body中先全局声明font-size=62.5%，这里的%的算法和rem一样。
+
+因为100%=16px，1px=6.25%，所以10px=62.5%，
+
+这是的1rem=10px，所以12px=1.2rem。px与rem的转换通过10就可以得来，很方便了吧！
+
+### 使用方法
+
+注意，rem是只相对于根元素html的font-size，即只需要设置根元素的font-size，其他元素使用rem单位设置成相应的百分比即可；
+
+一般情况下，是这样子使用的：
+
+```css
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 12px;
+  font-size: 1.2rem;
+}
+
+p {
+  font-size: 14px;
+  font-size: 1.4rem;
+}
+```
+
 
