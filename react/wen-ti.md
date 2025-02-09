@@ -505,10 +505,10 @@ React 基于 Virtual DOM 实现了一个 SyntheticEvent 层（合成事件层）
 没有继承 React.Component,由于生命周期函数是 React.Component 类的方法实现的,所以没继承这个类,自然就没法使用生命周期函数
 
 ### 如何提高组件的渲染效率
-1.子组件执行 shouldcomponentUpdate 接收两个参数控制是否渲染
-2. 使用 React.PureComponent
-3. React 提供了一个辅助对象来实现浅比较(shallowCompare)这种模式 - 继承自 React.PureComponent。当组件更新时，如果组件的 props 和 state 都没发生改变，render 方法就不会触发，省去 Virtual DOM 的生成和比对过程，达到提升性能的目的。
-4. immutable.js 不可突变的数据结构
+- 1. 子组件执行 shouldcomponentUpdate 接收两个参数控制是否渲染
+- 2. 使用 React.PureComponent
+- 3. React 提供了一个辅助对象来实现浅比较(shallowCompare)这种模式 - 继承自 React.PureComponent。当组件更新时，如果组件的 props 和 state 都没发生改变，render 方法就不会触发，省去 Virtual DOM 的生成和比对过程，达到提升性能的目的。
+- 4. immutable.js 不可突变的数据结构
 
 Immutable Data 就是一旦创建，就不能再被更改的数据。对 Immutable 对象的任何修改或添加删除操作都会返回一个新的 Immutable 对象。Immutable 实现的原理是 Persistent Data Structure（持久化数据结构），也就是使用旧数据创建新数据时，要保证旧数据同时可用且不变
 
