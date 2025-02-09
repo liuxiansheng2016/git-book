@@ -1539,3 +1539,25 @@ Object.create = function (o) {
 ```
 
 [^1]: 
+
+155\. 前端资源加载失败优化
+```
+1. 加载失败时，刷新页面 (reload）
+
+2.针对加载失败的文件进行重加载
+
+
+1.我们可以给 script 标签添加上 onerror 属性，这样在加载失败时触发事件回调，从而捕捉到异常。
+
+借助构建工具 ( 如 webpack 的 script-ext-html-webpack-plugin 插件) ，我们可以轻易地完成对所有 script 标签自动化注入 onerror 标签属性
+
+window.addEventListener
+因为 onerror 的事件并不会向上冒泡，window.onerror 接收不到加载失败的错误。冒泡虽不行，但捕获可以！我们可以通过捕获的方式全局监控加载失败的错误，虽然这也监控到了脚本错误，
+但通过 !(event instanceof ErrorEvent) 判断便可以筛选出加载失败的错误。
+window.addEventListener('error', function(event) {
+    // 检查是否为资源加载错误而非脚本运行时错误
+    if (!(event instanceof ErrorEvent)) {
+        console.log('加载资源出错:', event.target.src || event.target.href);
+    }
+}, true); // 'true' 表示使用捕获模式
+```
