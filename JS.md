@@ -1332,3 +1332,67 @@ p {
 ```
 
 
+### Vite 特性整理
+
+#### 1. 原生 ES 模块支持
+- **无打包启动**：Vite 利用了浏览器对原生 ES 模块的支持，开发过程中无需打包整个项目。这意味着启动开发服务器时，Vite 只需读取和解析模块图，而不是像 Webpack 那样将所有文件打包成一个或多个 bundle。
+- **按需编译**：只有在实际请求某个模块时，Vite 才会编译和转换该模块。这大大减少了启动时间和热更新的时间。
+
+#### 2. 开发服务器优化
+- **快速冷启动**：由于 Vite 使用了原生 ES 模块，开发服务器的启动时间非常短，通常只需几秒钟。
+- **热模块替换（HMR）**：Vite 提供了高效的热模块替换（HMR）机制，可以在不刷新页面的情况下实时更新代码。HMR 的实现更加精细，只更新实际发生变化的部分，而不是整个模块。
+
+#### 3. 依赖预构建
+- **预构建依赖**：Vite 会自动预构建项目中的依赖项，将它们转换为 ES 模块格式。这样可以避免在开发过程中重复编译第三方库，进一步加快了开发速度。
+- **缓存机制**：预构建的依赖会被缓存起来，下次启动时可以直接使用，进一步减少了启动时间。
+
+#### 4. 内置开发服务器
+- **内置开发服务器**：Vite 自带了一个开发服务器，基于 Node.js 的 esbuild 和 rollup，提供了开箱即用的开发环境。开发服务器支持多种开发工具和插件，如 TypeScript、CSS 预处理器等。
+- **自动重启**：开发服务器会监听文件变化，自动重启以反映最新的代码变更。
+
+#### 5. 生产构建优化
+- **高效构建**：虽然 Vite 在开发模式下不进行打包，但在生产构建时，Vite 会使用 Rollup 进行高效的打包。Rollup 的构建速度通常比 Webpack 更快，尤其是在处理大型项目时。
+- **Tree Shaking**：Vite 通过 Rollup 进行 Tree Shaking，移除未使用的代码，减小最终的包体积。
+
+### 实现地图功能
+
+#### 1. 数据准备
+- **地图数据**
+  - 矢量数据：使用 GeoJSON 格式的数据，包含点、线、多边形等地理要素。
+  - 栅格数据：使用 TIFF、PNG、JPEG 等格式的卫星图像或地图瓦片。
+- **数据来源**
+  - 公开数据：可以从 OpenStreetMap、Natural Earth 等网站获取免费的地理数据。
+  - 自采数据：使用 GPS 设备或无人机采集数据。
+
+#### 2. 前端开发
+- **选择框架**
+  - 纯 JavaScript：使用原生 JavaScript 和 HTML5 Canvas 或 SVG。
+  - Web GIS 框架：使用 Leaflet、OpenLayers 等成熟的地图库。
+- **基本地图显示**
+  - 使用 Leaflet：
+    1. 引入 Leaflet：
+    ```html
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    ```
+    2. 创建地图容器：
+    ```html
+    <div id="map" style="height: 500px;"></div>
+    ```
+    3. 初始化地图：
+    ```javascript
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    ```
+
+- **使用Canvas**
+  - GeoJSON 是一种强大且灵活的地理数据格式，大多数现代地图库（如 Leaflet、OpenLayers、Mapbox）都支持直接使用 GeoJSON 数据。
+  - `coordinates` 是一个包含多个数值的数组，表示经度和纬度。
+  - GeoJSON 对象可以包含以下几种类型：
+    - 几何对象（Geometry）：表示地理形状，如点、线、多边形等。
+    - 特征（Feature）：包含几何对象和属性信息。
+    - 特征集合（Feature Collection）：包含多个特征对象。 
+
+这些步骤和说明旨在提供一个清晰的指导，帮助理解如何利用 Vite 加速前端开发流程以及如何使用 Leaflet 或其他地图库来展示地图数据。
