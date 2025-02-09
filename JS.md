@@ -1113,4 +1113,160 @@ console.log(0.1 + 0.2); // 0.30000000000000004
 [更多详细内容](https://2ality.com/2012/01/object-plus-object.html)
 [参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)
 
+### Ajax
 
+使用 Ajax 发起 HTTP 请求的步骤如下：
+
+1. 创建 `XMLHttpRequest` 对象。
+2. 创建一个新的 HTTP 请求，并指定 HTTP 请求的方法、URL 及验证信息（是否支持异步，默认为 true）。
+3. 设置响应 HTTP 请求状态变化的函数。
+4. 发送 HTTP 请求。
+
+示例代码：
+
+```javascript
+let xhr = new XMLHttpRequest();
+
+xhr.open("GET", url, true);
+xhr.responseType = "json";
+xhr.setRequestHeader("Accept", "application/json");
+
+xhr.onreadystatechange = function() {
+  if (xhr.readyState === 4 && xhr.status === 200) {
+    console.log(xhr.response);
+  }
+};
+
+xhr.onerror = function() {
+  console.error("Request error");
+};
+
+xhr.send(null);
+```
+
+Ajax 是异步 JavaScript 和 XML，用于在 Web 页面中实现异步数据交互。
+
+### Fetch
+
+`Fetch` 是 JavaScript 中用于发起 HTTP 请求的库。与 Ajax 相比，Fetch 有以下不同：
+
+1. **API 设计风格**
+   - Fetch API：采用 Promise 的模式来处理异步操作，更加符合现代 JavaScript 的编程习惯。Fetch API 的设计简洁明了，易于理解和使用。
+   - AJAX：通常依赖于 `XMLHttpRequest` 对象，需要处理多个状态码和事件。尽管 `XMLHttpRequest` 也可以使用 Promise 包装，但其原生 API 更加繁琐。
+
+2. **返回值**
+   - Fetch API：总是返回一个 Promise，无论请求是否成功，都需要通过 `.then()` 方法来处理结果。如果请求失败，会返回一个带有错误状态码的 Response 对象。（当接收到错误的 HTTP 状态码时，返回的 Promise 不会标记为 reject，只有网络故障和请求被阻止才会标记为 reject）
+   - AJAX：使用 `XMLHttpRequest` 时，可以通过 `onreadystatechange` 事件来处理请求完成的状态变化，也可以使用 `responseText` 或 `responseXML` 属性来获取响应内容。
+
+3. **全局错误处理**
+   - Fetch API：如果请求过程中出现了网络错误或者其他类型的错误，Promise 会被 reject，因此可以通过 `.catch()` 来处理这些错误。
+   - AJAX：需要为 `XMLHttpRequest` 设置 `onerror` 和 `onabort` 事件来处理错误。
+
+其他区别：
+- 缺少拦截器：Fetch 没有内置的请求和响应拦截器。
+- 手动处理 JSON：需要手动将响应数据转换为 JSON。
+- 错误处理：Fetch 不会因为 HTTP 错误状态码（如 404 或 500）而 reject Promise，需要手动检查响应状态。
+
+```
+// GET 请求
+fetch('https://jsonplaceholder.typicode.com/posts')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(data => console.log(data))
+  .catch(error => console.error('There has been a problem with your fetch operation:', error));
+
+// POST 请求
+fetch('https://jsonplaceholder.typicode.com/posts', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    title: 'foo',
+    body: 'bar',
+    userId: 1,
+  }),
+})
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(data => console.log(data))
+  .catch(error => console.error('There has been a problem with your fetch operation:', error));
+```
+
+### Axios
+
+Axios 是另一个用于发起 HTTP 请求的库，具有以下优点和缺点：
+
+#### 优点
+
+- 跨浏览器兼容性：支持所有现代浏览器，包括 IE11。
+- Promise-based：基于 Promise，使得异步操作更加简洁和易于处理。
+- 拦截器：可以设置请求和响应的拦截器，方便进行请求和响应的预处理。
+- 自动转换：自动将响应数据转换为 JSON（如果响应类型为 JSON）。
+- 支持多种请求方法：GET、POST、PUT、DELETE 等。
+- 错误处理：提供了统一的错误处理机制。
+- 取消请求：支持取消请求，可以用于处理用户取消操作或超时情况。
+
+#### 缺点
+
+- 需要额外安装：需要通过 npm 或其他包管理工具安装。
+- 体积较大：相比原生的 Fetch，Axios 的体积稍大一些。
+
+```
+const axios = require('axios');
+
+// GET 请求
+axios.get('https://jsonplaceholder.typicode.com/posts')
+  .then(response => {
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.error('There has been a problem with your axios operation:', error);
+  });
+
+// POST 请求
+axios.post('https://jsonplaceholder.typicode.com/posts', {
+  title: 'foo',
+  body: 'bar',
+  userId: 1,
+})
+  .then(response => {
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.error('There has been a problem with your axios operation:', error);
+  });
+```
+
+### 柯里化
+
+柯里化主要用于将接受多个参数的函数转换为接受单个参数的函数，并返回一个新函数，该新函数接受余下的参数并返回结果。
+
+#### 示例代码
+
+```javascript
+// 普通的add函数
+function add(x, y) {
+  return x + y;
+}
+
+// Currying后
+function curryingAdd(x) {
+  return function (y) {
+    return x + y;
+  }
+}
+
+console.log(add(1, 2)); // 输出: 3
+console.log(curryingAdd(1)(2)); // 输出: 3
+```
+
+更多内容可以参考 [这篇文章](https://www.jianshu.com/p/2975c25e4d71)。
