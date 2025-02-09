@@ -784,3 +784,333 @@ Nginx 反向代理：
 
 缺点：配置复杂，需要编写和维护配置文件
 
+### 模块化
+在ES6之前，社区制定了若干模块加载方案，其中最著名的有CommonJS和AMD两种规范。
+
+- CommonJS 主要应用于服务器端（如Node.js环境）。
+- AMD（Asynchronous Module Definition），则多用于浏览器端。
+  
+#### CommonJS
+CommonJS是一种主要用于Node.js环境的模块化规范。ES6的设计思想倾向于静态化，即尽可能在编译时确定模块的依赖关系、输入输出变量等信息。相比之下，CommonJS和AMD模块依赖关系以及输入输出变量只能在运行时确定。
+
+例如，在CommonJS中，一个模块实质上是一个对象，当导入时需要查找该对象的属性。比如从fs模块中整体加载（即加载fs的所有方法），生成一个对象_fs，然后从这个对象中读取特定的方法。这种加载方式被称为“运行时加载”，因此无法进行编译时的“静态优化”。
+
+#### ES6模块
+ES6模块不是对象，而是通过export命令显式指定输出的内容，并且这些输出是静态定义的。这样做的好处是可以实现“编译时加载”，即只加载实际需要的部分。例如，如果只需要从fs模块加载3个方法，则只会加载这3个方法，其他方法不会被加载。这种方式称为“编译时加载”，但这也意味着你不能像对待对象那样引用整个模块。
+
+使用export default时，对应的import语句不需要使用大括号。这是因为默认导出只能有一个。
+如果不使用export default，则需要使用大括号来明确指出导入哪些具体成员。
+本质上，export default就是输出一个名为default的变量或方法，允许为它取任意名字。
+
+#### 加载机制对比
+- CommonJS: 输出的是值的一个拷贝，这意味着一旦输出了一个值，模块内部的变化就不会影响到这个值。
+- ES6模块: 输出的是值的引用，实现了动态引用，所以模块内部的变化可以反映到外部。
+
+#### CommonJS vs AMD
+
+**CommonJS**
+
+定义：每个单独文件就是一个模块。
+输出：通过module.exports对象作为唯一出口。
+加载：使用require()方法加载模块。
+
+**AMD (Asynchronous Module Definition)**
+
+目标：解决浏览器端模块开发的问题，特别是处理多个JavaScript文件之间的依赖关系，并避免js文件加载阻塞页面渲染。
+工具：Require.js，它定义了全局函数define来定义模块，以及异步加载的require()函数。
+
+**CMD (Common Module Definition)**
+浏览器端的实现之一是Sea.js，其设计目标类似于Require.js，但在模块定义和加载机制上有自己的特点，比如使用sea.use()来加载模块。
+
+### 避免全局变量
+- 立即执行函数
+
+- 声明命名空间
+
+- 模块化
+
+### 立即执行函数表达式（IIFE）
+
+#### 错误示例
+
+```javascript
+function (){ /* code */ }() // 错误
+```
+在JavaScript中，遇到`function`关键字时，默认会将其视为函数声明。由于函数声明需要一个名称，并且不能直接跟一对括号来立即调用它，因此上述代码会导致语法错误。
+
+即使加上了函数名`foo`，这个例子也会出错。这里的括号`()`被解释为分组操作符而不是函数调用的一部分，因为JavaScript期望一个函数声明或表达式而非这种形式。正确的形式应为：
+
+```javascript
+function foo { /* code */ }
+
+() // 错误
+```
+
+#### 正确形式
+
+要创建一个立即执行函数表达式（IIFE），你需要确保`function`关键字被视为函数表达式的一部分。这可以通过将整个函数包裹在括号内实现，如下所示：
+
+```javascript
+(function() { /* code */ })(); // 正确
+```
+或者
+```javascript
+(function() { /* code */ }()); // 也是正确的
+```
+
+#### 立即执行函数的作用
+
+- 避免全局变量污染
+IIFE允许你定义不需要命名的函数并立即执行它们，这样就不会向全局作用域添加额外的变量或函数名。
+
+- 创建独立的作用域
+IIFE内部形成了一个新的作用域，这意味着你可以在此范围内定义局部变量，这些变量对外部是不可访问的，从而实现封装和隐藏数据的效果。
+
+- 封装变量
+可以用来封装变量，防止它们泄露到全局作用域，同时提供了一种组织代码的方式。
+
+- 立即执行函数的参数
+如果IIFE需要使用外部的全局变量，可以通过参数传递给IIFE，这种方式可以提高代码的可维护性和清晰度。例如：
+
+```javascript
+(function(j) {
+    // 在这里可以使用 j
+})(i); // i 是实参，j 是形参
+```
+
+- 立即执行函数的返回值
+IIFE可以有返回值，但是通常情况下，除非特别需要，否则很少关注IIFE的返回值。如果你确实需要从IIFE获取返回值，可以直接将其赋值给一个变量：
+
+```javascript
+const result = (function() {
+    return "This is the result";
+})();
+console.log(result); // 输出: This is the result
+```
+### JavaScript 变量提升与作用域
+
+#### 声明提升
+1. 变量提升只会提升变量名的声明，而不会提升变量的赋值初始化。
+2. 函数提升优先于变量提升，即函数提升在变量提升之上。
+3. 函数声明会将函数提升（包括声明function和赋值=），函数表达式只会将变量var提升。
+
+#### 示例代码
+
+```javascript
+function fn() {
+  getValue = function () { console.log(1); };
+  return this;
+}
+
+fn.getValue = function () { console.log(2); };
+fn.prototype.getValue = function () { console.log(3); };
+var getValue = function () { console.log(4); };
+function getValue() { console.log(5); }
+var getValue = function () { console.log(4); };
+function getValue() { console.log(5); }
+
+// 请写出以下输出结果：
+getValue(); // 4
+fn().getValue(); // 1
+getValue(); // 1
+new fn.getValue(); // 2
+new fn().getValue(); // 3
+```
+
+#### 块级作用域的函数声明
+
+##### 示例代码
+
+```javascript
+if (true) {
+  a = 10;
+  console.log(a, window.a); // 10 undefined
+
+  function a() {};
+  console.log(a, window.a); // 10 10
+}
+
+if (true) {
+  console.log(a, window.a); // ƒ a(){} undefined
+
+  function a() {};
+  a = 10;
+  console.log(a, window.a); // 10 ƒ a(){}
+}
+```
+
+在块级作用域中默认声明的变量，只有代码执行到声明语句之后，才可以进行访问，否则会报错。块级作用域中默认声明的变量会被提升到全局作用域。
+
+ECMAScript的作用域只有两种：全局作用域和函数作用域。但ES6的到来，为我们提供了“块级作用域”。凡是带 `{}` 的都是块级作用域。
+
+`window.a` 只有等块级作用域中函数声明的定义的那行代码执行过之后，才会被映射到全局作用域。
+
+函数声明中，整个函数体也都会被提升，而函数表达式中只会提升名称。
+
+#### This 例子
+
+##### 示例代码
+
+```javascript
+var x = 3;
+let result = {
+  x: 2,
+  baz: {
+    x: 1,
+    bar: function() {
+      return this.x;
+    }
+  }
+};
+
+let go = result.baz.bar;
+console.log(result.baz.bar()); // 1
+console.log(go()); // 3
+```
+
+### 继承
+通过子类的原型prototype对象实例化来实现
+缺点是：子类之间相互影响。所有子对象共享同一个原型对象，对原型对象的修改会影响到所有子对象
+
+#### 构造函数式继承
+构造函数继承是通过在子构造函数中调用父构造函数来实现继承。在构造函数继承中，通过在子构造函数中使用**call()或apply()**方法，将父构造函数的上下文设置为子对象的上下文，从而实现继承。
+```
+function Parent(name) {
+  this.name = name;
+}
+
+Parent.prototype.sayName = function() {
+  console.log(this.name);
+};
+
+function Child(name) {
+  Parent.call(this, name); // 调用父类构造函数
+}
+
+let child1 = new Child('Alice');
+let child2 = new Child('Bob');
+
+child1.sayName(); // 输出: Alice
+child2.sayName(); // 输出: Bob
+```
+
+使通过this创建的属性和方法在子类中复制一份，因为是单独复制的，所以各个实例化的子类互不影响。Parent.call(this ,name),所以父类的原型方法自然不会被子类继承，而如果要想被子类继承就必须要放在构造函数中。
+
+#### 组合式继承
+但是父类的构造函数会被创建两次（一次是在设置原型时，一次是在创建子对象时）
+```
+function Parent(name) {
+    this.name = name;
+    this.colors = ['red', 'blue', 'green'];
+}
+
+Parent.prototype.sayName = function() {
+    console.log(this.name);
+};
+
+function Child(name, age) {
+    Parent.call(this, name); // 第二次调用Parent构造函数
+    this.age = age;
+}
+
+// 直接将Parent.prototype赋值给Child.prototype，这会导致Parent构造函数被第二次调用
+Child.prototype = new Parent(); 
+
+Child.prototype.constructor = Child; 
+Child.prototype.sayAge = function() {
+    console.log(this.age);
+};
+```
+
+#### 寄生组合继承
+```
+function inheritPrototype(subType, superType) {
+  let prototype = Object.create(superType.prototype); // 创建父类原型的副本
+  prototype.constructor = subType; // 修复构造函数引用
+  subType.prototype = prototype; // 将子类原型指向这个副本
+}
+
+function SuperType(name) {
+  this.name = name;
+}
+
+SuperType.prototype.sayName = function() {
+  console.log(this.name);
+};
+
+function SubType(name, age) {
+  SuperType.call(this, name); // 继承父类的实例属性
+  this.age = age;
+}
+
+inheritPrototype(SubType, SuperType); // 继承父类的原型方法
+
+SubType.prototype.sayAge = function() {
+  console.log(this.age);
+};
+
+let instance = new SubType('Alice', 25);
+instance.sayName(); // 输出: Alice
+instance.sayAge(); // 输出: 25
+```
+#### ES6中的继承 extends
+在 ES2015 中有了 class 语法糖，有了 extends、super、static 这样的关键字，更像强类型语言中的“类”了。
+
+
+### 字符相加
+
+在JavaScript中，不同类型的值在进行相加操作时，会根据类型的不同进行转换和处理。
+
+#### 示例代码
+
+```javascript
+// !可将变量转换成boolean类型，null、undefined、NaN以及空字符串('')取反都为true，其余都为false。
+console.log(!null); // true
+console.log(!undefined); // true
+console.log(!NaN); // true
+console.log(!''); // true
+
+// [] + {} "[object Object]"
+console.log([] + {}); // "[object Object]"
+
+// {} + [] => + [] 0
+console.log({} + []); // 0
+
+// 通过Number()将值转换为数字
+console.log(Number(undefined)); // NaN
+console.log(Number({})); // NaN
+
+console.log(1 + 'string'); // '1string'
+console.log(1 + undefined); // NaN
+console.log(1 + null); // 1
+console.log(1 + [2,3]); // "12,3"
+console.log(1 + {name: 'andyyou'}); // "1[object Object]"
+console.log(1 + true); // 2
+
+var a = (2, 3, 5);
+console.log(a); // 5
+
+console.log(Math.max([2,3,4,5])); // NaN
+
+console.log(0.1 + 0.2); // 0.30000000000000004
+```
+
+#### 说明
+
+- `[] + {}` 结果为 `"[object Object]"`，这是因为数组和对象的相加在JavaScript中被转换为字符串操作。
+- `{}` + `[]` 结果为 `0`，因为会被解释为 `+ []`，而空数组转换成数字后为 `0`。
+- `Number(undefined)` 和 `Number({})` 都会返回 `NaN`，因为它们不能被转换成有效的数字。
+- 当数字与字符串相加时，数字会被转换为字符串。
+- 与 `undefined` 相加会返回 `NaN`。
+- 与 `null` 相加时，`null` 被转换为 `0`。
+- 与数组相加时，数组会被转换为字符串。
+- 与对象相加时，对象会被转换为字符串 `[object Object]`。
+- `1 + true` 结果为 `2`，因为 `true` 被转换为 `1`。
+- 逗号运算符返回最后一个表达式的值。
+- `Math.max` 不能直接处理数组，需要使用 `Math.max.apply(null, [2,3,4,5])`。
+- 浮点数计算可能会出现精度问题，如 `0.1 + 0.2` 结果为 `0.30000000000000004`。
+
+[更多详细内容](https://2ality.com/2012/01/object-plus-object.html)
+[参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)
+
+
