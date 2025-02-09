@@ -25,6 +25,7 @@
 * [Typescript](typescript.md)
 * [Js](JS.md)
 * [Css](CSS.md)
+*  [Http](Http.md)
 * [Library](Library.md)
 * [Rxjs](rxjs/README.md)
   * [Observer 与 Observable](rxjs/observer-yu-observable.md)
