@@ -24,7 +24,7 @@
   * [ng-container 和ng-template](angular/ngcontainer-he-ngtemplate.md)
 * [Typescript](typescript.md)
 * [Js](JS.md)
-* [Es6](Es6.md)
+* [Es6](ES6.md)
 * [Css](CSS.md)
 *  [Http](Http.md)
 * [Library](Library.md)
