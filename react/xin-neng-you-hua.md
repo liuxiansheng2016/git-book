@@ -20,27 +20,35 @@ Https://zhuanlan.zhihu.com/p/559922432
 
 九、debounce、throttle 优化频繁触发的回调
 
-### 使用 React.memo 和 useMemo usecallback
+在React中，优化组件的渲染性能可以从以下几个方面入手：
 
-**React.memo**：用于优化函数组件的重新渲染。当父组件重新渲染时，如果函数组件的 props 没有变化，则不会重新渲染。
+#### 减少不必要的渲染
 
-**useMemo**：用于缓存计算结果，当依赖项没有变化时，不会重新计算。
+- **使用`React.memo()`**：对函数组件使用`React.memo()`，通过浅比较props来避免不必要的渲染。可以传递一个自定义的比较函数作为第二个参数，实现更深层次的对比。
+- **使用`shouldComponentUpdate()`或`PureComponent`**：在类组件中，重写`shouldComponentUpdate()`方法或继承`React.PureComponent`，通过比较新旧props和state来决定是否重新渲染。
 
-### 使用 React.lazy 和 \<Suspense>
-使用 shouldComponentUpdate 或 PureComponent
+#### 优化渲染过程
 
-**shouldComponentUpdate**：在类组件中可以重写此方法来手动控制组件是否需要更新。
+- **避免在`render()`中创建新对象**：在`render()`方法内部创建新对象（如数组、函数等）会导致每次渲染时引用变化，触发子组件的重新渲染。应将这些对象移到组件外部或利用`useMemo()`进行缓存。
+- **使用`useCallback()`**：对回调函数使用`useCallback()`，仅在依赖项变化时才重新创建函数，避免不必要的子组件渲染。
 
-**PureComponent**：React 提供的基类，它会根据 props 和 state 的浅层比较来决定是否需要重新渲染。
+#### 优化数据传递
 
-### 优化状态管理
+- **合理使用props和state**：尽量将数据传递限制在必要的组件范围内，避免不相关的组件因接收数据而触发渲染。
+- **使用`context`**：对于需要跨多层级传递的数据，使用`context`可以避免逐层传递props，减少不必要的渲染。
 
-**useState** 和 **useReducer**：尽量减少全局状态的数量，优先考虑局部状态。
+#### 代码拆分和懒加载
 
-**Context API**：对于需要跨多个组件传递的状态，可以使用 Context API 来避免 prop-drilling。
+- **代码拆分**：利用React的代码拆分功能，将应用拆分为多个代码块，按需加载，减少初始加载时间。
+- **懒加载组件**：使用`React.lazy()`和`Suspense`组件，实现组件的按需加载，提升应用性能。
 
-### 优化虚拟 DOM
+#### 使用生产环境构建
 
-**避免不必要的重新渲染**：确保只有在状态或 props 改变时才重新渲染。
+- **启用生产环境模式**：在生产环境中构建应用，React会启用各种优化，如减少不必要的检查、优化渲染算法等，提升运行性能。
 
-**使用 Key 属性**：确保列表中的元素都有唯一的 key 属性，以帮助 React 识别哪些元素发生了变化。
+#### 性能分析和监控
+
+- **使用React Profiler**：利用React Profiler工具分析组件的渲染性能，找出性能瓶颈并进行优化。
+- **监控性能指标**：使用性能监控工具，实时监控应用的性能指标，及时发现并解决性能问题。
+
+通过综合运用这些策略，可以有效提升React应用的渲染性能，改善用户体验。
