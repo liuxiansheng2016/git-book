@@ -55,6 +55,8 @@ Https://zhuanlan.zhihu.com/p/559922432
 
 ### 虚拟列表
 
+相关库： react-window/react-virtualized
+
 https://juejin.cn/post/7132277540806213645
 
 虚拟列表（Virtual List）是一种优化长列表渲染性能的技术。在React中，虚拟列表通过只渲染当前可见区域的列表项，而不是渲染所有列表项，从而显著减少DOM节点的数量和渲染工作量，提高页面的滚动性能和响应速度。
