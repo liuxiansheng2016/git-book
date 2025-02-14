@@ -706,8 +706,50 @@ ReactDOM.render(<MyComponentWithPersistentData />, document.getElementById('root
 ```
 
 ### 受控组件
-类似于表单元素会维护自身的状态，基于用户输入更新
-在使用表单来收集用户输入时，例如\<input>\<select>\<textearea>等元素都要绑定一个 change 事件，当表单的状态发生变化，就会触发 onChange 事件，更新组件的 state。这种组件在 React 中被称为受控组件
+在React中，处理表单数据主要有两种方式：使用受控组件和非受控组件。
+
+#### 受控组件
+- **工作原理**：受控组件的表单元素值由React组件的状态管理。每当用户输入时，组件的`state`会更新，从而控制表单元素的值。
+- **示例**：
+  ```jsx
+  function ControlledInput() {
+    const [value, setValue] = useState('');
+
+    function handleChange(e) {
+      setValue(e.target.value);
+    }
+
+    return <input type="text" value={value} onChange={handleChange} />;
+  }
+  ```
+- **优点**：数据流清晰，表单状态完全可控，易于实现复杂的表单逻辑和验证。
+- **缺点**：需要编写更多的代码来管理表单状态。
+
+#### 非受控组件
+- **工作原理**：非受控组件的表单元素值由DOM节点本身管理。React通过`ref`来访问和操作DOM节点的值。
+- **示例**：
+  ```jsx
+  function UncontrolledInput() {
+    const inputRef = useRef(null);
+
+    function handleSubmit() {
+      console.log(inputRef.current.value);
+    }
+
+    return (
+      <form onSubmit={handleSubmit}>
+        <input type="text" ref={inputRef} />
+        <button type="submit">提交</button>
+      </form>
+    );
+  }
+  ```
+- **优点**：代码简洁，适用于简单的表单场景。
+- **缺点**：数据流不够清晰，难以实现复杂的表单逻辑和验证。
+
+#### 使用场景
+- **受控组件**：适用于需要实时验证、格式化输入或复杂表单交互的场景。
+- **非受控组件**：适用于简单的表单输入，如搜索框等，不需要复杂逻辑的场景。
 
 ### Purecomponent
 React 创建了 PureComponent 组件创建了默认的 shouldComponentUpdate 行为。
