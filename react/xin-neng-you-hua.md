@@ -64,6 +64,7 @@ https://juejin.cn/post/7132277540806213645
 2. **动态渲染**：仅渲染可见区域内的列表项，当用户滚动时，根据滚动位置重新计算可见区域，并更新渲染的列表项。
 3. **模拟滚动高度**：为了保持滚动的连贯性，需要设置一个容器元素的高度，使其等于所有列表项的总高度，即使实际渲染的列表项只有一小部分。
 
+```
 import React, { useRef, useState, useEffect } from 'react';
 
 const VirtualList = ({ items, itemHeight }) => {
