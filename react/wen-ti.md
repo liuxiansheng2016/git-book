@@ -885,7 +885,9 @@ return this.props.children
 
 3.使用稳定的标识符：如果可能，使用来自数据源的稳定标识符（如数据库 ID）作为 key。
 
- 数组中使用的键在其同级中应该是唯一的，但它们不需要是全局唯一的。也就是说，你可以在两个不同的数组中使用相同的键![image](https://github.com/user-attachments/assets/02006610-95d5-4e50-9f4c-d10e6e5e4d59)
+ 数组中使用的键在其同级中应该是唯一的，但它们不需要是全局唯一的。也就是说，你可以在两个不同的数组中使用相同的键
+ 
+![image](https://github.com/user-attachments/assets/10503c61-a656-40c6-bd30-a2805cb23913)
 
 
 
