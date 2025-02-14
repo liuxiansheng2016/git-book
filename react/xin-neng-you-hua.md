@@ -54,101 +54,100 @@ Https://zhuanlan.zhihu.com/p/559922432
 通过综合运用这些策略，可以有效提升React应用的渲染性能，改善用户体验。
 
 ### 虚拟列表
-```
-/**
- * 绝对定位方案
- */
-import { useState } from 'react';
-import { flushSync } from 'react-dom';
 
-function FixedSizeList({ containerHeight, itemHeight, itemCount, children }) {
-  // children 语义不好，赋值给 Component
-  const Component = children;
+https://juejin.cn/post/7132277540806213645
 
-  const contentHeight = itemHeight * itemCount; // 内容高度
-  const [scrollTop, setScrollTop] = useState(0); // 滚动高度
+虚拟列表（Virtual List）是一种优化长列表渲染性能的技术。在React中，虚拟列表通过只渲染当前可见区域的列表项，而不是渲染所有列表项，从而显著减少DOM节点的数量和渲染工作量，提高页面的滚动性能和响应速度。
 
-  // 继续需要渲染的 item 索引有哪些
-  let startIdx = Math.floor(scrollTop / itemHeight);
-  let endIdx = Math.floor((scrollTop + containerHeight) / itemHeight);
+#### 实现原理
+1. **确定可见区域**：计算当前可视区域内应该显示的列表项范围。
+2. **动态渲染**：仅渲染可见区域内的列表项，当用户滚动时，根据滚动位置重新计算可见区域，并更新渲染的列表项。
+3. **模拟滚动高度**：为了保持滚动的连贯性，需要设置一个容器元素的高度，使其等于所有列表项的总高度，即使实际渲染的列表项只有一小部分。
 
-  // // 上下额外多渲染几个 item，解决滚动时来不及加载元素出现短暂的空白区域的问题
-  // const paddingCount = 2;
-  // startIdx = Math.max(startIdx - paddingCount, 0); // 处理越界情况
-  // endIdx = Math.min(endIdx + paddingCount, itemCount - 1);
+import React, { useRef, useState, useEffect } from 'react';
 
-  const top = itemHeight * startIdx; // 第一个渲染 item 到顶部距离
+const VirtualList = ({ items, itemHeight }) => {
+  const containerRef = useRef(null);
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(0);
 
-  // 需要渲染的 items
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = containerRef.current.scrollTop;
+      const newStartIndex = Math.floor(scrollTop / itemHeight);
+      const newEndIndex = Math.min(items.length - 1, newStartIndex + Math.ceil(containerRef.current.clientHeight / itemHeight));
+      setStartIndex(newStartIndex);
+      setEndIndex(newEndIndex);
+    };
+
+    const container = containerRef.current;
+    container.addEventListener('scroll', handleScroll);
+
+    // Initial calculation
+    handleScroll();
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, [items, itemHeight]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        height: '100vh', // 设置容器高度为视口高度
+        overflowY: 'auto', // 启用滚动条
+      }}
+    >
+      <div style={{ height: `${items.length * itemHeight}px`, position: 'relative' }}>
+        {items.slice(startIndex, endIndex + 1).map((item, index) => (
+          <div
+            key={item.id}
+            style={{
+              position: 'absolute',
+              top: `${(startIndex + index) * itemHeight}px`,
+              height: `${itemHeight}px`,
+              width: '100%', // Ensure the item takes full width of the container
+              boxSizing: 'border-box', // Include padding and border in the element's total width and height
+            }}
+          >
+            {item.name}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default VirtualList;
+
+
+// src/App.js
+import React from 'react';
+import VirtualList from './VirtualList';
+
+function generateItems(count) {
   const items = [];
-  for (let i = startIdx; i <= endIdx; i++) {
-    items.push(
-      <Component
-        key={i}
-        index={i}
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: i * itemHeight,
-          width: '100%',
-          height: itemHeight
-        }}
-      />
-    );
+  for (let i = 1; i <= count; i++) {
+    items.push({ id: i, name: `Item ${i}` });
   }
+  return items;
+}
+
+const ITEMS_COUNT = 1000; // 模拟1000条数据
+const ITEM_HEIGHT = 50; // 每个列表项的高度为50px
+
+function App() {
+  const items = generateItems(ITEMS_COUNT);
 
   return (
-    <div
-      style={{
-        height: containerHeight,
-        overflow: 'auto',
-        position: 'relative'
-      }}
-      onScroll={(e) => {
-        flushSync(() => {
-          setScrollTop(e.target.scrollTop);
-        });
-      }}
-    >
-      <div style={{ height: contentHeight }}>{items}</div>
+    <div>
+      <h1>Virtual List Demo</h1>
+      <VirtualList items={items} itemHeight={ITEM_HEIGHT} />
     </div>
   );
 }
 
-export default FixedSizeList;
-
-import FixedSizeList from './FixedSizeList';
-
-function Item({ style, index }) {
-  return (
-    <div
-      className="item"
-      style={{
-        ...style,
-        backgroundColor: index % 2 === 0 ? 'burlywood' : 'cadetblue'
-      }}
-    >
-      {index}
-    </div>
-  );
-}
-
-export default function App() {
-  const list = new Array(10000).fill(0).map((item, i) => i);
-
-  return (
-    <>
-      列表项高度固定 - 虚拟列表实现
-      <FixedSizeList
-        containerHeight={300}
-        itemCount={list.length}
-        itemHeight={50}
-      >
-        {Item}
-      </FixedSizeList>
-    </>
-  );
-}
-
+export default App;
 ```
 
