@@ -491,6 +491,38 @@ console.log(hw.next()); // { value: 'world', done: false }
 console.log(hw.next()); // { value: 'ending', done: true }
 console.log(hw.next()); // { value: undefined, done: true }
 ```
+```
+function runGenerator(genFunc, ...args) {
+  const gen = genFunc(...args);
+
+  function handleResult(next) {
+    if (next.done) return Promise.resolve(next.value);
+    return Promise.resolve(next.value)
+      .then(
+        res => handleResult(gen.next(res)),
+        err => handleResult(gen.throw(err))
+      );
+  }
+
+  try {
+    return handleResult(gen.next());
+  } catch (err) {
+    return Promise.reject(err);
+  }
+}
+
+function* fetchDataGenerator(url) {
+  const response = yield fetch(url);
+  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  const data = yield response.json();
+  return data;
+}
+
+runGenerator(fetchDataGenerator, 'https://api.example.com/data')
+  .then(data => console.log(data))
+  .catch(error => console.error('Error fetching data:', error));
+
+```
 ### Iterator（遍历器）
 
 在 ES6 中，引入了 `Iterator` 这一机制，它提供了一种统一的接口，使得各种不同的数据结构可以通过该接口完成遍历操作。任何数据结构只要部署了 `Iterator` 接口，就可以通过一致的方式依次处理该数据结构的所有成员。
