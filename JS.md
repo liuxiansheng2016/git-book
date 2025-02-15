@@ -240,6 +240,63 @@ encodeURI/ decodeURI：url编码解码，常用
 
 encodeURIComponent/ decodeURIComponent：url编码解码，和上面的不同的是，&=?也会被编码
 
+### 字符相加
+
+在JavaScript中，不同类型的值在进行相加操作时，会根据类型的不同进行转换和处理。
+// !可将变量转换成boolean类型，null、undefined、NaN以及空字符串('')取反都为true，其余都为false。
+
+#### 示例代码
+
+```javascript
+
+console.log(!null); // true
+console.log(!undefined); // true
+console.log(!NaN); // true
+console.log(!''); // true
+
+// [] + {} "[object Object]"
+console.log([] + {}); // "[object Object]"
+
+// {} + [] => + [] 0
+console.log({} + []); // 0
+
+// 通过Number()将值转换为数字
+console.log(Number(undefined)); // NaN
+console.log(Number({})); // NaN
+
+console.log(1 + 'string'); // '1string'
+console.log(1 + undefined); // NaN
+console.log(1 + null); // 1
+console.log(1 + [2,3]); // "12,3"
+console.log(1 + {name: 'andyyou'}); // "1[object Object]"
+console.log(1 + true); // 2
+
+var a = (2, 3, 5);
+console.log(a); // 5
+
+console.log(Math.max([2,3,4,5])); // NaN
+
+console.log(0.1 + 0.2); // 0.30000000000000004
+```
+
+#### 说明
+
+- `[] + {}` 结果为 `"[object Object]"`，这是因为数组和对象的相加在JavaScript中被转换为字符串操作。
+- `{}` + `[]` 结果为 `0`，因为会被解释为 `+ []`，而空数组转换成数字后为 `0`。
+- `Number(undefined)` 和 `Number({})` 都会返回 `NaN`，因为它们不能被转换成有效的数字。
+- 当数字与字符串相加时，数字会被转换为字符串。
+- 与 `undefined` 相加会返回 `NaN`。
+- 与 `null` 相加时，`null` 被转换为 `0`。
+- 与数组相加时，数组会被转换为字符串。
+- 与对象相加时，对象会被转换为字符串 `[object Object]`。
+- `1 + true` 结果为 `2`，因为 `true` 被转换为 `1`。
+- 逗号运算符返回最后一个表达式的值。
+- `Math.max` 不能直接处理数组，需要使用 `Math.max.apply(null, [2,3,4,5])`。
+- 浮点数计算可能会出现精度问题，如 `0.1 + 0.2` 结果为 `0.30000000000000004`。
+
+[更多详细内容](https://2ality.com/2012/01/object-plus-object.html)
+[参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)
+
 ### 事件
 
 #### 事件流：事件传播的顺序
@@ -581,63 +638,6 @@ Function.prototype.bind = function (context){
 基于web worker，不能访问dom。可以拦截当前网站的所有请求，进行判断。如果需要向服务器发起请求就转给服务器，如果可以使用缓存就返回缓存，提高浏览体验。
 
 
-### WebWorker多线程
-CPU在同一时刻只能运行一个程序（单核），一个应用程序可以由多个独立的进程组成，一个进程可以由多个独立的线程组成，线程是独立的程序的最小单位，可以并发执行。
-
-没有DOM访问权限：Web Worker 在创建时没有访问 DOM 的权限。
-需要额外的代码编写。
-不支持跨域请求。
-JS默认没有真正意义上的多线程，setTimeout setInterval只是模拟了多线程，并不能真正并发执行。如果JS有任何代码在执行中，定时器语言必须等待JS代码执行结束才能执行。
-
-WebWorker技术是真正意义上的多线程，可以在其他JS脚本运行期间并发同时执行，不影响页面效率，一般我们会把比较耗费时间的代码放到WebWorker里面运行。
-
-需要注意：WebWorker代码不能直接操作dom，需要把值回传给主程序（调用postMessage方法），通过主程序的回调函数（onmessage）来操作dom。
-
-### 推送（push）
-服务器在客户端没有主动发出请求的情况下，向客户端发送消息。
-
-#### 常见的WEB推送技术
-
-1. 长连接技术，推翻http协议的无状态的特征，不是请求响应结束之后立即断开连接，而是客户端浏览器和服务器端一直保持连接，缺点就是服务器压力太大。
-2. HTML5的服务器发送事件（server-sent event），属于单向服务器发送数据到客户端，注意响应的数据格式必须是data:xxxx，否则客户端无法接收。SSE最大的特点就是不需要客户端发送请求，可以实现只要服务器端数据有更新，就可以马上发送到客户端。
-3. 短轮询：用定时器每隔一段时间发送一个ajax请求，得到响应，兼容性最好，缺点是耗费很多无用的ajax请求浪费资源，响应的及时性不如真正的推送技术。
-4. 长轮询:客户端向服务器发送Ajax请求，服务器接到请求后hold住连接，直到有新消息才返回响应信息并关闭连接，客户端处理完响应信息后再向服务器发送新的请求。
-5. WebSocket双向通信的推送，需要服务器本身支持，客户端需要使用WS协议发送请求。完成一次握手的动作，浏览器和服务器就可以创建持久性的链接。
-6. WebRTC: WebRTC (Web Real-Time Communications) 是一项实时通讯技术，它允许网络应用或者站点，在不借助中间媒介的情况下，建立浏览器之间点对点（Peer-to-Peer）的连接，实现视频流和（或）音频流或者其他任意数据的传输。WebRTC包含的这些标准使用户在无需安装任何插件或者第三方的软件的情况下，创建点对点（Peer-to-Peer）的数据分享和电话会议成为可能。
-   
-### 三层架构
-分为:表现层(UI)、业务逻辑层(BLL)、数据访问层。
-
-### MVC
-M：model，模型层。代表数据库中的数据源。
-V：view，视图层。代表能看到的客户端页面，是根据模型数据创建的。
-C：controller，控制层。代表业务逻辑，是模型层和视图层之间的桥梁，建立两者之间的关系。控制层本身是不会处理数据以及输出数据，他只是用来接受请求并决定用那个模型去处理请求，然后再确定用哪个视图来显示返回的数据。
-
-### MVVM
-模型视图 视图模型。 数据模型数据双向绑定 的思想为核心。
-ViewModel：视图模型，可实现数据的双向绑定，连接View和Model的桥梁，当数据变化时，ViewModel能够监听到数据的变化（通过Data Bindings），自动更新视图，而当用户操作视图，ViewModel也能监听到视图的变化（通过DOM Listeners），然后通知数据做改动，这就实现了数据的双向绑定。
-
-### 跨域请求
-
-一个域名下的程序发出一个请求，请求的URL是另一个域名下的资源，这就是跨域请求，所有的浏览器默认都不允许ajax跨域请求。
-
-不同的域、协议或端口请求一个资源时，资源会发起一个跨域 HTTP 请求。
-
-#### 同源策略的限制包括以下几个方面：
-
-1. **Cookie、LocalStorage和IndexDB等存储在浏览器中的数据**只能被同源网页访问，不能被其他源的网页访问。
-2. **XMLHttpRequest和Fetch等网络请求API**只能向同源网址发送请求，不能向其他源发送请求。这样可以防止跨域请求攻击。
-3. **DOM操作**也受到同源策略的限制。一个网页只能修改同源网页的DOM，不能修改其他源的DOM。
-
-#### 解决跨域问题的方案
-
-- **在服务器端增加允许跨域请求的响应报头**，设置`Access-Control-Allow-Origin`为`*`。
-- **利用jsonp技术**，前端和后端配合实现跨域ajax。所谓的jsonp技术，就是利用浏览器并不禁止外联js是另一个域的js，所以jsonp跨域请求原理就是`<script src="其他域的js">`，而被外联的js是一个函数调用语句，通过实参把数据传递给请求客户端。动态创建script标签，只支持GET请求；存在脚本注入以及跨站请求伪造等安全问题。
-- **Postmessage**
-- **Node 中间层代理**
-- **Nginx反向代理**
-- **Websocket**
-
 ##### nodejs中间层代理
 利用http.request方法来转发请求
 
@@ -894,6 +894,44 @@ console.log(result); // 输出: This is the result
 2. 函数提升优先于变量提升，即函数提升在变量提升之上。
 3. 函数声明会将函数提升（包括声明function和赋值=），函数表达式只会将变量var提升。
 
+
+### 示例 1
+```javascript
+{
+    function foo() {}
+    foo = 1;
+}
+console.log(foo);
+```
+- **预期输出**：根据之前的知识，预期输出应该是 `1`。
+- **实际输出**：实际输出是 `function foo() {}`。
+- **解释**：这是因为函数声明会被提升到其所在作用域的顶部，而变量赋值 (`foo = 1;`) 不会被提升。
+
+### 示例 2
+```javascript
+{
+    foo = 1;
+    function foo() {}
+}
+console.log(foo);
+```
+- **预期输出**：输出是什么？
+- **实际输出**：输出是 `1`。
+- **解释**：在这个例子中，变量赋值 `foo = 1;` 发生在函数声明之前。由于函数声明会被提升到块级作用域的顶部，但变量赋值会覆盖函数引用，因此 `foo` 的值被设置为 `1`。
+
+### 函数提升的解释
+1. **函数声明的提升**：函数声明会被提升到其所在作用域的顶部。
+2. **执行顺序**：当代码执行时，它首先遇到已经被提升的函数声明。
+3. **变量赋值**：变量赋值按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
+
+### 总结
+- **函数声明**：会被提升到其所在作用域的顶部。
+- **变量赋值**：按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
+
+这解释了为什么在第一个示例中，`foo` 指向函数，而在第二个示例中，`foo` 是数字 `1`。
+
+
+
 #### 示例代码
 
 ```javascript
@@ -970,6 +1008,24 @@ console.log(go()); // 3
 
 ### 继承
 通过子类的原型prototype对象实例化来实现
+```
+function Parent() {
+    this.name = 'Parent';
+}
+
+Parent.prototype.sayHello = function() {
+    console.log('Hello');
+};
+
+function Child() {
+    this.name = 'Child';
+}
+
+Child.prototype = new Parent();
+
+var child = new Child();
+child.sayHello(); // Hello
+```
 缺点是：子类之间相互影响。所有子对象共享同一个原型对象，对原型对象的修改会影响到所有子对象
 
 #### 构造函数式继承
@@ -1057,61 +1113,7 @@ instance.sayAge(); // 输出: 25
 在 ES2015 中有了 class 语法糖，有了 extends、super、static 这样的关键字，更像强类型语言中的“类”了。
 
 
-### 字符相加
 
-在JavaScript中，不同类型的值在进行相加操作时，会根据类型的不同进行转换和处理。
-
-#### 示例代码
-
-```javascript
-// !可将变量转换成boolean类型，null、undefined、NaN以及空字符串('')取反都为true，其余都为false。
-console.log(!null); // true
-console.log(!undefined); // true
-console.log(!NaN); // true
-console.log(!''); // true
-
-// [] + {} "[object Object]"
-console.log([] + {}); // "[object Object]"
-
-// {} + [] => + [] 0
-console.log({} + []); // 0
-
-// 通过Number()将值转换为数字
-console.log(Number(undefined)); // NaN
-console.log(Number({})); // NaN
-
-console.log(1 + 'string'); // '1string'
-console.log(1 + undefined); // NaN
-console.log(1 + null); // 1
-console.log(1 + [2,3]); // "12,3"
-console.log(1 + {name: 'andyyou'}); // "1[object Object]"
-console.log(1 + true); // 2
-
-var a = (2, 3, 5);
-console.log(a); // 5
-
-console.log(Math.max([2,3,4,5])); // NaN
-
-console.log(0.1 + 0.2); // 0.30000000000000004
-```
-
-#### 说明
-
-- `[] + {}` 结果为 `"[object Object]"`，这是因为数组和对象的相加在JavaScript中被转换为字符串操作。
-- `{}` + `[]` 结果为 `0`，因为会被解释为 `+ []`，而空数组转换成数字后为 `0`。
-- `Number(undefined)` 和 `Number({})` 都会返回 `NaN`，因为它们不能被转换成有效的数字。
-- 当数字与字符串相加时，数字会被转换为字符串。
-- 与 `undefined` 相加会返回 `NaN`。
-- 与 `null` 相加时，`null` 被转换为 `0`。
-- 与数组相加时，数组会被转换为字符串。
-- 与对象相加时，对象会被转换为字符串 `[object Object]`。
-- `1 + true` 结果为 `2`，因为 `true` 被转换为 `1`。
-- 逗号运算符返回最后一个表达式的值。
-- `Math.max` 不能直接处理数组，需要使用 `Math.max.apply(null, [2,3,4,5])`。
-- 浮点数计算可能会出现精度问题，如 `0.1 + 0.2` 结果为 `0.30000000000000004`。
-
-[更多详细内容](https://2ality.com/2012/01/object-plus-object.html)
-[参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)
 
 ### Ajax
 
