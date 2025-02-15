@@ -24,6 +24,49 @@ let 和 const: let具有块级作用域的特性，
 
 for 循环时产生的闭包 可以使用let
 
+模拟let
+```
+(function() {
+    var c = 3;
+    console.log(c); // 1
+})();
+
+console.log(c); // c is not defined
+```
+
+模拟const
+```
+function _const(key, value) {
+    window[key] = value;
+    Object.defineProperty(window, key, {
+        enumerable: false,
+        configurable: false,
+        get: function() {
+            return value;
+        },
+        set: function(newValue) {
+            if (newValue !== value) {
+                throw TypeError("这是只读变量，不可修改");
+            } else {
+                return value;
+            }
+        },
+    });
+}
+
+```
+
+暂时性死区
+```
+var tmp = 123;
+
+if (true) {
+    tmp = 'abc'; // ReferenceError
+    let tmp;
+}
+
+```
+
 ### 箭头函数
 
 箭头函数提供了一种更简洁的语法来编写函数，并且其`this`值是在定义时确定的，而不是在执行时。
@@ -57,6 +100,7 @@ function identityAny(arg: any): any {
     return arg;
 }
 
+因此，我们需要一种方法使返回值的类型与传入参数的类型是相同的。 这里，我们使用了 类型变量，它是一种特殊的变量，只用于表示类型而不是值。
 // 使用泛型保留类型信息
 function identity<T>(arg: T): T {
     return arg;
@@ -318,6 +362,70 @@ resolve 只是改变了 Promise 的状态，并不会中断或提前结束执行
 ‌- 无法得知当前状态‌：Promise对象有三种状态：pending(进行中)、fulfilled(成功)和rejected(失败)。然而，一旦Promise的状态从pending变为fulfilled或rejected，我们就无法再获取到其当前的状态或进度。这意味着我们无法得知异步操作何时完成，或者已经完成了多少
 ‌
 -‌ 错误处理不够灵活‌：如果不设置回调函数，Promise内部抛出的错误不会反应到外部。如果忘记添加catch方法，Promise内部的错误可能会被忽略，这可能导致难以调试的问题
+
+#### Promise.race()：
+如果参数中某个promise解决或拒绝，返回的 promise就会解决或拒绝。
+#### Promise.allSettled()
+也就是说当Promise全部处理完成后我们可以拿到每个Promise的状态
+
+#### 写法
+```
+New Promise((resolve, reject) => {
+  setTimeout(() => {}, 5000)
+})
+省略 reject的写法
+New Promise(resolve ={
+})
+```
+
+这张图片展示了一段 JavaScript 代码，该代码使用了 `Promise` 对象来处理异步操作。以下是代码的详细解释：
+
+### 代码结构
+
+1. **`Promise.resolve(promise)`**:
+   - `Promise.resolve(promise)` 会将 `promise` 转换为一个 `Promise`。
+     - 如果 `promise` 本身已经是一个 `Promise`，则直接返回它。
+     - 如果 `promise` 是一个非 `Promise` 值，则返回一个解析为该值的 `Promise`。
+   - 这一步确保我们处理的是一个 `Promise`，即使传入的是一个非 `Promise` 值。
+
+2. **`.then(onFulfilled, onRejected)`**:
+   - `.then` 方法用于注册 `Promise` 的成功和失败回调。
+     - `onFulfilled` 是成功回调，当 `Promise` 成功解析时调用。
+     - `onRejected` 是失败回调，当 `Promise` 被拒绝时调用。
+
+### 代码详解
+
+```javascript
+Promise.resolve(promise).then(
+    (value) => {
+        results[index] = value;
+        completed++;
+        if (completed === promises.length) {
+            resolve(results);
+        }
+    },
+    (error) => {
+        reject(error);
+    }
+);
+```
+
+- **`Promise.resolve(promise)`**: 将 `promise` 转换为一个 `Promise`。
+- **`.then(onFulfilled, onRejected)`**:
+  - **`onFulfilled` 回调**:
+  - **`onRejected` 回调**:
+    - `(error) => { reject(error); }`: 当 `Promise` 被拒绝时，执行这个回调函数，并通过 `reject(error)` 抛出错误。
+
+### 总结
+
+这段代码的主要目的是处理多个 `Promise` 的结果，并在所有 `Promise` 都成功解析后收集结果。具体步骤如下：
+
+1. 使用 `Promise.resolve` 确保 `promise` 是一个 `Promise`。
+2. 注册成功和失败回调：
+   - 成功时，更新结果数组并检查是否所有 `Promise` 都已完成。
+   - 失败时，抛出错误。
+
+这种模式常用于处理并发请求或异步操作，确保所有操作完成后进行后续处理。
 
 - **‌实现promise all**
 ```
