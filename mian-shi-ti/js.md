@@ -989,6 +989,8 @@ async和defer的相同点
 通常情况下defer的使用频率较高,它能保证script之间的变量依赖。
 
 需要注意的是:async script的资源请求时异步的,但script的执行仍然会阻塞后续渲染(单线程),defer是在html渲染完之后执行的所以不会阻塞后续html的解析。
+![image](https://github.com/user-attachments/assets/a2e24559-f9ad-423b-aa2f-038458804191)
+
 ```
 
 99\. new.target
