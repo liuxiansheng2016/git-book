@@ -588,56 +588,6 @@ Immutable 通过 is 方法则可以完成对比，而无需像一样通过深度
 
 强制更新：通过调用组件实例的 forceUpdate 方法可以强制组件进行更新，即使组件的 props 和 state 没有发生变化，render 方法也会执行。
 
-
-### React.createClass 和 extends Component 的区别
-React.createClass 和 extends Component 的 bai 区别主要在于：
-
-（1）语法区别
-
-createClass 本质上是一个工厂函数，extends 的方式更加接近最新的 ES6 规范的 class 写法。两种方式在语法上的差别主要体现在方法的定义和静态属性的声明上。
-
-createClass 方式的方法定义使用逗号，隔开，因为 creatClass 本质上是一个函数，传递给它的是一个 Object；而 class 的方式定义方法时务必谨记不要使用逗号隔开，这是 ES6 class 的语法规范。
-
-（2）propType 和 getDefaultProps
-
-React.createClass：通过 proTypes 对象和 getDefaultProps()方法来设置和获取 props.
-
-React.Component：通过设置两个属性 propTypes 和 defaultProps
-
-（3）状态的区别
-
-React.createClass：通过 getInitialState()方法返回一个包含初始值的对象
-
-React.Component：通过 constructor 设置初始状态
-
-（4）this 区别
-
-React.createClass：会正确绑定 this
-
-React.Component：由于使用了 ES6，这里会有些微不同，属性并不会自动绑定到 React 类的实例上。
-
-（5）Mixins
-
-React.createClass：使用 React.createClass 的话，可以在创建组件时添加一个叫做 mixins 的属性，并将可供混合的类的集合以数组的形式赋给 mixins。
-
-如果使用 ES6 的方式来创建组件，那么 React mixins 的特性将不能被使用了。
-
-```
-
-import React from 'react';
-
-let MyMixin = {
-doSomething(){}
-}
-
-let TodoItem = React.createClass({
-mixins: [MyMixin], // add mixin
-render(){
-  return <div></div>
-}
-})
-```
-
 ### 高阶组件
 一个高阶组件就是一个函数，接受一个组件作为输入，然后返回一个新的组件作为结果。
 
