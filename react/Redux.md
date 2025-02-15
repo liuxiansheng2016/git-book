@@ -819,22 +819,9 @@ function MyComponent() {
 
 - **复杂控制流**：对于复杂的异步流程控制（例如取消请求、重试机制等），使用专门的中间件（如`redux-saga`）可能比手动编写效果更好。
 
-#### 结论
-
-总结来说，在React中处理异步操作并非一定要使用中间件。对于简单的异步任务，直接在组件内部处理通常是足够的。但是，随着应用规模的增长和需求的复杂化，采用中间件可以帮助更好地组织代码，提高可维护性和扩展性 。如果你正在构建一个小型应用，或者异步操作仅限于单个组件内部，那么直接在组件内处理可能是最简单的方法。而对于大型应用，特别是那些涉及到全局状态管理和复杂副作用的应用，使用中间件可能会更加合适。
-
-
-当然，我可以为你提供一个完整的例子来展示如何使用`@reduxjs/toolkit`中的`configureStore`替代传统的`createStore`。这个例子将包括设置Redux store、添加reducer以及应用中间件如`redux-thunk`。
-
-首先，确保你已经安装了必要的依赖：
-
-```bash
-npm install @reduxjs/toolkit react-redux redux-thunk
-```
-
-Redux Toolkit 是 Redux 官方推荐的工具包，旨在简化 Redux 的使用。它提供了一组工具和最佳实践，帮助开发者更容易地编写 Redux 逻辑。Redux Toolkit 解决了 Redux 的一些常见问题，如样板代码过多、配置复杂等。
 
 ### Redux Toolkit 的主要功能
+Redux Toolkit 是 Redux 官方推荐的工具包，旨在简化 Redux 的使用。它提供了一组工具和最佳实践，帮助开发者更容易地编写 Redux 逻辑。Redux Toolkit 解决了 Redux 的一些常见问题，如样板代码过多、配置复杂等。
 
 1. **`configureStore`**：简化了 store 的配置，自动添加了 Redux DevTools 和 thunk 中间件。
 2. **`createSlice`**：结合了 reducer 和 action 创建逻辑，减少了样板代码。
