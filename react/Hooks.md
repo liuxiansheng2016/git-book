@@ -237,16 +237,39 @@ export default Parent;
 在上面的例子中，handleClick 函数只会在组件首次渲染时创建一次，不会因为组件重新渲染而创建新的实例。
 
 ### useMemo
-useMemo 是 React 提供的一个用于优化组件性能的钩子函数。它可以缓存组件的计算结果，并在依赖项发生变化时重新计算。这可以避免在每次组件渲染时都重新计算相同的值，从而提高组件的性能。
+`useMemo` 是 React 中的一个 Hook，用于优化组件性能，避免不必要的计算和渲染。它通过缓存计算结果，在依赖项未发生变化时直接返回缓存值，从而减少重复计算。
 
-useMemo 的语法如下：
+#### 使用方法
+
+`useMemo` 接收两个参数：
+
+1. **计算函数**：返回需要缓存的值。
+2. **依赖数组**：包含计算函数依赖的变量。只有当依赖项发生变化时，`useMemo` 才会重新执行计算函数。
+
+```javascript
+import React, { useMemo } from 'eact';
+
+function MyComponent({ data }) {
+  const memoizedValue = useMemo(() => {
+    // 执行计算或逻辑
+    return expensiveCalculation(data);
+  }, [data]);
+
+  return <div>{memoizedValue}</div>;
+}
 ```
-const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
-```
 
-其中，computeExpensiveValue 是一个计算函数，它会在组件渲染时调用，并返回需要缓存的值。a 和 b 是计算函数的依赖项，当依赖项发生变化时，useMemo 会重新计算缓存的值。
+#### 使用场景
 
-使用 useMemo 的一个常见场景是在渲染大量数据时进行性能优化。例如，在渲染一个表格时，我们可能需要根据表格的数据进行一些复杂的计算，如计算每行数据的总和、平均值等。如果在每次渲染时都进行这些计算，会导致页面的响应变慢。使用 useMemo 可以缓存这些计算结果，并在数据发生变化时重新计算，从而提高页面的性能。
+1. **缓存计算结果**：对于复杂的计算，如数据转换、过滤或排序，使用 `useMemo` 可以避免在每次渲染时重复计算。
+2. **优化子组件渲染**：当父组件传递昂贵的计算值给子组件时，可以通过 `useMemo` 缓存该值，防止子组件不必要的重新渲染。
+
+#### 性能优化作用
+
+1. **减少计算量**：避免在依赖项未变化时重复执行昂贵的计算，提升组件性能。
+2. **优化渲染性能**：通过减少不必要的计算，间接减少渲染次数，提高页面响应速度。
+
+总之，`useMemo` 
 
 ### useRef
 const refContainer = useRef(initialValue);
