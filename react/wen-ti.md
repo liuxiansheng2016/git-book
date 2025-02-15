@@ -1800,3 +1800,46 @@ function App() {
 ```
 
 通过合理使用路由参数，可以实现动态内容的加载和页面之间的数据传递，提升应用的灵活性和用户体验。
+
+
+### 使用 `ReactDOM.createRoot` 和 `root.render`
+在React 18中，渲染机制有所更新，最显著的变化之一就是引入了`ReactDOM.createRoot`，这标志着旧的`ReactDOM.render`方法被逐步废弃。这种变化旨在提供更强大的功能和更好的性能优化，特别是在并发模式（Concurrent Mode）和其他新特性方面。
+
+以下是使用`ReactDOM.createRoot`替代传统`ReactDOM.render`的方法：
+
+#### 旧的方式
+
+在React 17及之前版本中，你可能会这样渲染你的应用：
+
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+#### 新的方式（React 18及以上）
+
+从React 18开始，推荐使用`createRoot`来替换上述方法：
+
+```javascript
+import React from 'react';
+import { createRoot } from 'react-dom/client'; // 注意这里的导入路径
+import App from './App';
+
+// 获取DOM容器
+const container = document.getElementById('root');
+// 创建一个新的根目录
+const root = createRoot(container);
+// 渲染你的应用
+root.render(<App />);
+```
+
+#### 关键点
+
+- **`createRoot`**：这是新的API，用来创建一个React根实例。它允许你利用React 18的新特性，如并发模式等。
+  
+- **移除第二个参数**：不同于之前的`ReactDOM.render`方法需要两个参数（要渲染的元素和目标DOM节点），`createRoot`只需要一个目标DOM节点，并通过调用`.render()`方法指定要渲染的内容。
+
+
