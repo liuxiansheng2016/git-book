@@ -1698,3 +1698,155 @@ Render Props 是一种强大的模式，它允许你将跨多个组件的逻辑�
 
 #### 使用Styled Components
 - **优点
+
+  
+### React中组件拆分的理解
+在React中，组件拆分是将一个复杂的UI界面分解为多个独立、可复用的组件的过程。合理拆分组件有助于提高代码的可维护性、可读性和可重用性。
+
+#### 组件拆分的原则
+
+1. **单一职责原则**：每个组件应负责单一的功能或展示特定的UI部分。避免在一个组件中包含过多的逻辑和样式。
+2. **高内聚、低耦合**：组件内部应高度内聚，即相关的功能和状态应集中在一个组件中；组件之间应低耦合，减少不必要的依赖。
+3. **可复用性**：设计组件时应考虑其复用性，尽量使组件在不同的场景下都能使用。
+4. **层级清晰**：组件的层级结构应清晰，父组件负责整体布局和状态管理，子组件负责具体的展示和交互。
+
+#### 拆分方法
+
+1. **按功能拆分**：将具有独立功能的部分拆分为组件，如搜索框、分页器、表单等。
+2. **按业务逻辑拆分**：根据业务逻辑的复杂程度，将不同的业务逻辑拆分为独立的组件。
+3. **按UI元素拆分**：将页面中的UI元素，如按钮、图标、卡片等，拆分为基础组件。
+4. **按数据流拆分**：根据数据的流向和处理方式，将数据处理和展示拆分为不同的组件。
+
+
+### React中处理国际化
+在React中处理国际化和本地化问题，可以使用以下库和实现思路：
+
+#### 相关库
+
+1. **`react-intl`**：一个广泛使用的React国际化库，提供组件和API来处理日期、数字、消息的本地化，支持多种语言环境。
+2. **`i18next`** 和 **`react-i18next`**：功能强大的国际化库，支持嵌套翻译、复数形式、上下文等高级特性，易于扩展和维护。
+
+#### 实现思路
+
+1. **定义语言环境**：确定应用支持的语言列表，如`en`、`zh-CN`等。
+2. **创建翻译文件**：为每种语言创建翻译文件，通常使用JSON或YAML格式，包含所有需要翻译的文本及其对应的翻译。
+3. **配置国际化库**：初始化国际化库，加载翻译文件，设置默认语言环境。
+4. **使用国际化组件**：在React组件中使用国际化库提供的组件或API，如`<FormattedMessage>`、`useTranslation`等，来显示本地化的文本。
+5. **切换语言环境**：提供用户界面，允许用户切换语言环境，并更新应用的国际化状态。
+
+#### 示例代码
+
+1. **安装依赖**
+   ```bash
+   npm install react-intl
+   ```
+
+2. **创建翻译文件**
+   - **`en.json`**
+     ```json
+     {
+       "hello": "Hello",
+       "welcome": "Welcome to my app"
+     }
+     ```
+   - **`zh-CN.json`**
+     ```json
+     {
+       "hello": "你好",
+       "welcome": "欢迎来到我的应用"
+     }
+     ```
+
+3. **配置国际化**
+   ```javascript
+   import { IntlProvider } from 'eact-intl';
+
+   const App = () => {
+     return (
+       <IntlProvider locale="en" messages={en}>
+         {/* 应用组件 */}
+       </IntlProvider>
+     );
+   };
+   ```
+
+4. **使用国际化组件**
+   ```javascript
+   import { FormattedMessage } from 'eact-intl';
+
+   const Greeting = () => {
+     return <FormattedMessage id="hello" defaultMessage="Hello" />;
+   };
+   ```
+
+通过以上步骤，可以实现React应用的国际化和本地化，支持多语言显示，提升用户体验。
+
+
+### 路由参数
+在React中，路由参数是一种在URL中传递数据的方式，常用于构建动态页面。路由参数允许根据URL的不同部分加载不同的内容或执行不同的操作。
+
+#### 路由参数的类型
+
+1. **动态路由参数**：在路由路径中使用冒号 `:` 定义参数，例如 `/users/:id`。当URL匹配该路径时，参数值会被提取并传递给对应的组件。
+2. **查询参数**：在URL中使用问号 `?` 后面跟着键值对的形式传递参数，例如 `/search?q=react`。查询参数不会改变路由的路径，但可以提供额外的信息。
+3. **状态参数**：通过 `history` 对象的 `push` 或 `replace` 方法传递参数，例如 `history.push('/dashboard', { userId: 123 })`。状态参数不会显示在URL中，但可以在组件中通过 `location.state` 访问。
+
+#### 获取和使用路由参数
+
+1. **动态路由参数**
+   - 在组件中使用 `useParams` Hook 获取参数，例如：
+     ```javascript
+     import { useParams } from 'eact-router-dom';
+
+     function UserDetail() {
+       const { id } = useParams();
+       // 使用 id 进行后续操作，如数据请求
+       return <div>User {id}</div>;
+     }
+     ```
+2. **查询参数**
+   - 使用 `useLocation` Hook 获取查询参数，然后使用 `URLSearchParams` 或第三方库（如 `qs`）进行解析，例如：
+     ```javascript
+     import { useLocation } from 'eact-router-dom';
+     import qs from 'qs';
+
+     function SearchResults() {
+       const location = useLocation();
+       const query = qs.parse(location.search, { ignoreQueryPrefix: true });
+       const searchTerm = query.q;
+       // 使用 searchTerm 进行后续操作，如显示搜索结果
+       return <div>Search results for "{searchTerm}"</div>;
+     }
+     ```
+3. **状态参数**
+   - 通过 `useLocation` Hook 获取 `location.state`，例如：
+     ```javascript
+     import { useLocation } from 'eact-router-dom';
+
+     function Dashboard() {
+       const location = useLocation();
+       const userId = location.state?.userId;
+       // 使用 userId 进行后续操作
+       return <div>Welcome to the dashboard, User {userId}</div>;
+     }
+     ```
+
+#### 示例路由配置
+
+```javascript
+import { BrowserRouter as Router, Route, Switch } from 'eact-router-dom';
+
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/users/:id" component={UserDetail} />
+        <Route path="/search" component={SearchResults} />
+        <Route path="/dashboard" component={Dashboard} />
+      </Switch>
+    </Router>
+  );
+}
+```
+
+通过合理使用路由参数，可以实现动态内容的加载和页面之间的数据传递，提升应用的灵活性和用户体验。
