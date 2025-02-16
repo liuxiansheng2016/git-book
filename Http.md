@@ -71,9 +71,50 @@ PUT 具有幂等性，多次提交相同请求资源状态不会改变，一般�
 
 ### 预检请求（Preflight Request）
 
-使用除了 GET、POST、HEAD 之外的方法。POST 请求的 Content-Type 不是上述三个值之一。包含自定义请求头（非简单请求头）。
+在跨域资源共享（CORS）中，**预检请求（Preflight Request）**是由浏览器自动发起的一种 HTTP 请求。当客户端尝试对跨域资源执行可能对服务器数据产生副作用的操作（如使用 `PUT`、`DELETE` 等方法，或发送自定义头部）时，浏览器会在实际请求之前，先使用 `OPTIONS` 方法发起预检请求，以确认服务器是否允许该实际请求。只包含头部信息，不包含请求体。
 
-非简单请求的 CORS（Cross-Origin Resource Sharing）请求，会在正式通信之前，增加一次 HTTP 查询请求，称为 "预检" 请求（preflight）。"预检" 请求用的请求方法是 OPTIONS，表示这个请求是用来询问的。只包含头部信息，不包含请求体。
+**预检请求的触发条件：**
+使用除了 GET、POST、HEAD 之外的非简单方法。POST 请求的 Content-Type 不是上述三个值之一。包含自定义请求头（非简单请求头）。
+
+**预检请求的作用：**
+- **验证权限：** 确保服务器允许特定的跨域请求，防止未经授权的操作。
+- **保护数据：** 避免跨域请求对服务器的数据产生未预期的影响。
+
+**预检请求的流程：**
+1. **浏览器发送 `OPTIONS` 请求：** 包含以下头部：
+   - `Access-Control-Request-Method`：表示实际请求将使用的方法。
+   - `Access-Control-Request-Headers`：表示实际请求将包含的自定义头部。
+   - `Origin`：表示请求的源。
+2. **服务器响应：** 如果允许该跨域请求，服务器会返回状态码 `200 OK`，并在响应头中包含：
+   - `Access-Control-Allow-Origin`：允许的源。
+   - `Access-Control-Allow-Methods`：允许的方法。
+   - `Access-Control-Allow-Headers`：允许的头部。
+   - `Access-Control-Max-Age`：预检请求的结果可缓存的时间。
+3. **浏览器根据响应决定是否发送实际请求：** 如果服务器允许，浏览器会继续发送实际请求；否则，阻止请求并抛出错误。
+
+**示例：**
+假设客户端需要对 `https://api.example.com/data` 资源发送一个包含自定义头部的 `DELETE` 请求。浏览器会先发起如下的预检请求：
+
+```http
+OPTIONS /data HTTP/1.1
+Host: api.example.com
+Origin: https://client.example.com
+Access-Control-Request-Method: DELETE
+Access-Control-Request-Headers: X-Custom-Header
+```
+
+如果服务器允许该操作，会返回：
+
+```http
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: https://client.example.com
+Access-Control-Allow-Methods: DELETE
+Access-Control-Allow-Headers: X-Custom-Header
+Access-Control-Max-Age: 86400
+```
+收到上述响应后，浏览器会继续发送实际的 `DELETE` 请求。
+
+通过预检请求机制，CORS 能有效地保护服务器资源，确保跨域请求的安全性。 
 
 ## Restful
 
@@ -397,6 +438,8 @@ SOAP 可以和现存的许多因特网协议和格式结合使用，包括 HTTP�
 
 ### DNS
 Domain Name System
+![image](https://github.com/user-attachments/assets/21d0c63d-9f3d-442a-bb07-6437739fbeeb)
+
 
 1. 查找本地 DNS 解析器缓存，是否有这个网址映射关系，如果有，直接返回，完成域名解析。
 2. 在浏览器中输入 www.qq.com 域名，操作系统会先检查自己本地的 hosts 文件是否有这个网址映射关系，如果有，就先调用这个 IP 地址映射，完成域名解析。
@@ -430,6 +473,10 @@ Domain Name System
 
 ### 三次握手
 三次握手是指建立 TCP 连接时，需要客户端和服务器总共需要发送三个包。
+![image](https://github.com/user-attachments/assets/b43532b5-749e-4cd0-9447-55a353d7b2ab)
+
+![image](https://github.com/user-attachments/assets/df3d1738-e379-4d27-9b61-776e9b8b58c3)
+
 
 1. 作用是为了确认双方的接收能力和发送能力是否正常。
 2. 防止服务器端因接收了早已失效的连接请求报文，从而一直等待客户端请求。
