@@ -32,8 +32,6 @@ root.render(<App />);
 - **移除第二个参数**：不同于之前的`ReactDOM.render`方法需要两个参数（要渲染的元素和目标DOM节点），`createRoot`只需要一个目标DOM节点，并通过调用`.render()`方法指定要渲染的内容。
 ```
 
-
-```
 **2. ReactDOM.createPortal()**
 用途：提供了一种方式，可以将子节点渲染到一个位于 DOM 层次结构之外的新位置（即 DOM 树中的任何位置）。
 用法示例：
