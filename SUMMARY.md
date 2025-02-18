@@ -27,7 +27,7 @@
 * [Es6](ES6.md)
 * [Css](CSS.md)
 * [git](git.md)
-*  [Http](Http.md)
+* [Http](Http.md)
 * [Library](Library.md)
 * [Rxjs](rxjs/README.md)
   * [Observer 与 Observable](rxjs/observer-yu-observable.md)
@@ -98,3 +98,4 @@
   * [生命周期](react/lifecycle.md)
   * [问题](react/wen-ti.md)
   * [Context](react/Context.md)
+  * [更新](react/geng-xin.md)

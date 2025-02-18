@@ -46,15 +46,24 @@ return ReactDOM.createPortal(
 }
 ```
 
-**3. ReactDOM.unmountComponentAtNode()** 用途：从 DOM 中卸载 React 组件，并清理其事件处理器和 state。 用法示例：
+**3.&#x20;**<mark style="color:red;">**`ReactDOM.unmountComponentAtNode()`**</mark> 用途：从 DOM 中卸载 React 组件，并清理其事件处理器和 state。 用法示例：
+
+<mark style="color:red;">`ReactDOM.unmountComponentAtNode`</mark><mark style="color:red;">已于</mark>[<mark style="color:red;">2022 年 3 月 (v18.0.0)</mark>](https://react.dev/blog/2022/03/08/react-18-upgrade-guide)<mark style="color:red;">弃用。在 React 19 中，你需要使用 迁移到</mark><mark style="color:red;">`root.unmount()`</mark><mark style="color:red;">。</mark>
 
 ```
 ReactDOM.unmountComponentAtNode(document.getElementById('root'));
+// Before
+unmountComponentAtNode(document.getElementById('root'));
+
+// After
+root.unmount();
 ```
 
 如果成功卸载了组件，则返回 true；如果没有组件被卸载，则返回 false。
 
-**4. ReactDOM.hydrate** 专门设计用来配合 SSR 使用。它不会重新创建已经存在于页面上的 DOM 节点，而是尝试复用它们，并在此基础上添加事件监听器等交互逻辑，使静态页面变得动态和交互式。
+**4.&#x20;**~~<mark style="color:red;">**`ReactDOM.hydrate`**</mark>~~ 专门设计用来配合 SSR 使用。它不会重新创建已经存在于页面上的 DOM 节点，而是尝试复用它们，并在此基础上添加事件监听器等交互逻辑，使静态页面变得动态和交互式。
+
+<mark style="color:red;">在 React 19 中，我们将删除</mark><mark style="color:red;">`ReactDOM.hydrate`</mark><mark style="color:red;">您需要迁移到的</mark>[<mark style="color:red;">`ReactDOM.hydrateRoot`</mark>](https://react.dev/reference/react-dom/client/hydrateRoot)<mark style="color:red;">，</mark>
 
 ```
 import React from 'react';
@@ -65,6 +74,15 @@ import App from './App'; // 假设这是你的根组件
 if (typeof document !== 'undefined') {
 ReactDOM.hydrate(<App />, document.getElementById('root'));
 }
+
+
+// Before
+import {hydrate} from 'react-dom';
+hydrate(<App />, document.getElementById('root'));
+
+// After
+import {hydrateRoot} from 'react-dom/client';
+hydrateRoot(document.getElementById('root'), <App />);
 ```
 
 ### ReactDOMServer 是什么?
@@ -253,7 +271,7 @@ export default MyInput;
 
 <mark style="color:red;">从 React 19 开始，你现在可以在函数组件中将 ref 作为 prop 进行访问：</mark>
 
-新的函数组件将不再需要 `forwardRef`，我们将发布一个 codemod 来自动更新你的组件以使用新的 `ref` prop。在未来的版本中，我们将弃用并移除 `forwardRef`。
+~~<mark style="color:red;">新的函数组件将不再需要</mark> <mark style="color:red;"></mark><mark style="color:red;">`forwardRef`</mark>~~，我们将发布一个 codemod 来自动更新你的组件以使用新的 `ref` prop。在未来的版本中，我们将弃用并移除 `forwardRef`。
 
 #### 注意
 
@@ -1885,20 +1903,3 @@ function App() {
 
 通过合理使用路由参数，可以实现动态内容的加载和页面之间的数据传递，提升应用的灵活性和用户体验。
 
-### 使用 `ReactDOM.createRoot` 和 `root.render`
-
-在React 18中，渲染机制有所更新，最显著的变化之一就是引入了`ReactDOM.createRoot`，这标志着旧的`ReactDOM.render`方法被逐步废弃。这种变化旨在提供更强大的功能和更好的性能优化，特别是在并发模式（Concurrent Mode）和其他新特性方面。
-
-以下是使用`ReactDOM.createRoot`替代传统`ReactDOM.render`的方法：
-
-#### 旧的方式
-
-在React 17及之前版本中，你可能会这样渲染你的应用：
-
-```javascript
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-
-ReactDOM.render(<App />, document.getElementById('root'));
-```
