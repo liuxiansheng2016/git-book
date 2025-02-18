@@ -20,8 +20,8 @@ https://zh-hans.react.dev/reference/react/useCallback
 5. **useCallback()**：返回一个 memoized 回调函数。
 6. **useMemo()**：返回一个 memoized 值。
 7. **useRef()**：返回一个可变的引用对象。
-8. **useTransition**
-9. `useActionState`&#x20;
+8. **useTransition：** 它允许你标记一个状态更新为过渡（transitions），这意味着这些更新不会立即触发同步的UI渲染，而是允许React在后台处理这些更新，并在适当的时候进行更新。这有助于提高应用的响应速度，尤其是在执行可能耗费较多时间的状态更新时，比如过滤大型列表或者进行复杂的计算
+9. `useActionState` 它主要用于表单提交场景下状态的管理和异步 Action 的处理
 
 #### 使用规则
 

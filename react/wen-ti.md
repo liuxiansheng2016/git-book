@@ -957,42 +957,41 @@ return {count: prevState.count + 1};
 
 ```
 class ErrorBoundary extends React.Component {
-constructor(props) {
-super(props)
-this.state = { hasError: false }
-}
-
-componentDidCatch(error, info) {
-// You can also log the error to an error reporting service
-logErrorToMyService(error, info)
-}
-
-static getDerivedStateFromError(error) {
- // Update state so the next render will show the fallback UI.
- return { hasError: true };
-}
-
-render() {
-if (this.state.hasError) {
-  // You can render any custom fallback UI
-  return <h1>{'Something went wrong.'}</h1>
-}
-return this.props.children
-}
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  
+  componentDidCatch(error, info) {
+    // You can also log the error to an error reporting service
+    logErrorToMyService(error, info)
+  }
+  
+  static getDerivedStateFromError(error) {
+     // Update state so the next render will show the fallback UI.
+     return { hasError: true };
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>{'Something went wrong.'}</h1>
+    }
+    return this.props.children
+  }
 }
 ```
 
 之后，将其作为常规组件使用：
 
-```
-<ErrorBoundary>
-<MyWidget />
-</ErrorBoundary>
-```
+<pre><code>&#x3C;ErrorBoundary>
+<strong>    &#x3C;MyWidget />
+</strong>&#x3C;/ErrorBoundary>
+</code></pre>
 
 ### Key
 
-提供唯一的 key 可以帮助 React 更快地识别和更新元素，从而提高性能。当列表中有大量元素时，这一点尤为重要。
+<mark style="color:red;">提供唯一的 key 可以帮助 React 更快地识别和更新元素</mark>，从而提高性能。当列表中有大量元素时，这一点尤为重要。
 
 1.使用唯一标识符：确保提供的 key 是唯一的，并且在每次渲染时都保持一致。
 
