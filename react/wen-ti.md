@@ -24,13 +24,14 @@ const container = document.getElementById('root');
 const root = createRoot(container);
 // 渲染你的应用
 root.render(<App />);
-```
 
 #### 关键点
 
 - **`createRoot`**：这是新的API，用来创建一个React根实例。它允许你利用React 18的新特性，如并发模式等。
   
 - **移除第二个参数**：不同于之前的`ReactDOM.render`方法需要两个参数（要渲染的元素和目标DOM节点），`createRoot`只需要一个目标DOM节点，并通过调用`.render()`方法指定要渲染的内容。
+```
+
 
 ```
 **2. ReactDOM.createPortal()**
