@@ -1,6 +1,7 @@
-### BrowserRouter 和 HashRouter
+# Router
 
-#### 1. BrowserRouter
+## 1. BrowserRouter
+
 工作原理
 
 **HTML5 History API**：BrowserRouter 使用 HTML5 的历史记录 API (pushState, replaceState, popstate) 来管理路由。它利用浏览器的地址栏和历史记录来实现平滑的页面切换，而不需要重新加载整个页面。
@@ -19,11 +20,12 @@
 
 **不支持旧浏览器**：HTML5 History API 在一些旧浏览器中可能不可用。
 
-<BrowserRouter>：包裹应用以启用路由。
+：包裹应用以启用路由。
 
-<Routes>：包含多个 <Route>，匹配 URL 并渲染组件。
+：包含多个 ，匹配 URL 并渲染组件。
 
-<Route>：定义路径到组件的映射。
+：定义路径到组件的映射。
+
 ```
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
@@ -61,7 +63,10 @@ function App() {
 export default App;
 ```
 
-路由跳转
+### 路由跳转
+
+useNavigate
+
 ```
 const HomeButton = () => {
   const navigate = useNavigate();
@@ -74,56 +79,49 @@ const HomeButton = () => {
 };
 ```
 
-#### Link 和 NavLink
-Link 还是 NavLink，它们的工作原理都是拦截浏览器默认的行为（即页面刷新），并通过调用 history.pushState() 方法来改变 URL，而不触发完整的页面加载。
+#### redirect
 
-Link 组件的主要功能是生成一个 HTML <a> 标签
-
-NavLink 是基于 Link 构建的一个更高级别的组件，它不仅提供了与 Link 相同的功能，而且还增加了自动检测是否处于活动状态的能力这意味着你可以轻松地为当前选中的链接应用特定的样式或类名
-
-#### <Navigate>
-
-声明式导航：这种方式是声明式的，意味着它直接作为 JSX 的一部分出现在组件返回的渲染树中。当条件满足时，React 将会渲染 <Navigate> 组件，这会导致 URL 和视图的变化。
-
-支持状态传递：通过 state 属性，你可以传递额外的信息给目标页面，例如当前试图访问的位置（location），以便登录成功后能够返回原来的页面。
 ```
-<Route path="/login" element={<Navigate to="/dashboard" state={{ from: '/login' }} />} />
+import { redirect } from "react-router";
 
-import { useLocation } from 'react-router-dom';
+export async function action({ request }) {
+  const formData = await request.formData();
+  const submission = Object.fromEntries(formData.entries());
 
-function Dashboard() {
-  const location = useLocation();
-  const { state } = location;
+  // 假设这里有一些异步操作来处理表单数据
+  await submitForm(submission);
 
-  return (
-    <div>
-      {state?.from
-        ? <p>You are coming from: {state.from}</p>
-        : <p>Welcome to the dashboard!</p>}
-    </div>
-  );
+  // 成功后重定向
+  return redirect("/success");
 }
 ```
 
-替换历史条目：replace 属性设置为 true 可以确保这次导航不会添加新的历史记录条目，而是替换掉当前的历史条目。这对于避免用户点击浏览器的“后退”按钮返回到受保护页面是有用的。
+* **`useNavigate` vs. `redirect`**：
+  * `useNavigate` 更适合于在React组件中直接调用，尤其是在用户交互触发导航的情况下。
+  * `redirect` 主要应用于数据加载器或动作处理器中，当你需要根据数据加载或提交的结果来决定是否进行重定向时。
+* **何时使用哪个**：
+  * 如果你需要在组件内通过事件处理程序（如按钮点击）进行导航，请使用`useNavigate`。
+  * 如果你在编写数据加载器或动作处理器，并希望在这些函数中根据某些条件执行重定向，则应使用`redirect`
 
-#### 2. HashRouter
+## Link 和 NavLink
 
-**工作原理**
+Link 还是 NavLink，它们的工作原理都是拦截浏览器默认的行为（即页面刷新），并通过调用 history.pushState() 方法来改变 URL，而不触发完整的页面加载。
 
-**URL 哈希 (#)**：HashRouter 使用 URL 的哈希部分（即 # 后面的部分）来管理路由。浏览器的地址栏会显示类似于 http://example.com/#/about 的 URL。
+Link 组件的主要功能是生成一个 HTML 标签
 
-HashRouter 依赖于浏览器的 hashchange 事件来检测路由的变化
+NavLink 是基于 Link 构建的一个更高级别的组件，它不仅提供了与 Link 相同的功能，而且还增加了自动检测是否处于活动状态的能力这意味着你可以轻松地为当前选中的链接应用特定的样式或类名声明式导
 
-**优点**
+**替换历史条目**：replace 属性设置为 true 可以确保这次导航不会添加新的历史记录条目，而是替换掉当前的历史条目。这对于避免用户点击浏览器的“后退”按钮返回到受保护页面是有用的。
 
-**无需服务器配置**：由于路由信息包含在 URL 的哈希部分，服务器只需要处理根路径的请求，不需要特殊配置。
+**2. HashRouter工作原理URL 哈希 (#)**：
+
+HashRouter 使用 URL 的哈希部分（即 # 后面的部分）来管理路由。浏览器的地址栏会显示类似于 http://example.com/#/about 的 URL。HashRouter 依赖于浏览器的 hashchange 事件来检测路由的变化
+
+**优点无需服务器配置**：由于路由信息包含在 URL 的哈希部分，服务器只需要处理根路径的请求，不需要特殊配置。
 
 **兼容性好**：支持所有现代浏览器和大部分旧浏览器。
 
-**缺点**
-
-**URL 不够美观**：URL 中包含 # 符号，看起来不够专业。
+**缺点URL 不够美观**：URL 中包含 # 符号，看起来不够专业。
 
 **搜索引擎优化 (SEO)**：搜索引擎可能不会很好地抓取和索引带有 # 的 URL，影响 SEO。
 
