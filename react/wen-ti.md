@@ -487,18 +487,18 @@ export default MyComponent;
 
 ```
 class MyComponent extends React.Component {
-constructor(props) {
-super(props);
-this.handleClick = this.handleClick.bind(this);
-}
-
-handleClick() {
-console.log('Clicked!');
-}
-
-render() {
-return <button onClick={this.handleClick}>Click Me</button>;
-}
+  constructor(props) {
+  super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+  
+  handleClick() {
+   console.log('Clicked!');
+  }
+  
+  render() {
+    return <button onClick={this.handleClick}>Click Me</button>;
+  }
 }
 ```
 
@@ -506,17 +506,16 @@ return <button onClick={this.handleClick}>Click Me</button>;
 
 而当你使用属性初始化器来定义类方法时，比如：
 
-```
-class MyComponent extends React.Component {
-handleClick = () => {
-console.log('Clicked!');
-};
-
-render() {
-return <button onClick={this.handleClick}>Click Me</button>;
+<pre><code>class MyComponent extends React.Component {
+<strong>    handleClick = () => {
+</strong>        console.log('Clicked!');
+    };
+    
+    render() {
+        return &#x3C;button onClick={this.handleClick}>Click Me&#x3C;/button>;
+    }
 }
-}
-```
+</code></pre>
 
 在这种情况下，handleClick 是作为一个类的字段（Field）来定义的，它在组件实例化时就被创建了一次，并且不会在每次渲染时重新创建。这使得它比直接在 JSX 中定义匿名箭头函数更高效。
 
@@ -524,17 +523,16 @@ return <button onClick={this.handleClick}>Click Me</button>;
 
 当你直接在 JSX 的事件处理属性中定义一个匿名的箭头函数时，例如：
 
-```
-class MyComponent extends React.Component {
-render() {
-return <button onClick={() => this.handleClick()}>Click Me</button>;
+<pre><code>class MyComponent extends React.Component {
+    render() {
+<strong>        return &#x3C;button onClick={() => this.handleClick()}>Click Me&#x3C;/button>;
+</strong>    }
+    
+    handleClick() {
+        console.log('Clicked!');
+    }
 }
-
-handleClick() {
-console.log('Clicked!');
-}
-}
-```
+</code></pre>
 
 这种做法每次组件渲染时都会创建一个新的函数实例，因为匿名箭头函数是在 render 方法内定义的。这样做可能导致性能问题，尤其是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染。
 
@@ -544,13 +542,13 @@ console.log('Clicked!');
 
 ```
 class MyComponent extends React.Component {
-handleClick() {
-console.log('Clicked!');
-}
-
-render() {
-return <button onClick={this.handleClick.bind(this)}>Click Me</button>;
-}
+    handleClick() {
+        console.log('Clicked!');
+    }
+    
+    render() {
+        return <button onClick={this.handleClick.bind(this)}>Click Me</button>;
+    }
 }
 ```
 
@@ -1112,14 +1110,14 @@ useImperativeHandle 的基本用法 useImperativeHandle(ref, createHandle, \[inp
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 
 const ChildComponent = forwardRef((props, ref) => {
-const [count, setCount] = useState(0);
-
-useImperativeHandle(ref, () => ({
-increment: () => setCount(prevCount => prevCount + 1),
-getCount: () => count,
-}));
-
-return <div>Count: {count}</div>;
+  const [count, setCount] = useState(0);
+  
+  useImperativeHandle(ref, () => ({
+    increment: () => setCount(prevCount => prevCount + 1),
+    getCount: () => count,
+  }));
+  
+  return <div>Count: {count}</div>;
 });
 
 export default ChildComponent;
@@ -1506,7 +1504,7 @@ Render Props模式是一种在React中复用组件逻辑的强大方式。通过
 
 Render Props 是一种在 React 中共享代码的模式，它通过使用一个函数类型的 prop 来实现。这个函数通常接收一些数据并返回 React 元素。以下是一个具体的 Render Props 示例，该示例展示了如何使用 Render Props 模式来追踪鼠标的位置，并将这些信息传递给渲染逻辑。
 
-### 示例：MouseTracker 组件
+#### 示例：MouseTracker 组件
 
 首先，我们创建一个 `Mouse` 组件，它负责监听鼠标移动事件，并将其位置作为参数传递给 render 函数：
 
@@ -1562,7 +1560,7 @@ export default MouseTracker;
 
 以下是更多关于Render Props模式的示例，展示了它在不同场景下的应用：
 
-### 示例 5: 权限控制
+#### 示例 5: 权限控制
 
 在需要基于用户权限控制UI展示的应用中，可以使用Render Props来封装权限检查逻辑。
 
@@ -1588,7 +1586,7 @@ function App() {
 }
 ```
 
-### 示例 6: 无限滚动加载
+#### 示例 6: 无限滚动加载
 
 创建一个可复用的无限滚动组件，当用户滚动到列表底部时加载更多数据。
 
@@ -1639,7 +1637,7 @@ function App() {
 }
 ```
 
-### 示例 7: 模态框管理
+#### 示例 7: 模态框管理
 
 创建一个通用的模态框组件，通过Render Props控制模态框的显示和隐藏。
 
@@ -1680,7 +1678,7 @@ function App() {
 }
 ```
 
-### 示例 8: 拖放功能
+#### 示例 8: 拖放功能
 
 创建一个可复用的拖放组件，允许用户拖放元素。
 
@@ -1768,8 +1766,6 @@ Render Props 是一种强大的模式，它允许你将跨多个组件的逻辑�
 * **示例**：使用`useSpring`、`useTransition`等钩子函数实现各种动画效果。
 
 #### 使用Styled Components
-
-* \*\*优点
 
 ### React中组件拆分的理解
 
@@ -1908,23 +1904,5 @@ Render Props 是一种强大的模式，它允许你将跨多个组件的逻辑�
        }
        ```
 
-#### 示例路由配置
 
-```javascript
-import { BrowserRouter as Router, Route, Switch } from 'eact-router-dom';
-
-function App() {
-  return (
-    <Router>
-      <Switch>
-        <Route path="/users/:id" component={UserDetail} />
-        <Route path="/search" component={SearchResults} />
-        <Route path="/dashboard" component={Dashboard} />
-      </Switch>
-    </Router>
-  );
-}
-```
-
-通过合理使用路由参数，可以实现动态内容的加载和页面之间的数据传递，提升应用的灵活性和用户体验。
 
