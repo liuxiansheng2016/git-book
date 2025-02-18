@@ -4,7 +4,7 @@ https://github.com/semlinker/reactjs-interview-questions/blob/master/README.md#%
 
 ### ReactDOM
 
-**1.&#x20;**~~**ReactDOM.render()**~~ 用途：这是最常用的 API 之一，用于将 React 元素渲染到提供的容器中并返回对 mounted 实例的引用。 用法示例：
+**1.** ~~<mark style="color:red;">**ReactDOM.render()**</mark>~~ 用途：这是最常用的 API 之一，用于将 React 元素渲染到提供的容器中并返回对 mounted 实例的引用。 用法示例：
 
 ````
 const element = <h1>Hello, world</h1>;
@@ -218,7 +218,7 @@ return (
 }
 ```
 
-### React.forwardRef
+### ~~<mark style="color:red;">React.forwardRef</mark>~~
 
 React.forwardRef 的 API 中 ref 必须指向 dom 元素而不是 React 组件
 
@@ -238,17 +238,35 @@ React.forwardRef 会创建一个 React 组件，这个组件能够将其接受�
 
 假设我们有一个函数组件 MyInput，我们希望能够在父组件中通过 ref 获取到这个输入框的引用：
 
-```
-import React, { forwardRef } from 'react';
+<pre><code>import React, { forwardRef } from 'react';
 
 // 使用 forwardRef 包装组件，使得可以接收 ref 并将其转发给 input 元素
 const MyInput = forwardRef((props, ref) => {
-return (
-<input {...props} ref={ref} />
-);
+    return (
+<strong>        &#x3C;input {...props} ref={ref} />
+</strong>    );
 });
 
 export default MyInput;
+
+</code></pre>
+
+<mark style="color:red;">从 React 19 开始，你现在可以在函数组件中将 ref 作为 prop 进行访问：</mark>
+
+新的函数组件将不再需要 `forwardRef`，我们将发布一个 codemod 来自动更新你的组件以使用新的 `ref` prop。在未来的版本中，我们将弃用并移除 `forwardRef`。
+
+#### 注意
+
+在类组件中，`ref` 不作为 props 传递，因为它们引用的是组件实例。这意味着，如果你在类组件中需要访问 `ref`，你需要使用 `React.forwardRef` 或者 `React.createRef`。
+
+```
+
+function MyInput({placeholder, ref}) {
+  return <input placeholder={placeholder} ref={ref} />
+}
+
+//...
+<MyInput ref={ref} />
 ```
 
 ```
