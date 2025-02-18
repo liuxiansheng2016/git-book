@@ -20,6 +20,8 @@ https://zh-hans.react.dev/reference/react/useCallback
 5. **useCallback()**：返回一个 memoized 回调函数。
 6. **useMemo()**：返回一个 memoized 值。
 7. **useRef()**：返回一个可变的引用对象。
+8. **useTransition**
+9. `useActionState`&#x20;
 
 #### 使用规则
 
@@ -363,3 +365,64 @@ function UpdateName({}) {
   );
 }
 </code></pre>
+
+## useActionState
+
+* `useActionState` 用于包装一个“Action”函数（通常是提交表单时调用的服务器操作），并跟踪该 Action 的执行状态。它在每次表单提交时，会调用传入的 Action 函数，同时返回最新的状态、包装后的提交函数以及一个表示当前是否处于待处理状态（isPending）的标志。
+*   **参数和返回值**\
+    调用 `useActionState(fn, initialState, permalink?)` 时：
+
+    * 第一个参数 `fn` 是一个 Action 函数，当表单提交时，该函数会被调用，并接收上一次状态作为第一个参数，以及表单数据（FormData）作为后续参数。
+    * 第二个参数 `initialState` 指定了初始状态。
+    * 第三个可选参数 `permalink` 用于在某些场景下控制表单的导航。
+
+    返回一个数组，包含：
+
+    1. 当前的状态（初始值为 `initialState`，Action 执行后更新为 Action 返回的值）。
+    2. 一个包装后的 Action 函数（可直接赋值给 `<form>` 元素的 `action` 属性或按钮的 `formAction` 属性）。
+    3. 一个 `isPending` 布尔值，表示当前是否有 Action 正在执行。
+
+
+
+    **表单处理**\
+    在表单提交时，你可以使用 `useActionState` 来管理提交过程中的各种状态，比如显示提交中状态（pending）、处理提交返回的错误信息或成功提示等。\
+    示例代码：
+
+    ```jsx
+    import { useActionState } from 'react';
+
+    async function updateName(prevState, formData) {
+      // 从 formData 中获取输入值，进行相应处理（如调用 API）
+      const newName = formData.get('name');
+      // 模拟异步操作
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return newName;
+    }
+
+    function UpdateNameForm() {
+      const [state, submitAction, isPending] = useActionState(updateName, '');
+
+      return (
+        <form action={submitAction}>
+          <input name="name" placeholder="Enter new name" />
+          <button type="submit" disabled={isPending}>
+            {isPending ? 'Updating...' : 'Update'}
+          </button>
+          <div>{state && `Updated name: ${state}`}</div>
+        </form>
+      );
+    }
+    ```
+
+### `useFormStatus`  <a href="#new-hook-useformstatus" id="new-hook-useformstatus"></a>
+
+在设计系统中，常常需要编写设计一类能够访问其所在的 `<form>` 的信息而无需将属性传递到组件内的组件。这可以通过 Context 来实现，但为了使这类常见情况更简单，我们添加了一个新的 Hook `useFormStatus`：
+
+```
+import {useFormStatus} from 'react-dom';
+
+function DesignButton() {
+  const {pending} = useFormStatus();
+  return <button type="submit" disabled={pending} />
+}
+```
