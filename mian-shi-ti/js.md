@@ -1,6 +1,6 @@
 # JS
 
-1\. 事件流
+### 事件流
 
 ```
 事件捕获阶段：事件从最外层的元素开始，逐层向下传递到目标元素
@@ -8,13 +8,13 @@
 事件冒泡阶段：事件从目标节点开始，沿着 DOM 树向上冒泡，直到冒泡到最顶层的 DOM 节点
 ```
 
-2\. 事件委托
+### 2. 事件委托
 
 ```
 利用事件冒泡的原理，通过父元素来捕获子元素的事件加以处理
 ```
 
-3\. 继承
+### 3. 继承
 
 ```
 原型链继承
@@ -24,7 +24,7 @@ ES6的类
 https://blog.csdn.net/weixin_70134200/article/details/131730945
 ```
 
-4\. 垃圾回收机制
+### 4. 垃圾回收机制
 
 ```
 
@@ -53,9 +53,9 @@ https://blog.csdn.net/weixin_70134200/article/details/131730945
    - 停顿时间控制：不同的GC算法有不同的停顿时间特性，选择合适的GC算法对于实时性要求较高的应用尤为重要。开发者可以根据应用的具体需求调整垃圾收集策略，以平衡性能与响应时间。
 ```
 
-6\. 前端监控系统
+### 6. 前端监控系统
 
-7\. 进程和线程
+### 7. 进程和线程
 
 ```
 进程是资源分配和独立运行的基本单位，而线程是进程中的执行单元。
@@ -65,7 +65,7 @@ https://blog.csdn.net/weixin_70134200/article/details/131730945
 进程之间需要通过进程间通信（IPC）来进行数据交换，线程之间可以直接访问共享的数据
 ```
 
-8\. content-type
+### 8. content-type
 
 {% code overflow="wrap" %}
 ```
@@ -106,7 +106,7 @@ video/webm	WebM 视频文件。
 ```
 {% endcode %}
 
-9\. Get/post
+### 9. Get/post
 
 ```
 get是获取数据
@@ -118,9 +118,9 @@ Get 参数可以 放在url 中，长度有限制，不安全
 GET 请求可以被浏览器和代理服务器缓存，提高性能
 ```
 
-10\. Symbol
+### 10. Symbol
 
-11\. Object.keys() 和for in for of
+### 11. Object.keys() 和for in for of
 
 {% code overflow="wrap" %}
 ```
@@ -138,7 +138,7 @@ for of 只能遍历数组（需要实现iterator接口）
 ```
 {% endcode %}
 
-12\. Object.create和new的区别
+### 12. Object.create和new的区别
 
 {% code overflow="wrap" %}
 ```
@@ -148,14 +148,14 @@ Object.create(proto [, propertiesObject]);
 ```
 {% endcode %}
 
-13\. In 和 hasOwnProperty
+### 13. In 和 hasOwnProperty
 
 ```
 判断对象中是否拥有某个属性
 in 包含原型链
 ```
 
-14\. is 和 instanceof
+### 14. is 和 instanceof
 
 {% code overflow="wrap" %}
 ```
@@ -171,14 +171,14 @@ is 类型守卫可以提供更细粒度的类型检查，并且在返回 true �
 ```
 {% endcode %}
 
-15\. 强制类型转换和隐式类型转换
+### 15. 强制类型转换和隐式类型转换
 
 ```
 String()，Boolean()，Number()
 隐式：拼接字符串
 ```
 
-16\. 堆和栈
+### 16. 堆和栈
 
 {% code overflow="wrap" %}
 ```
@@ -189,7 +189,7 @@ String()，Boolean()，Number()
 ```
 {% endcode %}
 
-17\. 深拷贝和浅拷贝
+### 17. 深拷贝和浅拷贝
 
 {% code overflow="wrap" %}
 ```
@@ -199,7 +199,7 @@ https://blog.csdn.net/weixin_44369568/article/details/101515407
 ```
 {% endcode %}
 
-18\. 判断一个对象是否是数组，如何处理类数组对象
+### 18. 判断一个对象是否是数组，如何处理类数组对象
 
 ```javascript
 1. Array.isArray(obj)
@@ -221,7 +221,7 @@ call 方法：call 是 Function.prototype 上的一个方法，它可以改变�
 应用到类数组对象：当你使用 Array.prototype.slice.call(arrayLike) 时，实际上是将 slice 方法的 this 绑定到了 arrayLike 对象上，使得 slice 方法能够像处理普通数组那样处理这个类数组对象。由于 slice 不修改原对象而是返回一个新的数组，所以结果是一个真正的数组，包含了从 arrayLike 提取的所有元素。
 ```
 
-19\. 说下你对 Reflect 的理解？为什么会有 Reflect 的出现？Proxy 也简单的说一下？
+### 19. 说下你对 Reflect 的理解？为什么会有 Reflect 的出现？Proxy 也简单的说一下？
 
 ```
 Reflect 和 Proxy 都是用来控制和操作 JavaScript 对象，Reflect 提供了一组标准的方法来执行语言内部的操作，而 Proxy 则允许你自定义这些操作的行为
@@ -298,9 +298,9 @@ Proxy 是一个构造函数，它能够创建一个代理对象，用于拦截�
 var proxy = new Proxy(target, handler);
 ```
 
-20\. Webpack 打包 速度慢怎么办？
+### 20. Webpack 打包 速度慢怎么办？
 
-21\. 微前端
+### 21. 微前端
 
 ```
 微前端是一套架构体系，
@@ -315,7 +315,7 @@ Module Federation 是webpack给出的技术方案
 每个微应用之间状态隔离，运行时状态不共享
 ```
 
-22\. 前端工程化
+### 22. 前端工程化
 
 ```
 模块化
@@ -325,15 +325,15 @@ Module Federation 是webpack给出的技术方案
 https://www.zhihu.com/question/433854153/answer/2925739518?utm_id=0
 ```
 
-23\. 封装公共组件需要注意什么？
+### 23. 封装公共组件需要注意什么？
 
 ```
 可复用性、可维护性、可测试性和灵活性
 ```
 
-24\. 项目开发你是怎么组织 CSS 的？
+### 24. 项目开发你是怎么组织 CSS 的？
 
-25\. 性能优化
+### 25. 性能优化
 
 ```
 按需加载（On-demand Loading）
@@ -368,7 +368,7 @@ splitChunks：提取公共代码。
 TerserPlugin 是 Webpack 中用于压缩 JavaScript 的插件。
 ```
 
-26\. 按需加载
+### 26. 按需加载
 
 ```
 懒加载
@@ -376,7 +376,7 @@ TerserPlugin 是 Webpack 中用于压缩 JavaScript 的插件。
 异步加载
 ```
 
-27\. 说一下减少 dom 数量的办法？一次性给你大量的 dom 怎么优化？
+### 27. 说一下减少 dom 数量的办法？一次性给你大量的 dom 怎么优化？
 
 ```
 一、减少DOM数量的方法
@@ -390,11 +390,11 @@ TerserPlugin 是 Webpack 中用于压缩 JavaScript 的插件。
 3虚拟Dom
 ```
 
-28\. CI/CD
+### 28. CI/CD
 
-29\. ES6 代码转成 ES5 代码
+### 29. ES6 代码转成 ES5 代码
 
-30\. commonJS, ES6模块化, UMD,CMD
+### 30. commonJS, ES6模块化, UMD,CMD
 
 ```
 commonJS 一个文件就是一个模块，运行时加载
@@ -406,7 +406,7 @@ AMD:
 异步模块的定义，它是浏览器端模块开发的规范。由于不是js的原生支持，需要用到对应的库函数。Require.js.
 ```
 
-31\. 为什么利用多个域名来存储网站资源？
+### 31. 为什么利用多个域名来存储网站资源？
 
 ```
 浏览器限制：现代浏览器对同一域名下的并发请求数量有限制（通常为6个）。这意味着如果一个页面需要加载大量资源（如图片、CSS、JavaScript文件等），可能会因为达到最大并发连接数而不得不等待前面的请求完成。通过使用多个域名，可以增加总的并发连接数，从而加快资源加载速度。
@@ -415,7 +415,7 @@ CDN 优化：使用内容分发网络（CDN）可以将资源分布到全球多�
 域名隔离：通过使用不同的域名，可以实现资源的隔离，防止跨域问题，提高安全性和稳定性。
 ```
 
-32\. 负载均衡
+### 32. 负载均衡
 
 {% code overflow="wrap" %}
 ```
@@ -423,11 +423,11 @@ CDN 优化：使用内容分发网络（CDN）可以将资源分布到全球多�
 ```
 {% endcode %}
 
-33\. 接口怎么防刷
+### 33. 接口怎么防刷
 
-34\. Promise状态
+### 34. Promise状态
 
-35\. 函数式编程的理解 JavaScript
+### 35. 函数式编程的理解 JavaScript
 
 ```
 纯函数
@@ -436,7 +436,7 @@ CDN 优化：使用内容分发网络（CDN）可以将资源分布到全球多�
 优点： 无状态，更优雅的组合
 ```
 
-36\. 高阶函数
+### 36. 高阶函数
 
 {% code overflow="wrap" %}
 ```
@@ -444,25 +444,25 @@ CDN 优化：使用内容分发网络（CDN）可以将资源分布到全球多�
 ```
 {% endcode %}
 
-37\. 说出前端框架设计模式(MVVM 或 MVC)的含义以及原理
+### 37. 说出前端框架设计模式(MVVM 或 MVC)的含义以及原理
 
-38\. :说一下 jQuery ajax、axios、fetch 的区别
+### 38. :说一下 jQuery ajax、axios、fetch 的区别
 
-39\. jsonp
+### 39. jsonp
 
 ```
 前端和后端配合实现跨域ajax，需要服务端配合处理回调函数
 ```
 
-40\. 介绍下 npm 模块安装机制？输入 npm install 命令敲下回车后它的一个执行流程是怎样的？
+### 40. 介绍下 npm 模块安装机制？输入 npm install 命令敲下回车后它的一个执行流程是怎样的？
 
-41\. Node.js 支持高并发的理解
+### 41. Node.js 支持高并发的理解
 
 ```
 它的事件驱动、非阻塞I/O模型以及单线程事件循环架构
 ```
 
-42\. 请求时是否带Cookie
+## 42. 请求时是否带Cookie
 
 ```
 ⦁fetch：通过设置 credentials: 'include' 来携带 Cookie。
@@ -471,9 +471,9 @@ CDN 优化：使用内容分发网络（CDN）可以将资源分布到全球多�
 
 ```
 
-43\. Http 无状态
+### 43. Http 无状态
 
-44\. HTTPS 与 HTTP
+### 44. HTTPS 与 HTTP
 
 {% code overflow="wrap" %}
 ```
@@ -481,7 +481,7 @@ HTTPS是HTTP协议的安全版本，HTTP协议的数据传输是明文的，是�
 ```
 {% endcode %}
 
-45\. HTTP/2
+### 45. HTTP/2
 
 {% code overflow="wrap" %}
 ```
@@ -514,7 +514,7 @@ HTTP/3 建立在 HTTP/2 的基础上，并且保留了许多 HTTP/2 的特性。
 ```
 {% endcode %}
 
-46\. http请求由什么组成
+### 46. http请求由什么组成
 
 ```
 请求行、请求头部、空行、请求数据。
@@ -527,9 +527,9 @@ GET /data/info.html HTTP/1.1
 2.响应报文(状态行、消息报头、响应正文)
 ```
 
-47\. http请求类型
+### 47. http请求类型
 
-48\. 简单请求和非简单请求
+### 48. 简单请求和非简单请求
 
 {% code overflow="wrap" %}
 ```
@@ -545,11 +545,11 @@ https://baijiahao.baidu.com/s?id=1765836290890433189&wfr=spider&for=pc
 ```
 {% endcode %}
 
-49\. Https 加密握手的过程
+### 49. Https 加密握手的过程
 
-50\. 什么时候用 TCP，什么时候适合 UDP？
+### 50. 什么时候用 TCP，什么时候适合 UDP？
 
-51\. DNS
+### 51. DNS
 
 ```
 Domain name system
@@ -560,7 +560,7 @@ Domain name system
 4更高级别的DNS服务器发送查询请求
 ```
 
-52\. http请求从发起请求到收到响应的全部过程
+### 52. http请求从发起请求到收到响应的全部过程
 
 ```
 1 输入网址
@@ -573,7 +573,7 @@ Domain name system
 8、浏览器发送请求获取其他在HTML中的资源
 ```
 
-53\. 多路复用：
+### 53. 多路复用：
 
 {% code overflow="wrap" %}
 ```
@@ -583,7 +583,7 @@ HTTP/1.1 的持久连接，请求和响应必须按顺序进行。
 ```
 {% endcode %}
 
-54\. keep-alive和多路复用
+### 54. keep-alive和多路复用
 
 ```
 HTTP/1.1 的 keep-alive：
@@ -599,7 +599,7 @@ HTTP/2 的多路复用：
 流和帧：请求和响应被分割成多个流和帧，可以交错传输。
 ```
 
-55\. Tcp 和UDP
+### 55. Tcp 和UDP
 
 ```
 传输控制协议
@@ -610,7 +610,7 @@ Tcp 开销大，拥塞机制，流量控制
 所以速度更慢
 ```
 
-56\. 三次握手
+### 56. 三次握手
 
 ```
 三次握手是指 建立tcp 连接时，需要客户端和服务器总共需要发送三个包。
@@ -618,7 +618,7 @@ Tcp 开销大，拥塞机制，流量控制
 2 防止服务器端因接收了早已失效的连接请求报文，从而一直等待客户端请求，
 ```
 
-57\. 四次挥手
+### 57. 四次挥手
 
 {% code overflow="wrap" %}
 ```
@@ -629,8 +629,7 @@ Tcp 开销大，拥塞机制，流量控制
 ```
 {% endcode %}
 
-\
-58\. 计算机网络七层模型详解
+### 58. 计算机网络七层模型详解
 
 {% code overflow="wrap" %}
 ```
@@ -646,7 +645,7 @@ Tcp 开销大，拥塞机制，流量控制
 ```
 {% endcode %}
 
-59\. Websocket和http
+### 59. Websocket和http
 
 ```
 WebSocket是一种在单个TCP连接上进行全双工通信的协议。它被设计用于替代传统的HTTP请求/响应模型，以实现更高效、实时的通信。
@@ -665,7 +664,7 @@ WebSocket使得服务器和客户端可以在建立连接后，双向发送数�
 WebSocket 可以通过 WSS（WebSocket Secure）提供加密传输，确保数据的安全性。
 ```
 
-60\. 对 JavaScript 执行上下文的理解 JavaScript
+### 60. 对 JavaScript 执行上下文的理解 JavaScript
 
 ```
 在全局执行上下文中，this的值指向全局对象
@@ -674,13 +673,13 @@ WebSocket 可以通过 WSS（WebSocket Secure）提供加密传输，确保数�
 如果它被一个引用对象调用，那么this会被设置成那个对象，否则this的值被设置为全局对象或者undifined,
 ```
 
-61\. ES5 模拟实现一下 let、const（https://www.cnblogs.com/bxtfdxg/p/14885568.html）
+### 61. ES5 模拟实现一下 let、const（https://www.cnblogs.com/bxtfdxg/p/14885568.html）
 
 ```
 匿名函数和闭包
 ```
 
-62\. 暂时性死区
+### 62. 暂时性死区
 
 {% code overflow="wrap" %}
 ```
@@ -689,7 +688,7 @@ https://zhuanlan.zhihu.com/p/438563024?utm_id=0
 ```
 {% endcode %}
 
-63\. 异步请求为什么会导致tcp的对头阻塞（https://www.jianshu.com/p/8f64f93d0080）
+### 63. 异步请求为什么会导致tcp的对头阻塞（https://www.jianshu.com/p/8f64f93d0080）
 
 {% code overflow="wrap" %}
 ```
@@ -700,7 +699,7 @@ TCP 的阻塞问题是包括慢启动和拥塞控制（当网络出现拥塞时�
 ```
 {% endcode %}
 
-64\. 虚拟列表
+### 64. 虚拟列表
 
 {% code overflow="wrap" %}
 ```
@@ -711,15 +710,15 @@ https://juejin.cn/post/6877507011769008135
 ```
 {% endcode %}
 
-65\. webWorker的优缺点
+### 65. webWorker的优缺点
 
-66\. 程序设计模式
+### 66. 程序设计模式
 
-67\. 运营商劫持
+### 67. 运营商劫持
 
-68\. JSON.stringify [https://zhuanlan.zhihu.com/p/478226524?utm\_id=0](https://zhuanlan.zhihu.com/p/478226524?utm_id=0)
+### 68. JSON.stringify [https://zhuanlan.zhihu.com/p/478226524?utm\_id=0](https://zhuanlan.zhihu.com/p/478226524?utm_id=0)
 
-69\. 网页扫码登录的原理
+### 69. 网页扫码登录的原理
 
 ```
 1. 生成二维码
@@ -732,7 +731,7 @@ https://juejin.cn/post/6877507011769008135
 4. 网页轮询验证
 ```
 
-70\. 原型prototype
+### 70. 原型prototype
 
 ```
 每个类型（例如Date,Error,Array,Number……包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象
@@ -742,7 +741,7 @@ constructor属性的含义就是指向该对象的构造函数，所有函数（
 f1.constructor === Foo
 ```
 
-71\. 原型链
+### 71. 原型链
 
 {% code overflow="wrap" %}
 ```
