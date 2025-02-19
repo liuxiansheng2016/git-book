@@ -4,11 +4,9 @@
 
 ### angular JS
 
-### GOJS
+### GoJS
 
-### Gulp
 
-### Webpack
 
 ### Aurelia
 
@@ -219,7 +217,7 @@ window.onload和$(document).ready的区别：
 * `$.each(对象或者数组,function(index, el) {});`
 * `JQ对象.each(function(index, el) {});`
 
-## Electron
+### Electron
 
 #### 主要特性
 
