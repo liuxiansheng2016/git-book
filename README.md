@@ -285,7 +285,176 @@ console.log(0.1 + 0.2); // 0.30000000000000004
 * `Math.max` 不能直接处理数组，需要使用 `Math.max.apply(null, [2,3,4,5])`。
 * 浮点数计算可能会出现精度问题，如 `0.1 + 0.2` 结果为 `0.30000000000000004`。
 
-[更多详细内容](https://2ality.com/2012/01/object-plus-object.html) [参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)
+[更多详细内容](https://2ality.com/2012/01/object-plus-object.html) [参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)\
+\
+
+
+## 深克隆浅克隆
+
+**浅克隆**
+
+浅克隆是指只复制对象的一层结构，即如果源对象中的属性是引用类型（如数组、对象等），那么浅克隆后的新对象中的这些属性将仍然指向原对象中对应的属性的内存地址。这意味着，对新对象中这些属性的修改会影响到原对象
+
+以下是对上述内容进行格式化和修正语法错误后的代码及详细解释：
+
+#### 浅克隆
+
+**1. 使用 `Object.assign()`**
+
+```javascript
+// 定义原始对象 obj1
+let obj1 = { a: 1, b: { c: 2 } };
+// 使用 Object.assign() 方法进行浅克隆，将 obj1 的属性复制到一个空对象中
+let obj2 = Object.assign({}, obj1);
+
+// 验证浅克隆，修改 obj2 中 b 属性的 c 值
+obj2.b.c = 3;
+console.log(obj1.b.c); // 输出 3，说明修改 obj2 影响了 obj1
+```
+
+**2. 使用扩展运算符 (`...`)**
+
+```javascript
+// 定义原始对象 obj1
+let obj1 = { a: 1, b: { c: 2 } };
+// 使用扩展运算符进行浅克隆
+let obj2 = { ...obj1 };
+
+// 验证浅克隆，修改 obj2 中 b 属性的 c 值
+obj2.b.c = 3;
+console.log(obj1.b.c); // 输出 3，说明修改 obj2 影响了 obj1
+```
+
+**3. 自定义浅克隆方法**
+
+```javascript
+// 在 Object 类的原型中添加一个克隆方法
+Object.prototype.clone = function () {
+    // 根据情况创建数组对象或者普通 object 对象
+    let obj = this instanceof Array ? [] : {};
+    // 遍历当前对象的成员，赋给新对象
+    for (let prop in this) {
+        obj[prop] = this[prop];
+    }
+    return obj;
+};
+
+// 使用自定义浅克隆方法
+let obj1 = { a: 1, b: { c: 2 } };
+let obj2 = obj1.clone();
+
+// 验证浅克隆，修改 obj2 中 b 属性的 c 值
+obj2.b.c = 3;
+console.log(obj1.b.c); // 输出 3，说明修改 obj2 影响了 obj1
+```
+
+#### 深克隆
+
+**1. 使用 `JSON.parse(JSON.stringify())`**
+
+```javascript
+// 定义原始对象 obj1
+let obj1 = { a: 1, b: { c: 2 } };
+// 使用 JSON.parse(JSON.stringify()) 进行深克隆
+let obj2 = JSON.parse(JSON.stringify(obj1));
+
+// 验证深克隆，修改 obj2 中 b 属性的 c 值
+obj2.b.c = 3;
+console.log(obj1.b.c); // 输出 2，说明修改 obj2 不影响 obj1
+```
+
+**2. 自定义深克隆方法**
+
+```javascript
+// 在 Object 类的原型中添加一个深克隆方法
+Object.prototype.clone = function () {
+    // 根据情况创建一个数组或者普通 object 对象
+    let obj = this instanceof Array ? [] : {};
+    // 遍历当前对象的成员，赋给新对象
+    for (let prop in this) {
+        // 如果当前成员是对象类型
+        if (typeof this[prop] === 'object' && this[prop]!== null) {
+            obj[prop] = this[prop].clone();
+        } else {
+            obj[prop] = this[prop];
+        }
+    }
+    return obj;
+};
+
+// 使用自定义深克隆方法
+let obj1 = { a: 1, b: { c: 2 } };
+let obj2 = obj1.clone();
+
+// 验证深克隆，修改 obj2 中 b 属性的 c 值
+obj2.b.c = 3;
+console.log(obj1.b.c); // 输出 2，说明修改 obj2 不影响 obj1
+```
+
+#### 注意事项
+
+* **`JSON.parse(JSON.stringify())`**：该方法有一些局限性，比如不能处理函数、`undefined`、`Symbol` 等类型，并且不会复制对象的原型链。
+* **自定义方法**：通过递归调用 `clone` 方法实现深克隆，但要注意循环引用的问题，上述代码没有处理循环引用，实际使用时可能需要额外处理。
+
+## 节流与防抖（throttle 和 debounce）
+
+**Throttle**
+
+规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行。
+
+**场景**：监听滚动事件，比如是否滑到底部自动加载更多，用 `throttle` 来判断。
+
+**实现思路**：设置一个参数，执行完毕才为 `true`，如果为 `false` 则不继续执行。
+
+```javascript
+// 节流 throttle 代码：
+function throttle(fn, delay) {
+    let canRun = true; // 通过闭包保存一个标记
+    return function () {
+        // 在函数开头判断标记是否为 true，不为 true 则 return
+        if (!canRun) return;
+        // 立即设置为 false
+        canRun = false;
+        // 将外部传入的函数的执行放在 setTimeout 中
+        setTimeout(() => {
+            // 最后在 setTimeout 执行完毕后再把标记设置为 true(关键)表示可以执行下一次循环了。
+            // 当定时器没有执行的时候标记永远是 false，在开头被 return 掉
+            fn.apply(this, arguments);
+            canRun = true;
+        }, delay);
+    };
+}
+
+function sayHi(e) {
+    console.log('节流：', e.target.innerWidth, e.target.innerHeight);
+}
+```
+
+**Debounce**
+
+在事件被触发 `n` 秒后再执行，如果在这 `n` 秒内又被触发，则重新计时，触发多次只执行一次（如 `input` 输入、`onresize` 事件）。
+
+**实现思路**：每次触发事件时设置一个延迟调用方法，并且取消之前的延时调用方法。
+
+```javascript
+// 防抖 debounce 代码：
+function debounce(fn, delay) {
+    var timeout = null; // 创建一个标记用来存放定时器的返回值
+    return function (e) {
+        // 每当用户输入的时候把前一个 setTimeout clear 掉
+        clearTimeout(timeout);
+        // 然后又创建一个新的 setTimeout, 这样就能保证 interval 间隔内如果时间持续触发，就不会执行 fn 函数
+        timeout = setTimeout(fn, delay);
+    };
+}
+
+// 处理函数
+function handle() {
+    console.log('防抖：', Math.random());
+}
+```
+
+上述代码分别实现了节流和防抖函数。节流函数 `throttle` 确保在指定的时间间隔内，回调函数只能执行一次；防抖函数 `debounce` 则会在事件停止触发一段时间后才执行回调函数，如果在这段时间内再次触发事件，会重新计时。
 
 ## 事件
 
