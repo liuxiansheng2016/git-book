@@ -214,10 +214,23 @@ function ThemedButton() {
 
 useReducer 是 React 中的一个 Hook，它为复杂的状态逻辑提供了一种更可预测和结构化的方式来管理状态。 它类似于 Redux 的工作原理，通过一个 reducer 函数来管理状态的变化。
 
-useReducer 不是对 useState 的“替代”，而是一种适用于更复杂状态场景的替代方案。如果你的状态更新简单、逻辑直白，useState 完全足够；如果状态更新逻辑较复杂，或需要对状态变化进行更细粒度的控制和记录，则使用 useReducer 会更合适。
+
 
 * **useReducer** 适合用于单个组件或局部组件树中管理较复杂的状态逻辑，无需引入额外的状态管理库。
 * **Redux** 则用于全局状态管理，特别是当多个组件需要共享状态、需要中间件支持异步操作或需要调试工具时，Redux 提供了更完善的解决方案。
+*   **与`useState`的区别**
+
+    1. **状态更新方式**
+       * **`useState`**：通过调用返回的更新函数直接更新状态，适用于简单的状态管理。
+       * **`useReducer`**：通过`dispatch`函数发送action来更新状态，action描述了要执行的操作，reducer函数根据action更新状态，适用于复杂的状态管理。
+    2. **性能优化**
+       * **`useState`**：每次更新状态都会触发组件的重新渲染。
+       * **`useReducer`**：可以通过`useMemo`或 `useCallback`对`dispatch`函数进行优化，减少不必要的渲染。
+    3. **可读性和可维护性**
+       * **`useState`**：对于简单的状态管理，代码简洁易懂。
+       * **`useReducer`**：将状态更新逻辑集中在一个reducer函数中，提高了代码的可读性和可维护性，尤其适用于大型项目。
+
+    总之，`useReducer`适用于复杂状态管理和需要高度可维护性的场景，而`useState`适用于简单的状态管理。根据具体需求选择合适的钩子，可以提高应用的性能和开发效率
 
 **基本使用**
 
@@ -522,3 +535,6 @@ function DesignButton() {
   return <button type="submit" disabled={pending} />
 }
 ```
+
+####
+
