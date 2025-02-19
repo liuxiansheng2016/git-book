@@ -83,7 +83,7 @@
   * [兼容性实现](mian-shi-ti/jian-rong-xing-shi-xian.md)
   * [datadog](mian-shi-ti/datadog.md)
   * [微前端](mian-shi-ti/wei-qian-duan.md)
-  * [浏览器缓存](mian-shi-ti/liu-lan-qi-huan-cun.md)
+  * [缓存](mian-shi-ti/liu-lan-qi-huan-cun.md)
   * [怎么设计一套UI](mian-shi-ti/zen-me-she-ji-yi-tao-ui.md)
   * [服务端渲染](mian-shi-ti/fu-wu-duan-xuan-ran.md)
   * [Git 自动化部署](mian-shi-ti/git-zi-dong-hua-bu-shu.md)

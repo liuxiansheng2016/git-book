@@ -22,6 +22,7 @@ https://zh-hans.react.dev/reference/react/useCallback
 7. **useRef()**：返回一个可变的引用对象。
 8. **useTransition：** 它允许你标记一个状态更新为过渡（transitions），这意味着这些更新不会立即触发同步的UI渲染，而是允许React在后台处理这些更新，并在适当的时候进行更新。这有助于提高应用的响应速度，尤其是在执行可能耗费较多时间的状态更新时，比如过滤大型列表或者进行复杂的计算
 9. `useActionState` 它主要用于表单提交场景下状态的管理和异步 Action 的处理
+10. `useFormStatus`  够访问其所在的 `<form>` 的信息而无需将属性传递到组件内的组件
 
 #### 使用规则
 
@@ -142,7 +143,7 @@ reducer：这是一个函数，接收当前的 state 和一个 action，并返�
 const [state, dispatch] = useReducer(reducer, initialState);
 ```
 
-**Reducer 函数**
+### **Reducer 函数**
 
 Reducer 函数通常遵循以下模式：
 
@@ -202,7 +203,7 @@ export default function Counter() {
 
 **范围**：useReducer 适用于局部状态管理，而 Redux 通常用于应用级别的状态管理。 **中间件支持**：Redux 支持丰富的中间件生态系统，如异步操作处理、日志记录等，而 useReducer 则没有内置这样的功能。
 
-#### useCallback
+### useCallback
 
 useCallback 是 React 的一个 hook，用于优化性能。它的作用是缓存一个函数，确保在组件重新渲染时，不会创建新的函数实例。
 
@@ -252,7 +253,7 @@ export default Parent;
 
 在上面的例子中，handleClick 函数只会在组件首次渲染时创建一次，不会因为组件重新渲染而创建新的实例。
 
-#### useMemo
+### useMemo
 
 `useMemo` 是 React 中的一个 Hook，用于优化组件性能，避免不必要的计算和渲染。它通过缓存计算结果，在依赖项未发生变化时直接返回缓存值，从而减少重复计算。
 
@@ -322,7 +323,7 @@ useRef 返回一个可变的 ref 对象，其 .current 属性被初始化为传�
 
 
 
-**useTransition**
+### **useTransition**
 
 使用 `useTransition` 可以帮助你在状态更新和UI渲染之间创建更流畅的用户体验。当你有一个耗时的状态更新操作时，你可以将其标记为过渡，这样用户界面就不会被阻塞，同时可以显示一个加载指示器，直到过渡完成并准备好进行最终的UI更新。
 
@@ -366,7 +367,7 @@ function UpdateName({}) {
 }
 </code></pre>
 
-## useActionState
+### useActionState
 
 * `useActionState` 用于包装一个“Action”函数（通常是提交表单时调用的服务器操作），并跟踪该 Action 的执行状态。它在每次表单提交时，会调用传入的 Action 函数，同时返回最新的状态、包装后的提交函数以及一个表示当前是否处于待处理状态（isPending）的标志。
 *   **参数和返回值**\
@@ -416,7 +417,16 @@ function UpdateName({}) {
 
 ### `useFormStatus`  <a href="#new-hook-useformstatus" id="new-hook-useformstatus"></a>
 
-在设计系统中，常常需要编写设计一类能够访问其所在的 `<form>` 的信息而无需将属性传递到组件内的组件。这可以通过 Context 来实现，但为了使这类常见情况更简单，我们添加了一个新的 Hook `useFormStatus`：
+在设计系统中，常常需要编写设计一类能够访问其所在的 `<form>` 的信息而无需将属性传递到组件内的组件。这可以通过 Context 来实现，但为了使这类常见情况更简单，我们添加了一个新的 Hook&#x20;
+
+`useFormStatus` 返回的是一个对象，这个对象包含多个属性，用来描述当前 `<form>` 的状态。通常，这个对象具有以下几个属性：
+
+* **pending**：布尔值，指示表单是否处于提交状态。当表单正在提交时，`pending` 为 `true`；否则为 `false`。
+* **data**：当表单处于提交状态时，这里会包含当前的 `FormData` 对象；当表单未提交时，通常为 `null`。
+* **method**：表示表单提交时使用的 HTTP 方法（例如 `'post'` 或 `'get'`）；如果表单未提交，则为 `null`。
+* **action**：表示表单的提交目标，可以是一个 URL 字符串或一个函数（用于处理表单提交）；如果表单未提交，则为 `null`。
+
+在非 pending 状态下，除了 `pending` 为 `false` 外，其他属性通常都为 `null`。而当表单提交过程中，这些属性则提供了相关的上下文信息，使你可以根据需要更新 UI（例如禁用提交按钮或显示加载状态）。
 
 ```
 import {useFormStatus} from 'react-dom';

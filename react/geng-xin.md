@@ -1,5 +1,7 @@
 # 更新
 
+[https://react.dev/blog/2024/04/25/react-19-upgrade-guide](https://react.dev/blog/2024/04/25/react-19-upgrade-guide)
+
 {% embed url="https://zh-hans.react.dev/blog/2024/12/05/react-19#ref-as-a-prop" %}
 
 ### React DOM 相关
@@ -31,6 +33,7 @@
 
 * **ref 作为普通 prop**
   * 从 React v19 开始，在函数组件中可以直接将 `ref` 作为 prop 使用，而不必再借助 `forwardRef`。未来版本中将弃用 `forwardRef`，推荐直接使用新的模式。
+  * 在类组件中，`ref` 不作为 props 传递，因为它们引用的是组件实例。这意味着，如果你在类组件中需要访问 `ref`，你需要使用 `React.forwardRef` 或者 `React.createRef`
 * **ref 清理函数支持**
   * 新的 ref 回调现在可以返回一个清理函数，这个函数将在元素卸载或 ref 更新时调用，帮助开发者在取消订阅或清理副作用时更加方便。
   * 与之前的行为不同，以前卸载时会用 `null` 调用 ref 函数，现在如果返回清理函数，则不会再调用 ref 回调传入 null。
