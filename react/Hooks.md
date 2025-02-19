@@ -29,6 +29,87 @@ https://zh-hans.react.dev/reference/react/useCallback
 1. 只能在 React 的函数组件中调用 Hook。不要在其他 JavaScript 函数中调用。（还有一个地方可以调用 Hook —— 就是自定义的 Hook 中）
 2. 不要在循环，条件或嵌套函数中调用 Hook，必须始终在 React 函数的顶层使用 Hook
 
+## 常见hooks
+
+### 1. 状态管理类 Hooks
+
+* **useState**\
+  用于在函数组件中添加本地状态。它返回当前状态和更新状态的函数，适合管理简单数据。
+* **useReducer**\
+  用于处理复杂状态逻辑或多个子状态之间相互关联的场景。它接收一个 reducer 函数和初始状态，返回当前状态和 dispatch 函数，类似 Redux 的工作方式。
+
+***
+
+### 2. 副作用与 DOM 操作类 Hooks
+
+* **useEffect**\
+  用于执行副作用操作，如数据获取、订阅、手动修改 DOM 等。它会在组件渲染后异步执行，并可在依赖变化时重新调用。
+* **useLayoutEffect**\
+  与 useEffect 类似，但在所有 DOM 变更后同步执行，适用于需要测量 DOM 或立即更新布局的场景。
+* **useInsertionEffect**\
+  新增的 Hook，专门用于在 DOM 更新前同步插入样式（例如 CSS-in-JS 库），确保样式在浏览器绘制前生效。
+
+***
+
+### 3. 上下文与引用类 Hooks
+
+* **useContext**\
+  用于消费 React Context，直接获取上下文中的值，避免层层传递 props。
+* **useRef**\
+  用于持久化存储可变值或引用 DOM 元素。更新 ref.current 不会触发组件重新渲染，常用于保存跨渲染周期的实例变量。
+* **useImperativeHandle**\
+  与 forwardRef 配合使用，允许组件自定义暴露给父组件的实例值，控制父组件通过 ref 访问到哪些内部方法或属性。
+
+***
+
+### 4. 性能优化类 Hooks
+
+* **useMemo**\
+  用于缓存高开销的计算结果，只有在依赖项变化时才重新计算，避免每次渲染都执行昂贵计算。
+* **useCallback**\
+  用于缓存函数实例，确保只有在依赖项变化时才创建新函数，常用于传递给子组件以避免不必要的重渲染。
+
+***
+
+### 5. 调试与开发类 Hooks
+
+* **useDebugValue**\
+  用于在 React DevTools 中显示自定义 Hook 的调试信息，帮助开发者跟踪 Hook 内部的状态和变化，便于调试复杂逻辑。
+
+***
+
+### 6. 并发与新特性类 Hooks（React 18+）
+
+* **useTransition**\
+  允许将某些状态更新标记为“过渡”更新，使得高优先级的 UI 更新保持流畅，适用于实现更平滑的并发渲染。
+* **useDeferredValue**\
+  延迟更新某个值，降低频繁更新带来的性能压力，使得用户界面在高负载下仍能保持响应性。
+* **useId**\
+  用于生成唯一标识符，常用于无障碍属性、表单标签关联等需要唯一 id 的场景。
+* **useSyncExternalStore**\
+  用于在并发渲染环境下安全地读取外部存储的数据，确保数据一致性，是构建全局状态管理或订阅外部数据时的推荐方案。
+
+***
+
+### 7. 新实验性或未来推广的 Hooks（React 19+）
+
+* **use**\
+  一个全新的 API，可在组件渲染中直接读取 Promise 或其他异步数据，结合 Suspense 实现数据加载挂起，简化异步数据处理。
+* **useOptimistic**\
+  用于实现乐观更新，允许在发起异步操作时立即更新界面，并在操作完成后根据结果进行回滚或确认，提升用户体验
+
+## 第三方库常见hooks
+
+* **react-redux**
+  * **常用 Hook**：`useSelector`、`useDispatch`、`useStore`
+  * **介绍**：用于在函数组件中访问 Redux 全局状态及派发 actions，适合中大型应用的全局状态管理。
+* **react-router-dom**
+  * **常用 Hook**：`useNavigate`、`useLocation`、`useParams`、`useRoutes`
+  * **介绍**：React 官方推荐的路由解决方案，提供编程式导航、路由参数获取和路由配置等功能。
+* **react-i18next**
+  * **常用 Hook**：`useTranslation`
+  * **介绍**：基于 i18next 的国际化解决方案，使用 Hook 来加载翻译资源、切换语言和格式化文本。
+
 #### UseState
 
 useState 就是一个 hook.通过在函数组件里调用它来给组件添加一些内部 state.react 会在重复渲染时保留这个 state.useState 会返回一个值：当前状态和一个让你更新它的函数。 可以在事件处理函数中或者其他一些地方调用这个函数，类似与 this.setState，但是不会将新的 state 与旧的 state 合并。
@@ -131,7 +212,12 @@ function ThemedButton() {
 
 #### UseReducer
 
-useReducer 是 React 中的一个 Hook，它为复杂的状态逻辑提供了一种更可预测和结构化的方式来管理状态。 它类似于 Redux 的工作原理，通过一个 reducer 函数来管理状态的变化。相比于 useState，useReducer 更适合处理涉及多个子值的状态逻辑，或者下一个状态依赖于前一个状态的情况。
+useReducer 是 React 中的一个 Hook，它为复杂的状态逻辑提供了一种更可预测和结构化的方式来管理状态。 它类似于 Redux 的工作原理，通过一个 reducer 函数来管理状态的变化。
+
+useReducer 不是对 useState 的“替代”，而是一种适用于更复杂状态场景的替代方案。如果你的状态更新简单、逻辑直白，useState 完全足够；如果状态更新逻辑较复杂，或需要对状态变化进行更细粒度的控制和记录，则使用 useReducer 会更合适。
+
+* **useReducer** 适合用于单个组件或局部组件树中管理较复杂的状态逻辑，无需引入额外的状态管理库。
+* **Redux** 则用于全局状态管理，特别是当多个组件需要共享状态、需要中间件支持异步操作或需要调试工具时，Redux 提供了更完善的解决方案。
 
 **基本使用**
 
