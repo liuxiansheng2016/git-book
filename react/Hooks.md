@@ -144,7 +144,7 @@ class Counter extends React.Component {
 import React, { useState } from 'react';
 
 function Counter() {
-  const [count, setCount] = useState(0); // 初始化状态
+  const [count, setCount] = useState(0); // 初始化状态，可以是一个函数，在初始化时调用一次，使用返回值作为初始化值
 
   return (
     <div>

@@ -155,6 +155,8 @@ key 是唯一可以传递给 Fragment 的属性
 
 ReactDOM.createPortal(child, container)
 
+允许你将**组件的渲染结构挂载到指定的 DOM 节点上**，而不受父组件的 DOM 层级限制`Fragment`
+
 一个 portal 的典型用例是当父组件有 overflow: hidden 或 z-index 样式时，但你需要子组件能够在视觉上“跳出”其容器。例如，对话框、悬浮卡以及提示框：
 
 ### SusPense
@@ -237,6 +239,8 @@ return (
 ```
 
 ### ~~<mark style="color:red;">React.forwardRef</mark>~~
+
+<mark style="color:red;">允许函数组件接收来自父组件的 ref，并将其传递给子组件</mark>
 
 React.forwardRef 的 API 中 ref 必须指向 dom 元素而不是 React 组件
 
@@ -563,7 +567,7 @@ React 的事件机制是一套由 React 自行实现的、基于原生浏览器�
 #### 1. 合成事件（SyntheticEvent）
 
 * **封装原生事件**\
-  React 并不直接使用浏览器原生的事件对象，而是将其封装成合成事件对象。这个对象遵循 W3C 标准，提供统一的接口（例如：`preventDefault()`、`stopPropagation()` 等），从而屏蔽了不同浏览器之间的差异。\
+  React 并不直接使用浏览器原生的事件对象，setstat而是将其封装成合成事件对象。这个对象遵循 W3C 标准，提供统一的接口（例如：`preventDefault()`、`stopPropagation()` 等），从而屏蔽了不同浏览器之间的差异。\
   citeturn0search9
 * **事件池机制的演变**\
   在 React 16 及之前版本中，合成事件采用了事件池（event pooling）来复用事件对象，减少内存分配。但从 React 17 开始，事件池被移除，每次事件触发时都会创建新的事件对象，这使得异步事件处理更加直观，开发者也无需调用 `e.persist()` 来保留事件对象。\
@@ -616,14 +620,6 @@ react 事件不能采用 return false 的方式来阻止浏览器的默认行为
 事件的执行顺序为原生事件先执行，合成事件后执行，合成事件会冒泡绑定到 document 上，所以尽量避免原生事件与合成事件混用，如果原生事件阻止冒泡，可能会导致合成事件不执行，因为需要冒泡到 document 上合成事件才会执行
 
 
-
-### React-为什么不要直接改 state
-
-直接修改 react react 不会重新渲染，setstate 是异步的
-
-我们在改变 state 的时候，需要重新生成一个对象去代替原来的 state，而不是直接改原来的
-
-如果连续写多次 setState，会将多次 setState 的状态修改合并成一次状态修改。
 
 ### 函数式组件没有生命周期
 
@@ -849,9 +845,39 @@ React context
 
 发布订阅
 
+
+
+### React-为什么不要直接改 state
+
+直接修改 `state` 不会触发组件的重新渲染，
+
+而 `setState` 会触发 React 的调度机制，使组件进入更新流程。
+
+此外，`setState` 是 **异步的**，React 会 **批量处理** `setState`，优化性能，减少不必要的渲染
+
+
+
+`setState` 的异步行为
+
+大多数情况下，`setState` 是异步的。这是因为 React 可能会批量处理多个 `setState` 调用来优化性能。例如，在事件处理函数和生命周期方法（如 `componentDidMount` 或 `componentDidUpdate`）中调用 `setState` 时，它通常是异步的。
+
 ### 为什么 useState 要使用数组而不是对象 ？
 
 useState 返回一个数组而不是对象的主要原因是，数组的解构赋值更加灵活。这样，你可以自由地命名你的状态变量和更新函数，而不是被迫使用像 this.state 和 this.setState 这样的命名。
+
+如果返回一个对象，写法可能会更冗长：
+
+```
+const state = useState(0);
+const count = state.value;
+const setCount = state.setValue;
+```
+
+### 为什么 `useState` 不能直接修改状态，而需要使用 `setState` 进行更新？
+
+`useState` 不能直接修改状态的原因是 **React 需要跟踪状态的变化**，如果你直接修改 `state`，React **不会检测到变化**，组件也就不会重新渲染。
+
+而 `setState` **会触发 React 的调度机制**，确保组件在状态更新后重新渲染。同时，React 可能会 **批量更新** `setState` 调用，以优化性能
 
 ### setState
 
@@ -1096,7 +1122,7 @@ Fiber 架构的工作流程主要包括以下两个主要阶段：
 
 ### useImperativeHandle
 
-useImperativeHandle 是 React Hooks 中的一个 Hook，它用于自定义父组件通过 ref 访问子组件实例时的行为。这个 Hook 可以让你指定当一个父组件获取一个子组件的 ref 时，希望暴露哪些方法或值给父组件。这样可以让你控制父组件如何与子组件交互。
+useImperativeHandle 是 React Hooks 中的一个 Hook，`useImperativeHandle` 主要用于自定义暴露给父组件的 `ref`，让父组件可以调用子组件的特定方法，而不是直接访问整个 DOM 或组件实例。
 
 useImperativeHandle 的用途
 
