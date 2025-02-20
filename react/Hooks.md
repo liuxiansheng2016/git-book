@@ -313,10 +313,10 @@ useCallback 接受两个参数：回调函数和一个依赖数组。当依赖�
 
 **使用 useCallback 的场景包括**：
 
-1. 将回调函数传递给子组件，避免子组件不必要的重新渲染。
+1. <mark style="color:red;">将回调函数传递给子组件，避免子组件不必要的重新渲染。</mark>
 2. 将回调函数作为 effect 的依赖项，确保 effect 只在特定依赖项发生变化时执行。
 
-如果我们不使用 useCallback，每次父组件重新渲染时都会创建一个新的 onClick 函数，导致子组件重新渲染
+<mark style="color:red;">如果我们不使用 useCallback，每次父组件重新渲染时都会创建一个新的 onClick 函数，导致子组件重新渲染</mark>
 
 示例代码：
 
