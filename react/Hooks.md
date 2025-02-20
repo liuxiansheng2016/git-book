@@ -140,6 +140,9 @@ class Counter extends React.Component {
 
 **使用UseState**
 
+* **直接设置新值**：`setCount(newValue)`，适用于简单的状态更新。
+* 使用函数更新状态, **基于前一个状态更新**：`setCount(prevCount => prevCount + 1)`，适用于需要依赖于之前状态值的情况。
+
 ```
 import React, { useState } from 'react';
 
@@ -418,7 +421,7 @@ function ProductPage({ productId, referrer }) {
 
 const refContainer = useRef(initialValue);
 
-useRef 返回一个可变的 ref 对象，其 .current 属性被初始化为传入的参数（initialValue）。返回的 ref 对象在组件的整个生命周期内保持不变。
+useRef 返回一个可变的 ref 对象，其 .current 属性被初始化为传入的参数（initialValue）。返回的 <mark style="color:red;">ref 对象在组件的整个生命周期内保持不变。</mark>
 
 
 

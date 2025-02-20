@@ -2,111 +2,10 @@
 
 https://github.com/semlinker/reactjs-interview-questions/blob/master/README.md#%E7%9B%AE%E5%BD%95
 
-### ReactDOM
+### 请解释 `ReactDOM` 和 `ReactDOMServer` 的作用，它们分别用于什么场景？
 
-**1.** ~~<mark style="color:red;">**ReactDOM.render()**</mark>~~ 用途：这是最常用的 API 之一，用于将 React 元素渲染到提供的容器中并返回对 mounted 实例的引用。 用法示例：
-
-````
-const element = <h1>Hello, world</h1>;
-ReactDOM.render(element, document.getElementById('root'));
-
-
-从React 18开始，推荐使用`createRoot`来替换上述方法：
-
-```javascript
-import React from 'react';
-import { createRoot } from 'react-dom/client'; // 注意这里的导入路径
-import App from './App';
-
-// 获取DOM容器
-const container = document.getElementById('root');
-// 创建一个新的根目录
-const root = createRoot(container);
-// 渲染你的应用
-root.render(<App />);
-
-#### 关键点
-
-- **`createRoot`**：这是新的API，用来创建一个React根实例。它允许你利用React 18的新特性，如并发模式等。
-  
-- **移除第二个参数**：不同于之前的`ReactDOM.render`方法需要两个参数（要渲染的元素和目标DOM节点），`createRoot`只需要一个目标DOM节点，并通过调用`.render()`方法指定要渲染的内容。
-````
-
-**2. ReactDOM.createPortal()** 用途：提供了一种方式，可以将子节点渲染到一个位于 DOM 层次结构之外的新位置（即 DOM 树中的任何位置）。 用法示例：
-
-```
-const modalRoot = document.getElementById('modal-root');
-class Modal extends React.Component {
-render() {
-return ReactDOM.createPortal(
-  this.props.children,
-  modalRoot
-);
-}
-}
-```
-
-**3.&#x20;**<mark style="color:red;">**`ReactDOM.unmountComponentAtNode()`**</mark> 用途：从 DOM 中卸载 React 组件，并清理其事件处理器和 state。 用法示例：
-
-<mark style="color:red;">`ReactDOM.unmountComponentAtNode`</mark><mark style="color:red;">已于</mark>[<mark style="color:red;">2022 年 3 月 (v18.0.0)</mark>](https://react.dev/blog/2022/03/08/react-18-upgrade-guide)<mark style="color:red;">弃用。在 React 19 中，你需要使用 迁移到</mark><mark style="color:red;">`root.unmount()`</mark><mark style="color:red;">。</mark>
-
-```
-ReactDOM.unmountComponentAtNode(document.getElementById('root'));
-// Before
-unmountComponentAtNode(document.getElementById('root'));
-
-// After
-root.unmount();
-```
-
-如果成功卸载了组件，则返回 true；如果没有组件被卸载，则返回 false。
-
-**4.&#x20;**~~<mark style="color:red;">**`ReactDOM.hydrate`**</mark>~~ 专门设计用来配合 SSR 使用。它不会重新创建已经存在于页面上的 DOM 节点，而是尝试复用它们，并在此基础上添加事件监听器等交互逻辑，使静态页面变得动态和交互式。
-
-<mark style="color:red;">在 React 19 中，我们将删除</mark><mark style="color:red;">`ReactDOM.hydrate`</mark><mark style="color:red;">您需要迁移到的</mark>[<mark style="color:red;">`ReactDOM.hydrateRoot`</mark>](https://react.dev/reference/react-dom/client/hydrateRoot)<mark style="color:red;">，</mark>
-
-```
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App'; // 假设这是你的根组件
-
-// 客户端入口文件
-if (typeof document !== 'undefined') {
-ReactDOM.hydrate(<App />, document.getElementById('root'));
-}
-
-
-// Before
-import {hydrate} from 'react-dom';
-hydrate(<App />, document.getElementById('root'));
-
-// After
-import {hydrateRoot} from 'react-dom/client';
-hydrateRoot(document.getElementById('root'), <App />);
-```
-
-### ReactDOMServer 是什么?
-
-`ReactDOMServer` 对象使你能够将组件渲染为静态标记（通常用于 Node 服务器中），此对象主要用于服务端渲染（SSR）。以下方法可用于服务器和浏览器环境：
-
-1. `renderToString()`
-2. `renderToStaticMarkup()`
-
-例如，你通常运行基于 Node 的 Web 服务器，如 Express，Hapi 或 Koa，然后你调用 `renderToString` 将根组件渲染为字符串，然后作为响应进行发送。
-
-```javascript
-// using Express
-import { renderToString } from 'react-dom/server'
-import MyPage from './MyPage'
-
-app.get('/', (req, res) => {
-  res.write('<!DOCTYPE html><html><head><title>My Page</title></head><body>')
-  res.write('<div id="content">')
-  res.write(renderToString(<MyPage/>))
-  res.write('</div></body></html>')
-  res.end()
-})
-```
+* `ReactDOM` 是客户端渲染库，负责将 React 组件渲染到 DOM 中，例如 `ReactDOM.createRoot(container).render(<App />)`。
+* `ReactDOMServer` 主要用于服务器端渲染（SSR），它可以将 React 组件转换成 HTML 字符串，比如 `ReactDOMServer.renderToString(<App />)`，以便在服务器端渲染初始页面内容，提高 SEO 和首屏加载速度。
 
 ### 在 React 中如何使用 innerHTML?
 
@@ -124,11 +23,9 @@ function MyComponent() {
 }
 ```
 
-### Fragments
 
-React 还提供了用于减少不必要嵌套的组件。
 
-React.Fragment
+### React.Fragment
 
 使用场景：
 
@@ -155,7 +52,7 @@ key 是唯一可以传递给 Fragment 的属性
 
 ReactDOM.createPortal(child, container)
 
-允许你将**组件的渲染结构挂载到指定的 DOM 节点上**，而不受父组件的 DOM 层级限制`Fragment`
+允许你将**组件的渲染结构挂载到指定的 DOM 节点上**，而不受父组件的 DOM 层级限制
 
 一个 portal 的典型用例是当父组件有 overflow: hidden 或 z-index 样式时，但你需要子组件能够在视觉上“跳出”其容器。例如，对话框、悬浮卡以及提示框：
 
@@ -182,28 +79,27 @@ return (
 
 ### React.lazy
 
-允许定义一个动态加载的组件，这有助于缩减 bundle 的体积，并延迟加载初次渲染未使用道德组件
+允许定义一个动态加载的组件，这有助于缩减 bundle 的体积，并延迟加载初次渲染未使用组件
 
 Const SomeComponnet = React.lazy(() => import(‘./SomeCoponment’))
 
 ### React.createRef
 
-React 提供的一个 API，用于创建 refs，以便你可以直接访问 DOM 元素或者 React 组件实例。通常，你可以在组件的构造函数中使用 React.createRef() 来创建一个 ref，并通过 ref 属性将其附加到对应的元素或组件上。
+<mark style="color:red;">React 提供的一个 API，用于创建 refs，以便你可以直接访问 DOM 元素或者 React 组件实例</mark>。通常，你可以在组件的构造函数中使用 React.createRef() 来创建一个 ref，并通过 ref 属性将其附加到对应的元素或组件上。
 
 示例代码如下：
 
-```
-class MyComponent extends React.Component {
-constructor(props) {
-super(props);
-this.myRef = React.createRef();
+<pre><code>class MyComponent extends React.Component {
+    constructor(props) {
+        super(props);
+<strong>        this.myRef = React.createRef();
+</strong><strong>    }
+</strong>
+    render() {
+        return &#x3C;div ref={this.myRef} />;
+    }
 }
-
-render() {
-return <div ref={this.myRef} />;
-}
-}
-```
+</code></pre>
 
 使用回调
 
@@ -237,6 +133,10 @@ return (
 }
 }
 ```
+
+### UseRef
+
+
 
 ### ~~<mark style="color:red;">React.forwardRef</mark>~~
 
@@ -330,7 +230,7 @@ export default ParentComponent;
 
 element 其实就基本就可以解释为 Virtual DOM
 
-* 一个 React Element 是一个描述 UI 外观的简单对象。它通常包含组件类型、属性（props）以及子元素。可以把它看作是 UI 的“蓝图”。
+* 一个 <mark style="color:red;">React Element 是一个描述 UI 外观的简单对象</mark>。它通常包含组件类型、属性（props）以及子元素。可以把它看作是 UI 的“蓝图”。
 * **创建方式**：
   * 使用 JSX（例如 `<div>Hello</div>`）
   * 或使用 `React.createElement`
@@ -383,7 +283,7 @@ React.StrictMode 会导致某些生命周期方法和副作用函数被调用两
 
 **执行时机**
 
-useEffect：在浏览器绘制之后执行。 useLayoutEffect：在浏览器绘制之前同步执行。
+useEffect：在浏览器绘制之后异步执行。 useLayoutEffect：在浏览器绘制之前同步执行。
 
 **阻塞性**
 
@@ -572,7 +472,7 @@ React 的事件机制是一套由 React 自行实现的、基于原生浏览器�
 #### 1. 合成事件（SyntheticEvent）
 
 * **封装原生事件**\
-  React 并不直接使用浏览器原生的事件对象，setstat而是将其封装成合成事件对象。这个对象遵循 W3C 标准，提供统一的接口（例如：`preventDefault()`、`stopPropagation()` 等），从而屏蔽了不同浏览器之间的差异。\
+  <mark style="color:red;">React 并不直接使用浏览器原生的事件对象，而是将其封装成合成事件对象。</mark>这个对象遵循 W3C 标准，提供统一的接口（例如：`preventDefault()`、`stopPropagation()` 等），从而屏蔽了不同浏览器之间的差异。\
   citeturn0search9
 * **事件池机制的演变**\
   在 React 16 及之前版本中，合成事件采用了事件池（event pooling）来复用事件对象，减少内存分配。但从 React 17 开始，事件池被移除，每次事件触发时都会创建新的事件对象，这使得异步事件处理更加直观，开发者也无需调用 `e.persist()` 来保留事件对象。\
@@ -583,7 +483,7 @@ React 的事件机制是一套由 React 自行实现的、基于原生浏览器�
 #### 2. 事件委托机制
 
 * **统一绑定**\
-  React 并不是在每个组件的真实 DOM 节点上直接绑定事件处理函数，而是在整个应用的根容器上统一注册事件监听器。在 React 16 之前，这个绑定点通常是在全局的 `document` 上；而从 React 17 开始，事件监听器绑定在通过 `ReactDOM.createRoot` 创建的容器上。这种设计不仅降低了内存消耗，还减少了全局事件冲突的可能性。\
+  <mark style="color:red;">React 并不是在每个组件的真实 DOM 节点上直接绑定事件处理函数，而是在整个应用的根容器上统一注册事件监听器</mark>。在 React 16 之前，这个绑定点通常是在全局的 `document` 上；而从 React 17 开始，事件监听器绑定在通过 `ReactDOM.createRoot` 创建的容器上。这种设计不仅降低了内存消耗，还减少了全局事件冲突的可能性。\
   citeturn0search5
 * **事件分发**\
   当一个原生事件触发后，它会沿着 DOM 冒泡到根容器。React 捕获到这个事件后，会根据事件的目标节点及组件树的结构，查找并依次调用注册在各组件上的事件处理函数，从而模拟了事件的捕获和冒泡过程。
@@ -1038,7 +938,7 @@ class ErrorBoundary extends React.Component {
 
 ### 展示组件和 容器组件
 
-展示组件更关心 UI
+展示组件更关心 UI,不涉及业务逻辑，通常是无状态的。
 
 容器组件 更关心组件如何运作的，通常是有状态的
 
@@ -1131,7 +1031,7 @@ Fiber 架构的工作流程主要包括以下两个主要阶段：
 
 ### useImperativeHandle
 
-useImperativeHandle 是 React Hooks 中的一个 Hook，`useImperativeHandle` 主要用于自定义暴露给父组件的 `ref`，让父组件可以调用子组件的特定方法，而不是直接访问整个 DOM 或组件实例。
+useImperativeHandle 是 React Hooks 中的一个 Hook，`useImperativeHandle` <mark style="color:red;">主要用于自定义暴露给父组件的</mark> <mark style="color:red;"></mark><mark style="color:red;">`ref`</mark><mark style="color:red;">，让父组件可以调用子组件的特定方法</mark>，而不是直接访问整个 DOM 或组件实例。
 
 useImperativeHandle 的用途
 
