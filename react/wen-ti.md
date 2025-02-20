@@ -374,6 +374,11 @@ return (
 
 过时 API
 
+React.StrictMode 会导致某些生命周期方法和副作用函数被调用两次。这是为了帮助开发者发现副作用和潜在的错误。具体来说，React.StrictMode 会在开发模式下触发以下操作两次：
+
+1. **组件挂载和卸载**：组件的挂载和卸载会被触发两次。
+2. **状态更新函数**：状态更新函数（如 [useState](https://vscode-file/vscode-app/c:/Users/CeHe/AppData/Local/Programs/Microsoft%20VS%20Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html) 的更新函数）会被调用两次。
+
 ### UseEffect 和 useLayoutEffect
 
 **执行时机**
@@ -1020,6 +1025,10 @@ class ErrorBoundary extends React.Component {
 1.使用唯一标识符：确保提供的 key 是唯一的，并且在每次渲染时都保持一致。
 
 2.避免使用索引作为 key：如果列表项的位置可能会改变，避免使用索引作为 key，因为这会导致不必要的重新渲染。
+
+* 如果使用索引作为 `key`，在**元素顺序变化时**可能会导致错误的更新，例如：
+  * **导致不必要的重新渲染**：如果列表顺序改变，React 可能会误以为元素内容变了，而不是顺序变了。
+  * **状态丢失**：组件可能会错误地复用旧的 DOM 结构，导致内部状态（如输入框的内容）错乱。
 
 3.使用稳定的标识符：如果可能，使用来自数据源的稳定标识符（如数据库 ID）作为 key。
 
