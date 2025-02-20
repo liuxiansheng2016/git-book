@@ -2,10 +2,18 @@
 
 https://github.com/semlinker/reactjs-interview-questions/blob/master/README.md#%E7%9B%AE%E5%BD%95
 
-### 请解释 `ReactDOM` 和 `ReactDOMServer` 的作用，它们分别用于什么场景？
+### &#x20;`ReactDOM` 和 `ReactDOMServer`&#x20;
 
 * `ReactDOM` 是客户端渲染库，负责将 React 组件渲染到 DOM 中，例如 `ReactDOM.createRoot(container).render(<App />)`。
 * `ReactDOMServer` 主要用于服务器端渲染（SSR），它可以将 React 组件转换成 HTML 字符串，比如 `ReactDOMServer.renderToString(<App />)`，以便在服务器端渲染初始页面内容，提高 SEO 和首屏加载速度。
+
+### 为什么 React 采用虚拟 DOM，而不是直接操作真实 DOM
+
+React 通过\*\*虚拟 DOM（Virtual DOM）\*\*减少对真实 DOM 的直接操作，提高性能。它的核心优化点包括：
+
+1. **避免直接修改 DOM**：操作真实 DOM 代价高，而虚拟 DOM 只是在内存中计算变化。
+2. **Diff 算法**：React 通过 Diffing 机制找到最小的改动范围，只更新必要的部分，而不是整个 DOM。
+3. **批量更新**：React 会合并多个更新操作，减少浏览器的**回流（Reflow）和重绘（Repaint）**，提升性能。
 
 ### 在 React 中如何使用 innerHTML?
 
@@ -133,8 +141,6 @@ return (
 }
 }
 ```
-
-### UseRef
 
 
 
@@ -283,11 +289,11 @@ React.StrictMode 会导致某些生命周期方法和副作用函数被调用两
 
 **执行时机**
 
-useEffect：在浏览器绘制之后异步执行。 useLayoutEffect：在浏览器绘制之前同步执行。
+<mark style="color:red;">useEffect：在浏览器绘制之后异步执行。 useLayoutEffect：在浏览器绘制之前同步执行。</mark>
 
 **阻塞性**
 
-useEffect：不会阻塞浏览器更新屏幕，因此更适合用于不需要立即更新 DOM 的副作用操作。 useLayoutEffect：会阻塞浏览器更新屏幕，因此更适合用于需要在浏览器绘制之前读取或修改 DOM 的副作用操作。
+<mark style="color:red;">useEffect：不会阻塞浏览器更新屏幕，因此更适合用于不需要立即更新 DOM 的副作用操作。 useLayoutEffect：会阻塞浏览器更新屏幕，因此更适合用于需要在浏览器绘制之前读取或修改 DOM 的副作用操作。</mark>
 
 **性能影响** useEffect：由于不会阻塞浏览器更新屏幕，对性能的影响较小。
 
@@ -367,6 +373,35 @@ export default MyComponent;
 **缺少浏览器环境**：服务器端没有浏览器环境，因此无法访问 DOM，也无法执行与 DOM 相关的操作。
 
 **同步执行**：useLayoutEffect 需要在浏览器绘制之前同步执行，而服务器端渲染是在服务器上完成的，没有浏览器绘制的概念
+
+### `useMemo` 和 `useCallback` 有什么区别
+
+`useMemo` 和 `useCallback` 都是**用于性能优化的 Hooks**，但它们的作用不同：
+
+* **`useMemo`**：缓存**计算后的值**，适用于**昂贵的计算**，避免不必要的重复计算。
+* **`useCallback`**：缓存**函数本身**，适用于**避免子组件不必要的重新渲染**，特别是当这个函数作为 `props` 传递给子组件时。
+
+### `useRef` 和 `createRef` 有什么区别
+
+`UseRef` 是一个 Hook，可以在函数组件中使用。它不仅限于获取 DOM 节点的引用，还可以用来保存任何可变值，且在整个组件的生命周期内保持不变。
+
+**特点**
+
+* **持久性**：`useRef` 返回的对象在组件的整个生命周期内保持不变。这意味着即使组件重新渲染，`useRef` 的当前属性也不会丢失。
+* **多用途**：除了用于引用 DOM 节点外，还可以用于存储任意可变值，这些值不会触发重新渲染。
+
+#### `createRef`
+
+`createRef` 是一个用于类组件的方法，用于创建 refs。每个 `createRef` 创建的 ref 对象在其组件的生命周期内是唯一的。
+
+**特点**
+
+* **单一实例**：`createRef` 在组件实例化时创建一个新的 ref 对象，并且在组件的整个生命周期内保持不变。
+* **主要用于类组件**：因为它是为类组件设计的，所以在函数组件中通常不使用它。
+
+**使用场景**
+
+* **类组件中的 DOM 访问**：当你在类组件中需要访问 DOM 节点或子组件实例时。
 
 ### React 事件传参数
 
@@ -516,6 +551,19 @@ React 的事件机制通过合成事件和事件委托，实现了跨浏览器�
 
 ### React 的事件和普通的 HTML 事件有什么不同？
 
+* **合成事件 vs. 原生事件**
+  * **React 事件**：使用的是合成事件（SyntheticEvent），这是对原生事件的封装，旨在提供跨浏览器一致的行为。
+  * **HTML 事件**：直接使用浏览器原生事件，行为可能因浏览器不同而略有差异。
+* **事件绑定方式**
+  * **React 事件**：采用事件委托的方式，将所有事件监听器绑定在根节点（或 document）上，当事件触发时，React 会根据事件目标分发到相应的组件。
+  * **HTML 事件**：通常直接绑定在具体的 DOM 元素上。
+* **触发顺序**
+  * 在浏览器事件流中，原生事件遵循 **捕获 → 目标 → 冒泡** 的顺序。
+  * React 的合成事件大多是在冒泡阶段统一触发，因此 React 事件处理函数通常会在原生事件冒泡阶段被调用。
+  * 这种统一的处理方式使得在 React 中使用事件时，不必关心浏览器间的兼容性问题，但也可能会与直接绑定原生事件的顺序有所不同。
+* **事件对象池**
+  * 早期版本的 React 对合成事件对象进行了复用（事件池机制），事件回调结束后会清空对象属性；现代 React 已逐步取消这一机制，但仍对事件进行了封装。
+
 对于事件名称命名方式，原生事件为全小写，react 事件采用小驼峰；
 
 对于事件函数处理语法，原生事件为字符串，react 事件为函数；
@@ -524,7 +572,18 @@ react 事件不能采用 return false 的方式来阻止浏览器的默认行为
 
 事件的执行顺序为原生事件先执行，合成事件后执行，合成事件会冒泡绑定到 document 上，所以尽量避免原生事件与合成事件混用，如果原生事件阻止冒泡，可能会导致合成事件不执行，因为需要冒泡到 document 上合成事件才会执行
 
+### React 的合成事件：
 
+1. **事件绑定（事件委托）：**\
+   React 在渲染时不会为每个 DOM 元素分别绑定事件监听器，而是在应用的根节点（或指定容器）上绑定少量事件监听器。这种做法称为事件委托，所有事件都被捕获到根节点，再由 React 分发到对应的组件上。
+2. **触发原生事件：**\
+   当用户在某个元素上触发一个原生事件时，事件会沿着 DOM 树按照捕获、目标和冒泡阶段传播，最终到达根节点。
+3. **创建合成事件：**\
+   当事件到达 React 绑定的根节点时，React 会创建一个 `SyntheticEvent` 对象，这个对象是对原生事件的封装，保证在不同浏览器中的行为一致。
+4. **事件分发：**\
+   React 根据虚拟 DOM 的结构，从根节点开始向下遍历，找出所有注册了相应事件处理函数的组件，并依次调用它们的处理函数。
+   * 默认情况下，React 的事件处理是在冒泡阶段执行，但也可以通过在事件名称后加上 `Capture`（如 `onClickCapture`）来使用捕获阶段。
+5.
 
 ### 函数式组件没有生命周期
 
@@ -752,19 +811,51 @@ React context
 
 
 
-### React-为什么不要直接改 state
+### 为什么 `useState` 的初始值可以是一个函数？
 
-直接修改 `state` 不会触发组件的重新渲染，
+`useState` 的初始值可以直接传一个值，也可以传一个 **函数**，当传入函数时，React **只会在组件初始化时调用一次该函数**，并将返回值作为初始 state。
 
-而 `setState` 会触发 React 的调度机制，使组件进入更新流程。
+**示例 1（直接传值）**：
 
-此外，`setState` 是 **异步的**，React 会 **批量处理** `setState`，优化性能，减少不必要的渲染
+```jsx
+const [count, setCount] = useState(0); // 初始值为 0
+```
 
+**示例 2（传入函数，避免重复计算）**：
 
+```jsx
+const [count, setCount] = useState(() => {
+  console.log("计算初始值...");
+  return 10; // 只在初次渲染时执行
+});
+```
 
-`setState` 的异步行为
+### React 为什么不要直接改 state
 
-大多数情况下，`setState` 是异步的。这是因为 React 可能会批量处理多个 `setState` 调用来优化性能。例如，在事件处理函数和生命周期方法（如 `componentDidMount` 或 `componentDidUpdate`）中调用 `setState` 时，它通常是异步的。
+#### 1. **无法触发重新渲染**
+
+React 的组件重新渲染机制依赖于 `state` 和 `props` 的变化。当你直接修改 `state` 而不通过 `setState`（或其对应的 Hook `useState`），React 无法检测到这些变化，因此不会触发组件的重新渲染
+
+直接修改 `state` 可能导致状态变得难以追踪和调试。React 设计为单向数据流，即父组件通过 `props` 向子组件传递数据，而子组件通过 `setState` 更新自己的 `state`。这种设计使得应用的状态变化更加可预测
+
+**新旧 state 的比较**：React 内部会进行 **浅比较**，如果 `state` 没有变化（即引用没变），组件不会重新渲染
+
+```
+const [items, setItems] = useState([1, 2, 3]);
+// 错误的做法
+items.push(4); // 直接修改原数组，引用未变
+// 正确的做法
+setItems([...items, 4]); // 创建新数组实例，确保引用变化
+```
+
+### `setState` 的异步行为
+
+大多数情况下，`setState` 是异步的。这是因为 React 可能会批量处理多个 `setState` 调用来优化性能。例如，<mark style="color:red;">在事件处理函数和生命周期方法（如</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidMount`</mark> <mark style="color:red;"></mark><mark style="color:red;">或</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidUpdate`</mark><mark style="color:red;">）中调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`setState`</mark> <mark style="color:red;"></mark><mark style="color:red;">时，它通常是异步的</mark>。
+
+### `setState写法`
+
+* **直接设置新值**：`setCount(newValue)`，适用于简单的状态更新。
+* **使用回调函数更新状态**, 基于前一个状态更新：`setCount(prevCount => prevCount + 1)`，适用于需要依赖于之前状态值的情况。
 
 ### 为什么 useState 要使用数组而不是对象 ？
 
@@ -922,9 +1013,9 @@ class ErrorBoundary extends React.Component {
 
 <mark style="color:red;">提供唯一的 key 可以帮助 React 更快地识别和更新元素</mark>，从而提高性能。当列表中有大量元素时，这一点尤为重要。
 
-1.使用唯一标识符：确保提供的 key 是唯一的，并且在每次渲染时都保持一致。
+1.使<mark style="color:red;">用唯一标识符</mark>：确保提供的 key 是唯一的，并且在每次渲染时都保持一致。
 
-2.避免使用索引作为 key：如果列表项的位置可能会改变，避免使用索引作为 key，因为这会导致不必要的重新渲染。
+2<mark style="color:red;">.避免使用索引作为 key</mark>：如果列表项的位置可能会改变，避免使用索引作为 key，因为这会导致不必要的重新渲染。
 
 * 如果使用索引作为 `key`，在**元素顺序变化时**可能会导致错误的更新，例如：
   * **导致不必要的重新渲染**：如果列表顺序改变，React 可能会误以为元素内容变了，而不是顺序变了。

@@ -110,7 +110,7 @@ https://zh-hans.react.dev/reference/react/useCallback
   * **常用 Hook**：`useTranslation`
   * **介绍**：基于 i18next 的国际化解决方案，使用 Hook 来加载翻译资源、切换语言和格式化文本。
 
-#### UseState
+### UseState
 
 useState 就是一个 hook.通过在函数组件里调用它来给组件添加一些内部 state.react 会在重复渲染时保留这个 state.useState 会返回一个值：当前状态和一个让你更新它的函数。 可以在事件处理函数中或者其他一些地方调用这个函数，类似与 this.setState，但是不会将新的 state 与旧的 state 合并。
 
@@ -141,7 +141,7 @@ class Counter extends React.Component {
 **使用UseState**
 
 * **直接设置新值**：`setCount(newValue)`，适用于简单的状态更新。
-* 使用函数更新状态, **基于前一个状态更新**：`setCount(prevCount => prevCount + 1)`，适用于需要依赖于之前状态值的情况。
+* 使用回调函数更新状态, **基于前一个状态更新**：`setCount(prevCount => prevCount + 1)`，适用于需要依赖于之前状态值的情况。
 
 ```
 import React, { useState } from 'react';
