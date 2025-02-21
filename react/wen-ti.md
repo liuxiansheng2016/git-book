@@ -374,12 +374,75 @@ export default MyComponent;
 
 **同步执行**：useLayoutEffect 需要在浏览器绘制之前同步执行，而服务器端渲染是在服务器上完成的，没有浏览器绘制的概念
 
-### `useEffect` 的清理函数
+### `useEffect`&#x20;
 
-执行时机
+#### `useEffect` 执行的基本规则：
+
+1. 首次渲染后执行
+2. 依赖项更新时执行
+3. 组件卸载前执行清理函数
+4. **空依赖项数组**：当提供一个空的依赖项数组 `[]` 时，`useEffect` 将只在组件首次渲染执行并在每次组件卸载时执行清理函数
+
+#### 清理函数作用
+
+1. **防止内存泄漏**：当组件卸载时，清理函数可以取消不再需要的订阅、定时器或网络请求，从而释放资源，避免不必要的内存占用。
+2. **处理异步操作**：如果组件在异步操作完成前被卸载，清理函数可以中止这些操作，防止尝试更新已卸载组件的状态而导致错误。
+3. **优化性能**：当依赖项更新触发新的副作用执行之前，清理函数可以先撤销之前的副作用，确保应用状态的一致性和性能。
+4. **确保状态一致性**：通过清理函数可以撤销那些可能影响全局状态或浏览器级别的副作用，比如移除事件监听器等，保证应用状态的一致性。
+
+清理函数执行时机
 
 * **组件卸载时**（类似 `componentWillUnmount`）。
 * **依赖更新时**，新的 `useEffect` 运行之前会先执行上一次 `useEffect` 的清理函数。
+
+````
+```javascript
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
+
+function UnmountExample() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    console.log(`useEffect: Setting up effect with count = ${count}`);
+
+    // 返回一个清理函数
+    return () => {
+      console.log(`Cleanup: Clearing effect with count = ${count}`);
+    };
+  }, []); // 依赖于count的变化
+
+  return (
+    <div>
+      <div>This is an example component.</div>
+      <p>Current Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+function App() {
+  return (
+    <Router>
+      <div>
+        <nav>
+          <ul>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/example">Example Component</Link></li>
+          </ul>
+        </nav>
+
+        <Routes>
+          <Route path="/example" element={<UnmountExample />} />
+          <Route path="/" element={<div>Home Page</div>} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+```
+````
 
 ### `useMemo` 和 `useCallback` 有什么区别
 
@@ -961,7 +1024,10 @@ return {count: prevState.count + 1};
 ### 组件间通信
 
 1. 父组件向子组件传递 props
-2. 子组件向父组件传递 父组件向子组件传一个函数，然后通过这个函数的回调 3.兄弟组件之间的通信 则父组件作为中间层来实现数据的互通，通过使用父组件传递 4.父组件向后代组件传递 使用 context 提供了组件之间通讯的一种方式 5.非关系组件传递 建议将数据进行一个全局资源管理 redux
+2. 子组件向父组件传递 父组件向子组件传一个函数，然后通过这个函数的回调&#x20;
+3. 兄弟组件之间的通信 则父组件作为中间层来实现数据的互通，通过使用父组件传递&#x20;
+4. 父组件向后代组件传递 使用 context 提供了组件之间通讯的一种方式
+5. &#x20;非关系组件传递 建议将数据进行一个全局资源管理 redux
 
 ### ErrorBoundary
 
