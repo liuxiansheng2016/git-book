@@ -376,6 +376,10 @@ export default MyComponent;
 
 ### `useEffect`&#x20;
 
+#### 为什么 `useEffect` 依赖项中不能直接放对象或者数组
+
+React 在检测依赖变化时，`useEffect` 依赖项会使用**浅比较（shallow comparison）**。对于对象或数组来说，即使内容相同，每次渲染时都会创建新的引用，导致 `useEffect` 触发不必要的重新执行。
+
 #### <mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">执行的基本规则：</mark>
 
 1. <mark style="color:red;">首次渲染后执行</mark>
