@@ -262,6 +262,8 @@ function reducer(state, action) {
 
 state：当前状态。 action：描述发生了什么的对象，至少需要一个 type 属性，但也可以包含其他数据（称为 payload）。
 
+使用场景？：购物车
+
 ```
 const ACTION_TYPES = {
   INCREMENT: 'INCREMENT',
@@ -417,11 +419,23 @@ function ProductPage({ productId, referrer }) {
 1. useMemo **缓存函数调用的结果** 。在这里，它缓存了调用 computeRequirements(product) 的结果。除非 product 发生改变，否则它将不会发生变化。这让你向下传递 requirements 时而无需不必要地重新渲染 ShippingForm。必要时，React 将会调用传入的函数重新计算结果。
 2. useCallback **缓存函数本身**。不像 useMemo，它不会调用你传入的函数。相反，它缓存此函数。从而除非 productId 或 referrer 发生改变，handleSubmit 自己将不会发生改变。这让你向下传递 handleSubmit 函数而无需不必要地重新渲染 ShippingForm。直至用户提交表单，你的代码都将不会运行。
 
-#### useRef
+### `useRef`&#x20;
 
 const refContainer = useRef(initialValue);
 
-useRef 返回一个可变的 ref 对象，其 .current 属性被初始化为传入的参数（initialValue）。返回的 <mark style="color:red;">ref 对象在组件的整个生命周期内保持不变。</mark>
+`UseRef` 是一个 Hook，可以在函数组件中使用。<mark style="color:red;">它不仅限于获取 DOM 节点的引用，还可以用来保存任何可变值</mark>，且在整个组件的生命周期内保持不变。
+
+<mark style="color:red;">函数组件没有实例</mark>，不能像类组件那样通过实例来存储数据，`useRef` 可以在函数组件的多次渲染之间保存值，并且不会因为组件重新渲染而重置。
+
+直接修改 `useRef` 的 `.current` 属性不会触发组件重新渲染。
+
+#### &#x20;`useRef` 保存非状态值的例子
+
+假设你需要记录一个计时器的启动时间，并在用户点击按钮时显示经过的时间。这个场景下，我们并不需要每次时间变化都触发组件重新渲染，因此使用 `useRef` 来保存开始时间是合适的。
+
+* **存储表单输入值**（适用于不想因输入变更触发重新渲染的场景）。
+* **存储定时器 ID**，避免因组件重新渲染导致定时器被重置。
+* **存储前一次的 prop 或 state**，用于在 `useEffect` 中对比数据变化。
 
 
 

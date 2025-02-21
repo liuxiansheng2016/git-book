@@ -382,11 +382,18 @@ export default MyComponent;
 
 **同步执行**：useLayoutEffect 需要在浏览器绘制之前同步执行，而服务器端渲染是在服务器上完成的，没有浏览器绘制的概念
 
+`useLayoutEffect`使用例子：
+
+1. 比如你需要获取某个 DOM 元素的尺寸，并在渲染前进行调整
+2. 比如当你想让页面在组件渲染后立即滚动到顶部
+
 ### `useEffect`&#x20;
 
 #### 为什么 `useEffect` 依赖项中不能直接放对象或者数组
 
 React 在检测依赖变化时，`useEffect` 依赖项会使用**浅比较（shallow comparison）**。对于对象或数组来说，即使内容相同，每次渲染时都会创建新的引用，导致 `useEffect` 触发不必要的重新执行。
+
+依赖数组的作用就是控制 `useEffect` 何时执行，避免不必要的副作用触发。比如，<mark style="color:red;">如果</mark> <mark style="color:red;"></mark><mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">里有一个网络请求，每次组件渲染都会执行，那就会造成性能浪费</mark>
 
 #### <mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">执行的基本规则：</mark>
 
@@ -470,13 +477,19 @@ export default App;
 
 直接修改 `useRef` 的 `.current` 属性不会触发组件重新渲染。
 
-#### &#x20;`useRef` 保存非状态值的例子
+#### `useRef` 保存非状态值的例子
 
 假设你需要记录一个计时器的启动时间，并在用户点击按钮时显示经过的时间。这个场景下，我们并不需要每次时间变化都触发组件重新渲染，因此使用 `useRef` 来保存开始时间是合适的。
 
 * **存储表单输入值**（适用于不想因输入变更触发重新渲染的场景）。
 * **存储定时器 ID**，避免因组件重新渲染导致定时器被重置。
 * **存储前一次的 prop 或 state**，用于在 `useEffect` 中对比数据变化。
+
+**作用**
+
+* **存储组件的状态，但不会触发重新渲染**。不像 `useState`，`useRef` 的值变化不会导致组件重新渲染，因此适合存储一些不影响 UI 的数据，比如定时器 ID。
+* **在组件的整个生命周期内保持不变**。即使组件重新渲染，`useRef` 仍然会保持相同的对象，不会被重置。
+* **配合 `forwardRef` 让父组件获取子组件的 DOM 元素**，方便操作子组件的输入框、按钮等。
 
 ### `createRef`
 
@@ -902,7 +915,20 @@ React context
 
 发布订阅
 
+### 为什么推荐使用 useReducer 而不是 useState 来管理复杂的状态逻辑？
 
+`useReducer` 更适合管理复杂的状态逻辑，特别是在状态依赖于先前的状态或者有多个状态更新逻辑时
+
+* **`useState` 的局限性**：`useState` 通常用于管理简单状态，其更新函数（如 `setState` ）会直接替换状态值。当状态更新依赖先前状态时，`useState` 需手动处理，例如 `setCount(prevCount => prevCount + 1)` ，代码会变得繁琐且难以维护。
+* **`useReducer` 的优势**：`useReducer` 的更新基于 `reducer` 函数。`reducer` 是纯函数，接收当前状态和一个 `action` （描述状态更新的对象，一般含 `type` 属性说明操作），并返回新状态。在状态依赖先前状态时，`reducer` 能在一个函数内清晰定义所有更新逻辑<mark style="color:red;">，比如在一个购物车应用中，添加商品到购物车（状态改变依赖当前购物车状态）、更新商品数量等操作</mark>，都能在 `reducer` 中按不同 `action.type` 来处理，使状态更新逻辑更有条理。
+
+#### 1. 状态逻辑的集中管理
+
+* 使用 `useReducer` 可以将状态逻辑集中到一个 reducer 函数中
+
+#### 2. 更清晰的状态转换
+
+* `useReducer` 通过定义不同的 action 类型来描述状态如何根据特定事件而改变，这样可以更清晰地表达状态转换逻辑。相比 `useState`，它避免了在事件处理函数中直接进行状态更新，减少了代码的耦合性。
 
 ### 为什么 `useState` 的初始值可以是一个函数？
 
