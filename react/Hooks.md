@@ -217,8 +217,6 @@ function ThemedButton() {
 
 useReducer 是 React 中的一个 Hook，它为复杂的状态逻辑提供了一种更可预测和结构化的方式来管理状态。 它类似于 Redux 的工作原理，通过一个 reducer 函数来管理状态的变化。
 
-
-
 * **useReducer** 适合用于单个组件或局部组件树中管理较复杂的状态逻辑，无需引入额外的状态管理库。
 * **Redux** 则用于全局状态管理，特别是当多个组件需要共享状态、需要中间件支持异步操作或需要调试工具时，Redux 提供了更完善的解决方案。
 *   **与`useState`的区别**
@@ -245,7 +243,7 @@ reducer：这是一个函数，接收当前的 state 和一个 action，并返�
 const [state, dispatch] = useReducer(reducer, initialState);
 ```
 
-### **Reducer 函数**
+### useReducer
 
 Reducer 函数通常遵循以下模式：
 
