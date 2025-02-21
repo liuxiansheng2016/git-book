@@ -8,7 +8,7 @@
 
 **优点**
 
-**更好的用户体验**：用户可以使用浏览器的前进和后退按钮来导航，而不会导致页面重新加载。
+**更好的用户体验**：它利用浏览器的地址栏和历史记录来实现平滑的页面切换，不需要重新加载整个页面。
 
 **更干净的 URL**：URL 不包含 # 符号，看起来更专业和整洁。
 
@@ -79,7 +79,7 @@ HashRouter 使用 URL 的哈希部分（即 # 后面的部分）来管理路由�
 
 **书签和分享**：用户在书签或分享 URL 时，可能会遇到问题，因为哈希部分不会发送到服务器。
 
-<mark style="color:red;">它的主要优点是兼容性好，特别是在不支持</mark> <mark style="color:red;"></mark><mark style="color:red;">`History API`</mark> <mark style="color:red;"></mark><mark style="color:red;">的旧浏览器或者静态文件服务器上q</mark>
+### &#x20;区别
 
 `BrowserRouter` 和 `HashRouter` 是 `react - router - dom` 库中用于实现路由功能的两个组件，它们有以下区别：
 
