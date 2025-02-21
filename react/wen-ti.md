@@ -498,6 +498,8 @@ export default App;
 
 ### React 事件绑定
 
+`onClick={handleClick}` 用于函数组件，而 `onClick={this.handleClick}` 用于类组件。
+
 **1. 在构造函数中使用 bind 方法**
 
 这是 React 官方推荐的方法之一，它是在组件的构造函数中对需要使用的类方法进行 this 绑定。这样做的好处是性能较好，因为绑定只会在组件实例化时发生一次。
@@ -569,7 +571,13 @@ class MyComponent extends React.Component {
 }
 ```
 
-这种方法的问题在于每次组件重新渲染时都会创建一个新的函数实例，这可能会导致性能问题，特别是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染15。
+这种方法的问题在于每次组件重新渲染时都会创建一个新的函数实例，这可能会导致性能问题，特别是在该函数作为 props 传递给子组件的情况下，可能会导致不必要的重新渲染。
+
+### `onClick={(e) => handleClick(e)}` 和 `onClick={handleClick}` 有什么区别
+
+`onClick={handleClick}` 直接传递了函数引用，只有在点击时才会执行 `handleClick`
+
+而 `onClick={(e) => handleClick(e)}` 是创建了一个新的箭头函数，每次组件重新渲染时都会生成一个新的函数实例，这可能会影响性能
 
 ### React 事件机制
 
@@ -656,7 +664,8 @@ react 事件不能采用 return false 的方式来阻止浏览器的默认行为
 4. **事件分发：**\
    React 根据虚拟 DOM 的结构，从根节点开始向下遍历，找出所有注册了相应事件处理函数的组件，并依次调用它们的处理函数。
    * 默认情况下，React 的事件处理是在冒泡阶段执行，但也可以通过在事件名称后加上 `Capture`（如 `onClickCapture`）来使用捕获阶段。
-5.
+
+
 
 ### 函数式组件没有生命周期
 
@@ -1028,6 +1037,25 @@ return {count: prevState.count + 1};
 3. 兄弟组件之间的通信 则父组件作为中间层来实现数据的互通，通过使用父组件传递&#x20;
 4. 父组件向后代组件传递 使用 context 提供了组件之间通讯的一种方式
 5. &#x20;非关系组件传递 建议将数据进行一个全局资源管理 redux
+
+### React Context
+
+React Context 是用于在组件树中共享状态的方式，避免了通过 `props` 层层传递数据的问题。它通过 `React.createContext` 创建上下文，`Provider` 提供数据，`Consumer` 或 `useContext` 读取数据。适用于全局状态管理，比如主题、用户信息等。
+
+Context 适合小规模或低频率更新的全局状态。如果频繁更新，可能会导致性能问题
+
+#### Context 更新机制
+
+1. **Provider 和 Consumer**：Context 通过 `React.createContext()` 创建一个 Context 对象。这个对象包含两个主要的 React 组件：`Provider` 和 `Consumer`。`Provider` 允许消费组件订阅 context 的变化。你可以将 `Provider` 包裹在顶层组件周围，并通过 `value` prop 来传递数据。
+2. **值的变化触发重新渲染**：当 `Provider` 的 `value` 属性发生变化时，所有使用该 `Context` 的消费者（通过 `Context.Consumer` 或 `useContext` Hook）都会被强制重新渲染。这意味着，只有当 `Provider` 的 `value` 发生变化时，依赖于该 `Context` 的子组件才会更新。值得注意的是，即使父组件重新渲染，如果 `Provider` 的 `value` 没有改变，那么消费者也不会重新渲染 。
+3. **性能优化**：为了避免不必要的重新渲染，确保传递给 `Provider` 的 `value` 是稳定不变的（例如使用 `useMemo` 或 `useReducer`），除非确实需要更新。这是因为 React 使用浅比较来决定是否发生了变化。如果 `value` 是一个新的对象或数组引用，即使其内容未变，React 也会认为它是新的值并触发更新
+
+### React 中如何避免因 Context 更新导致的性能问题
+
+* **使用 `useMemo` 或 `useCallback`**：避免不必要的计算或函数重建。
+* **使用 `React.memo`**：对消费 Context 的组件进行优化，防止不必要的重新渲染。
+* **拆分 Context**：减少单个 Context 存储的数据范围，确保只有必要的组件会重新渲染。
+* **使用状态管理库**
 
 ### ErrorBoundary
 
