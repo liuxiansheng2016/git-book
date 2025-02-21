@@ -1545,89 +1545,7 @@ HTML5提供了一些内置的表单验证属性，如`required`、`pattern`、`m
 
 #### 使用第三方库
 
-### 路由守卫
 
-在React中，路由守卫（Route Guards）是一种机制，用于在用户访问特定路由之前进行权限检查或其他逻辑验证。它类似于现实世界中的门禁系统，确保只有具备特定条件的用户才能进入某些区域。路由守卫在React路由管理中发挥着重要作用，主要体现在以下几个方面：
-
-#### 权限验证
-
-路由守卫可以检查用户是否登录，以及是否具有访问特定页面的权限。例如，确保只有管理员才能访问管理页面。
-
-#### 数据预加载
-
-在进入需要大量数据的页面之前，路由守卫可以预先获取所需数据，提高页面加载速度和用户体验。
-
-#### 页面访问控制
-
-根据特定条件限制对某些页面的访问。例如，某些页面可能只允许在特定时间段内访问，路由守卫可以检查当前时间是否符合要求。
-
-#### 实现方式
-
-React中通常通过自定义高阶组件（如`PrivateRoute`）或使用`Route`组件的`render`属性来实现路由守卫。这些方法允许在渲染组件前执行逻辑，根据条件决定是否渲染目标组件或进行重定向。
-
-示例代码（使用高阶组件实现路由守卫）：
-
-```jsx
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './Home';
-import Login from './Login';
-import Dashboard from './Dashboard';
-import PrivateRoute from './PrivateRoute';
-
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // 模拟从服务器获取认证状态
-  useEffect(() => {
-    // 假设这里是从服务器获取认证状态
-    const checkAuth = async () => {
-      try {
-        // 这里应该有实际的认证检查逻辑
-        const response = await fetch('/api/check-auth');
-        if (response.ok) {
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        console.error("Authentication check failed", error);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        {/* 使用 element 属性来指定组件，在需要保护的路由上使用 PrivateRoute */}
-        <Route path="/dashboard" element={<PrivateRoute isAuthenticated={isAuthenticated} component={Dashboard} />} />
-      </Routes>
-    </Router>
-  );
-}
-
-export default App;
-
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-
-const PrivateRoute = ({ isAuthenticated, component: Component }) => {
-  return isAuthenticated
-    ? <Outlet /> // 如果用户已认证，则渲染子组件或元素
-    : <Navigate to="/login" />; // 否则重定向到登录页
-};
-
-// 在父组件中使用时，需将要保护的组件作为子元素传递给 PrivateRoute
-// 如：<PrivateRoute isAuthenticated={isAuthenticated}><Dashboard /></PrivateRoute>
-
-export default PrivateRoute;
-```
-
-#### 总结
-
-路由守卫是React路由管理中的重要概念，用于控制对特定路由的访问。通过实现路由守卫，可以增强应用的安全性和用户体验，确保用户只能访问他们有权访问的资源，并在需要时预先加载数据，提升应用的性能。
 
 ### 在React中，如何处理复杂的业务逻辑
 
@@ -2074,4 +1992,90 @@ Render Props 是一种强大的模式，它允许你将跨多个组件的逻辑�
 
 
 
-### BrowserRouter和HashRouter
+### 动态路由
+
+* **动态路由定义**：在 `<Route>` 组件中，同样使用 `:id` 来定义动态参数。
+* **获取动态参数**：在 `User` 组件中，使用 `useParams` 钩子来获取动态路由中的 `id` 值
+
+```
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
+
+// 动态路由对应的组件
+const User = () => {
+    // 使用 useParams 钩子获取动态路由参数
+    const { id } = useParams();
+    return (
+        <div>
+            <h2>User ID: {id}</h2>
+        </div>
+    );
+};
+
+const App = () => {
+    return (
+        <Router>
+            <div>
+                <Routes>
+                    {/* 定义动态路由，:id 表示动态参数 */}
+                    <Route path="/user/:id" element={<User />} />
+                </Routes>
+            </div>
+        </Router>
+    );
+};
+
+export default App;
+```
+
+### 路由守卫
+
+在React中，路由守卫（Route Guards）是一种机制，用于在用户访问特定路由之前进行权限检查或其他逻辑验证。它类似于现实世界中的门禁系统，确保只有具备特定条件的用户才能进入某些区域。路由守卫在React路由管理中发挥着重要作用，主要体现在以下几个方面：
+
+#### 权限验证
+
+路由守卫可以检查用户是否登录，以及是否具有访问特定页面的权限。例如，确保只有管理员才能访问管理页面。
+
+#### 数据预加载
+
+在进入需要大量数据的页面之前，路由守卫可以预先获取所需数据，提高页面加载速度和用户体验。
+
+#### 页面访问控制
+
+根据特定条件限制对某些页面的访问。例如，某些页面可能只允许在特定时间段内访问，路由守卫可以检查当前时间是否符合要求。
+
+React中通常通过自定义高阶组件（如`PrivateRoute`）或使用`Route`组件的`render`属性来实现路由守卫。这些方法允许在渲染组件前执行逻辑，根据条件决定是否渲染目标组件或进行重定向。
+
+示例代码（使用高阶组件实现路由守卫）：
+
+```jsx
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState } from "react";
+
+const PrivateRoute = ({ element: Element, isAuthenticated }) => {
+  return isAuthenticated ? <Element /> : <Navigate to="/login" replace />;
+};
+
+const Home = () => <h1>Home Page (Protected)</h1>;
+const Login = () => <h1>Login Page</h1>;
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<PrivateRoute element={Home} isAuthenticated={isAuthenticated} />} />
+      </Routes>
+      <button onClick={() => setIsAuthenticated(!isAuthenticated)}>
+        {isAuthenticated ? "Logout" : "Login"}
+      </button>
+    </Router>
+  );
+}
+
+export default App;
+
+```
+

@@ -8,8 +8,6 @@
 
 **优点**
 
-**更好的用户体验**：它利用浏览器的地址栏和历史记录来实现平滑的页面切换，不需要重新加载整个页面。
-
 **更干净的 URL**：URL 不包含 # 符号，看起来更专业和整洁。
 
 **搜索引擎优化 (SEO)**：由于 URL 更干净，搜索引擎更容易抓取和索引页面。
@@ -95,7 +93,12 @@ HashRouter 使用 URL 的哈希部分（即 # 后面的部分）来管理路由�
 * **应用场景与部署**：
   * `BrowserRouter` 适用于部署在 Web 服务器上，支持动态路由和服务端渲染（SSR）的项目，它可以让 URL 更美观和符合常规习惯。不过，使用时需要正确配置 Web 服务器，以确保在刷新页面或直接访问深层路由时，服务器能够正确处理并返回对应的页面。
   * `HashRouter` <mark style="color:red;">适用于静态站点、无服务器环境（如本地文件系统直接打开 HTML 文件）以及一些对兼容性要求较高的场景，因为它不依赖于服务器端的配置</mark>。但 URL 中包含哈希部分，可能会被认为是旧式的 URL 表示方式。
-* **解决路径错误问题**：`HashRouter` 可以用于解决一些路径错误的问题。因为其 URL 中的哈希部分不会被发送到服务器，所以即使哈希部分的路径写错，也不会导致服务器返回 404 错误。而 `BrowserRouter` 中如果路径错误，服务器可能会返回 404 错误，需要在服务器端进行相应的配置来处理这种情况。d
+* **解决路径错误问题**：`HashRouter` 可以用于解决一些路径错误的问题。因为其 URL 中的哈希部分不会被发送到服务器，所以即使哈希部分的路径写错，也不会导致服务器返回 404 错误。而 `BrowserRouter` 中如果路径错误，服务器可能会返回 404 错误，需要在服务器端进行相应的配置来处理这种情况。
+
+### 动态路由
+
+* **动态路由定义**：在 `<Route>` 组件中，同样使用 `:id` 来定义动态参数。
+* **获取动态参数**：在 `User` 组件中，使用 `useParams` 钩子来获取动态路由中的 `id` 值
 
 ## 路由跳转
 
@@ -136,6 +139,79 @@ export async function action({ request }) {
 * **何时使用哪个**：
   * 如果你需要在组件内通过事件处理程序（如按钮点击）进行导航，请使用`useNavigate`。
   * 如果你在编写数据加载器或动作处理器，并希望在这些函数中根据某些条件执行重定向，则应使用`redirect`
+
+### **`useLocation` 的常见使用场景**
+
+
+
+* **根据 URL 路径渲染不同内容**：根据当前 URL 的路径名来决定渲染哪些组件。
+
+\
+收起jsx
+
+```
+import { useLocation } from 'react-router-dom';
+
+function ContentBasedOnPath() {
+    const location = useLocation();
+    const { pathname } = location;
+
+    if (pathname === '/home') {
+        return <h1>Home Page</h1>;
+    } else if (pathname === '/about') {
+        return <h1>About Page</h1>;
+    }
+
+    return <h1>Unknown Page</h1>;
+}
+```
+
+\
+
+
+* **获取查询参数**：从 URL 的查询字符串中提取所需的参数。
+
+\
+收起jsx
+
+```
+import { useLocation } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+
+function GetQueryParams() {
+    const location = useLocation();
+    const [searchParams] = useSearchParams();
+
+    const paramValue = searchParams.get('param');
+
+    return (
+        <p>The value of 'param' in the URL is: {paramValue}</p>
+    );
+}
+```
+
+\
+
+
+* **处理导航传递的状态数据**：获取在导航过程中传递的额外状态数据。
+
+\
+收起jsx
+
+```
+import { useLocation } from 'react-router-dom';
+
+function ReceiveDataPage() {
+    const location = useLocation();
+    const { state } = location;
+
+    if (state && state.message) {
+        return <p>{state.message}</p>;
+    }
+
+    return <p>No data received.</p>;
+}
+```
 
 ## Link 和 NavLink
 
