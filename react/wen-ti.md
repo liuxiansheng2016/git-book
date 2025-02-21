@@ -376,12 +376,11 @@ export default MyComponent;
 
 ### `useEffect`&#x20;
 
-#### `useEffect` 执行的基本规则：
+#### <mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">执行的基本规则：</mark>
 
-1. 首次渲染后执行
-2. 依赖项更新时执行
-3. 组件卸载前执行清理函数
-4. **空依赖项数组**：当提供一个空的依赖项数组 `[]` 时，`useEffect` 将只在组件首次渲染执行并在每次组件卸载时执行清理函数
+1. <mark style="color:red;">首次渲染后执行</mark>
+2. <mark style="color:red;">依赖项更新时执行</mark>
+3. **空依赖项数组**：当提供一个空的依赖项数组 `[]` 时，`useEffect` 将只在组件首次渲染执行
 
 #### 清理函数作用
 
@@ -390,10 +389,10 @@ export default MyComponent;
 3. **优化性能**：当依赖项更新触发新的副作用执行之前，清理函数可以先撤销之前的副作用，确保应用状态的一致性和性能。
 4. **确保状态一致性**：通过清理函数可以撤销那些可能影响全局状态或浏览器级别的副作用，比如移除事件监听器等，保证应用状态的一致性。
 
-清理函数执行时机
+<mark style="color:red;">清理函数执行时机</mark>
 
-* **组件卸载时**（类似 `componentWillUnmount`）。
-* **依赖更新时**，新的 `useEffect` 运行之前会先执行上一次 `useEffect` 的清理函数。
+* <mark style="color:red;">**组件卸载时**</mark><mark style="color:red;">（类似</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentWillUnmount`</mark><mark style="color:red;">）。</mark>
+* <mark style="color:red;">**依赖更新时**</mark><mark style="color:red;">，新的</mark> <mark style="color:red;"></mark><mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">运行之前会先执行上一次</mark> <mark style="color:red;"></mark><mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">的清理函数</mark>。
 
 ````
 ```javascript
