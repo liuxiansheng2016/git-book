@@ -4,7 +4,7 @@
 
 工作原理
 
-**HTML5 History API**：BrowserRouter 使用 HTML5 的历史记录 API (pushState, replaceState, popstate) 来管理路由。它利用浏览器的地址栏和历史记录来实现平滑的页面切换，而不需要重新加载整个页面。
+**HTML5 History API**：BrowserRouter 使用 HTML5 的**History**  API (pushState, replaceState, popstate) 来管理路由。
 
 **优点**
 
@@ -77,7 +77,27 @@ HashRouter 使用 URL 的哈希部分（即 # 后面的部分）来管理路由�
 
 **搜索引擎优化 (SEO)**：搜索引擎可能不会很好地抓取和索引带有 # 的 URL，影响 SEO。
 
-**书签和分享**：用户在书签或分享 URL 时，可能会遇到问题，因为哈希部分不会发送到服务器。s路由跳转
+**书签和分享**：用户在书签或分享 URL 时，可能会遇到问题，因为哈希部分不会发送到服务器。
+
+<mark style="color:red;">它的主要优点是兼容性好，特别是在不支持</mark> <mark style="color:red;"></mark><mark style="color:red;">`History API`</mark> <mark style="color:red;"></mark><mark style="color:red;">的旧浏览器或者静态文件服务器上q</mark>
+
+`BrowserRouter` 和 `HashRouter` 是 `react - router - dom` 库中用于实现路由功能的两个组件，它们有以下区别：
+
+* **底层原理**：
+  * `BrowserRouter` 使用的是 H5 的 `history API`，比如 `pushState`、`replaceState` 和 `popState` 等方法，通过操作浏览器的历史记录来实现路由跳转和状态管理。但它不兼容 IE9 及以下版本。
+  * `HashRouter` 使用的是 URL 的哈希值（即 `window.location.hash`），URL 中 `#` 后面的内容变化时，并不会向服务器发起新的请求，而是通过监听 `hashchange` 事件来实现页面的局部更新。
+* **path 表现形式**：
+  * `BrowserRouter` 的路径中没有 `#`，例如 `https://example.com/demo/test`，这种形式更加简洁直观，看起来更像是正常的 URL。
+  * `HashRouter` 的路径包含 `#`，例如 `https://example.com/#/demo/test` ，`#` 及其后面的内容就是哈希值。
+* **刷新后对路由 state 参数的影响**：
+  * `BrowserRouter` 没有任何影响，因为 `state` 保存在 `history` 对象中，即使刷新页面，`history` 对象中的数据依然存在，能保证路由状态的完整性。
+  * `HashRouter` 刷新后会导致路由 `state` 参数的丢失，因为其 `state` 并没有被持久化存储在服务器或其他可靠的地方，刷新时页面重新加载，之前通过路由传递的 `state` 信息就会丢失 。
+* **应用场景与部署**：
+  * `BrowserRouter` 适用于部署在 Web 服务器上，支持动态路由和服务端渲染（SSR）的项目，它可以让 URL 更美观和符合常规习惯。不过，使用时需要正确配置 Web 服务器，以确保在刷新页面或直接访问深层路由时，服务器能够正确处理并返回对应的页面。
+  * `HashRouter` 适用于静态站点、无服务器环境（如本地文件系统直接打开 HTML 文件）以及一些对兼容性要求较高的场景，因为它不依赖于服务器端的配置。但 URL 中包含哈希部分，可能会被认为是旧式的 URL 表示方式。
+* **解决路径错误问题**：`HashRouter` 可以用于解决一些路径错误的问题。因为其 URL 中的哈希部分不会被发送到服务器，所以即使哈希部分的路径写错，也不会导致服务器返回 404 错误。而 `BrowserRouter` 中如果路径错误，服务器可能会返回 404 错误，需要在服务器端进行相应的配置来处理这种情况。
+
+## 路由跳转
 
 useNavigate
 
