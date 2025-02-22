@@ -95,14 +95,9 @@ HashRouter 使用 URL 的哈希部分（即 # 后面的部分）来管理路由�
   * `HashRouter` <mark style="color:red;">适用于静态站点、无服务器环境（如本地文件系统直接打开 HTML 文件）以及一些对兼容性要求较高的场景，因为它不依赖于服务器端的配置</mark>。但 URL 中包含哈希部分，可能会被认为是旧式的 URL 表示方式。
 * **解决路径错误问题**：`HashRouter` 可以用于解决一些路径错误的问题。因为其 URL 中的哈希部分不会被发送到服务器，所以即使哈希部分的路径写错，也不会导致服务器返回 404 错误。而 `BrowserRouter` 中如果路径错误，服务器可能会返回 404 错误，需要在服务器端进行相应的配置来处理这种情况。
 
-### 动态路由
-
-* **动态路由定义**：在 `<Route>` 组件中，同样使用 `:id` 来定义动态参数。
-* **获取动态参数**：在 `User` 组件中，使用 `useParams` 钩子来获取动态路由中的 `id` 值
-
 ## 路由跳转
 
-useNavigate
+#### useNavigate
 
 ```
 const HomeButton = () => {
@@ -140,14 +135,52 @@ export async function action({ request }) {
   * 如果你需要在组件内通过事件处理程序（如按钮点击）进行导航，请使用`useNavigate`。
   * 如果你在编写数据加载器或动作处理器，并希望在这些函数中根据某些条件执行重定向，则应使用`redirect`
 
-### **`useLocation` 的常见使用场景**
+### 动态路由
 
+#### useParams
 
+* **动态路由定义**：在 `<Route>` 组件中，同样使用 `:id` 来定义动态参数。
+* **获取动态参数**：在 `User` 组件中，使用 `useParams` 钩子来获取动态路由中的 `id` 值
+
+<mark style="color:red;">**`useParams`**</mark><mark style="color:red;">**动态路由匹配**</mark><mark style="color:red;">：在需要根据不同的参数展示不同内容的场景中非常有用，例如用户详情页、商品详情页等，通过动态参数获取特定用户或商品的信息</mark>
+
+```
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
+
+// 定义一个动态路由，:id 是动态参数
+const UserPage = () => {
+    const { id } = useParams();
+    return <div>当前用户的 ID 是: {id}</div>;
+};
+
+const App = () => {
+    return (
+        <Router>
+            <Routes>
+                <Route path="/users/:id" element={<UserPage />} />
+            </Routes>
+        </Router>
+    );
+};
+
+export default App;
+```
+
+#### **`useLocation`**
+
+返回一个包含当前 URL 信息的对象，其常见属性如下：
+
+* `pathname`：当前 URL 的路径部分。
+* `search`：URL 中的查询字符串，以 `?` 开头。
+* `hash`：URL 中的哈希值，以 `#` 开头。
+* `state`：在导航时传递的额外状态数据。
+
+<mark style="color:red;">**根据 URL 状态渲染不同内容**</mark><mark style="color:red;">：根据查询字符串或哈希值的不同，渲染不同的组件或执行不同的逻辑。例如，在搜索结果页根据查询参数显示不同的搜索结果。</mark>
+
+#### &#x20;使用场景
 
 * **根据 URL 路径渲染不同内容**：根据当前 URL 的路径名来决定渲染哪些组件。
-
-\
-收起jsx
 
 ```
 import { useLocation } from 'react-router-dom';
@@ -164,15 +197,10 @@ function ContentBasedOnPath() {
 
     return <h1>Unknown Page</h1>;
 }
+
 ```
 
-\
-
-
 * **获取查询参数**：从 URL 的查询字符串中提取所需的参数。
-
-\
-收起jsx
 
 ```
 import { useLocation } from 'react-router-dom';
@@ -190,13 +218,7 @@ function GetQueryParams() {
 }
 ```
 
-\
-
-
 * **处理导航传递的状态数据**：获取在导航过程中传递的额外状态数据。
-
-\
-收起jsx
 
 ```
 import { useLocation } from 'react-router-dom';
@@ -213,6 +235,41 @@ function ReceiveDataPage() {
 }
 ```
 
+#### `useParams` 和 `useLocation`
+
+\
+当访问 `/users/123` 时，`useParams` 会返回 `{ id: '123' }`，通过解构赋值可以轻松获取 `id` 的值。
+
+* `useParams` 主要关注动态路由参数的获取，用于处理路由路径中的可变部分。
+* `useLocation` 更侧重于获取整个 URL 的详细信息，包括路径名、查询字符串、哈希值和导航状态等。
+
+### seSearchParams
+
+`useSearchParams` 是 React Router v6 引入的一个 Hook，用来<mark style="color:red;">读取 URL 中的查询字符串参数</mark>（query string parameters）。这个 Hook 返回一个包含两个元素的数组：当前的 `searchParams` 对象和一个用于更新这些参数的函数。
+
+**使用示例**
+
+如果你想从 URL 中获取查询参数，比如 `/search?q=react&sort=latest`，你可以使用 `useSearchParams` 来访问这些参数：
+
+```
+import { useSearchParams } from 'react-router-dom';
+
+function SearchComponent() {
+  const [searchParams] = useSearchParams();
+  
+  const query = searchParams.get('q');
+  const sort = searchParams.get('sort');
+
+  return (
+    <div>
+      <h1>搜索结果</h1>
+      <p>查询关键词: {query}</p>
+      <p>排序方式: {sort}</p>
+    </div>
+  );
+}
+```
+
 ## Link 和 NavLink
 
 Link 还是 NavLink，它们的工作原理都是拦截浏览器默认的行为（即页面刷新），并通过调用 history.pushState() 方法来改变 URL，而不触发完整的页面加载。
@@ -221,4 +278,45 @@ Link 组件的主要功能是生成一个 HTML 标签
 
 NavLink 是基于 Link 构建的一个更高级别的组件，它不仅提供了与 Link 相同的功能，而且还增加了自动检测是否处于活动状态的能力这意味着你可以轻松地为当前选中的链接应用特定的样式或类名声明式导
 
-**替换历史条目**：replace 属性设置为 true 可以确保这次导航不会添加新的历史记录条目，而是替换掉当前的历史条目。这对于避免用户点击浏览器的“后退”按钮返回到受保护页面是有用的。
+**替换历史条目**：replace 属性设置为 true 可以确保这次导航不会添加新的历史记录条目，而是替换掉当前的历史条目。这对于避免用户点击浏览器的“后退”按钮返回到受保护页面是有用的。\
+
+
+### `Outlet`
+
+&#x20;是 React Router v6 中引入的一个重要组件，用于实现嵌套路由的渲染。比如一个页面有侧边栏导航，点击不同的菜单项会在主内容区域显示不同的子页面。`Outlet` 就是为了处理这种嵌套路由而设计的，它相当于一个占位符，用于渲染当前路由匹配的子路由组件。
+
+```
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+
+// 父路由组件
+const Parent = () => {
+    return (
+        <div>
+            <h1>这是父路由页面</h1>
+            {/* 使用 Outlet 渲染子路由组件 */}
+            <Outlet />
+        </div>
+    );
+};
+
+// 子路由组件
+const Child1 = () => <p>这是子路由 1</p>;
+const Child2 = () => <p>这是子路由 2</p>;
+
+const App = () => {
+    return (
+        <Router>
+            <Routes>
+                <Route path="/parent" element={<Parent />}>
+                    {/* 嵌套的子路由 */}
+                    <Route path="child1" element={<Child1 />} />
+                    <Route path="child2" element={<Child2 />} />
+                </Route>
+            </Routes>
+        </Router>
+    );
+};
+
+export default App;
+```
