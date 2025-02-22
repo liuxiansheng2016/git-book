@@ -1088,10 +1088,45 @@ Context 适合小规模或低频率更新的全局状态。如果频繁更新，
 
 ### React 中如何避免因 Context 更新导致的性能问题
 
-* **使用 `useMemo` 或 `useCallback`**：避免不必要的计算或函数重建。
+* #### 使用 `useMemo` 缓存 Context 值
 * **使用 `React.memo`**：对消费 Context 的组件进行优化，防止不必要的重新渲染。
+
+```
+import React, { createContext, useContext, useState } from'react';
+
+// 创建 Context
+const MyContext = createContext();
+
+// 使用 React.memo 包裹的组件
+const MyComponent = React.memo(({ data }) => {
+    return <div>{data}</div>;
+});
+
+// 提供 Context 值的组件
+const ContextProvider = () => {
+    const [count, setCount] = useState(0);
+
+    return (
+        <MyContext.Provider value={count}>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+            {/* 消费 Context 的组件 */}
+            <MyConsumer />
+        </MyContext.Provider>
+    );
+};
+
+// 消费 Context 的组件
+const MyConsumer = () => {
+    const contextValue = useContext(MyContext);
+    return <MyComponent data={contextValue} />;
+};
+
+export default ContextProvider;
+```
+
 * **拆分 Context**：减少单个 Context 存储的数据范围，确保只有必要的组件会重新渲染。
 * **使用状态管理库**
+* 所以一个优化策略是 **避免在 Context 中存放会频繁变化的值**，比如列表数据、UI 状态等，而是只存放相对静态或者全局需要的状态。
 
 ### ErrorBoundary
 
