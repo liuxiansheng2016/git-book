@@ -6,6 +6,8 @@ React 只是 DOM 的一个抽象层，并不是 Web 应用的完整解决方案�
 
 设计思想， web 应用是一个状态机，视图与状态一一对应，所有的状态保存在一个对象里面。
 
+### 结构
+
 **Action**:一个对象，其中 type 是必须的
 
 **Reducer**:是一个纯函数，接受 Action 和当前 State 作为参数，返回一个新的 State.
@@ -21,6 +23,8 @@ React 只是 DOM 的一个抽象层，并不是 Web 应用的完整解决方案�
 执行有副作用的操作，如 API 请求和路由跳转；
 
 调用非纯函数，如 Date.now() 或 Math.random()。
+
+### 特点
 
 **单一数据源**：整个应用的全局 state 被存储在一棵 object tree 中，并且这个 object tree 只存在于唯一一个 store 中。
 
@@ -176,9 +180,7 @@ ReactDOM.render(
 );
 ```
 
-#### 使用 useSelector 和 useDispatch
 
-useSelector 是一个 React Hook，用于从 Redux Store 中选择状态的一部分。在这里，我们选择 count 的值。 useDispatch 是另一个 React Hook，用于获取 Redux 的 dispatch 函数，以便分发动作。
 
 **定义 Action Types**
 
@@ -267,9 +269,11 @@ ReactDOM.render(
 );
 ```
 
-**使用 useSelector 和 useDispatch**
+### **使用 useSelector 和 useDispatch**
 
 现在，在组件内部使用 useSelector 来读取状态，使用 useDispatch 来分发 actions。
+
+useSelector 是一个 React Hook，用于从 Redux Store 中选择状态的一部分。在这里，我们选择 count 的值。 useDispatch 是另一个 React Hook，用于获取 Redux 的 dispatch 函数，以便分发动作。
 
 ```
 // Counter.js
@@ -342,8 +346,7 @@ function MyComponent() {
 export default MyComponent;
 ```
 
-\
-**connect 函数**
+### **connect 函数**
 
 connect 是 react-redux 提供的一个高阶组件（HOC），它用于将 React 组件与 Redux store 连接起来。通过 connect，你可以让 UI 组件订阅 Redux store 的更新，并且能够 dispatch actions 来更新 store。
 
@@ -569,7 +572,7 @@ export default PostList;
 
 
 
-#### Redux-Thunk
+### Redux-Thunk
 
 Redux-Thunk 是一个用于 Redux 的中间件，它允许你在 action creators 中返回一个函数（thunk）而不是普通的 action 对象。这使得你可以在这些函数中执行异步操作，并在合适的时机通过 dispatch 函数发送普通的 action 对象来更新 Redux store 1。
 
