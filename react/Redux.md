@@ -498,6 +498,10 @@ export default postReducer;
 
 2. **使用 combineReducers**： 通过 `combineReducers` 将多个 reducer 组合成一个根 reducer。
 
+代码组织与模块化
+
+在大型应用中，状态管理逻辑会变得非常复杂。如果将所有的状态处理逻辑都写在一个 reducer 函数中，代码会变得冗长且难以维护。使用 `combineReducers` 可以将不同的状态处理逻辑拆分成多个小的 reducer 函数，每个 reducer 只负责管理状态树中的一个特定部分，使代码结构更加清晰，易于理解和维护
+
 ```javascript
 // rootReducer.js
 import { combineReducers } from 'redux';
