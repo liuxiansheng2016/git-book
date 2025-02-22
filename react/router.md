@@ -243,7 +243,7 @@ function ReceiveDataPage() {
 * `useParams` 主要关注动态路由参数的获取，用于处理路由路径中的可变部分。
 * `useLocation` 更侧重于获取整个 URL 的详细信息，包括路径名、查询字符串、哈希值和导航状态等。
 
-### seSearchParams
+### useSearchParams
 
 `useSearchParams` 是 React Router v6 引入的一个 Hook，用来<mark style="color:red;">读取 URL 中的查询字符串参数</mark>（query string parameters）。这个 Hook 返回一个包含两个元素的数组：当前的 `searchParams` 对象和一个用于更新这些参数的函数。
 
@@ -252,23 +252,39 @@ function ReceiveDataPage() {
 如果你想从 URL 中获取查询参数，比如 `/search?q=react&sort=latest`，你可以使用 `useSearchParams` 来访问这些参数：
 
 ```
-import { useSearchParams } from 'react-router-dom';
+import React from'react';
+import { useSearchParams } from'react-router-dom';
 
-function SearchComponent() {
-  const [searchParams] = useSearchParams();
-  
-  const query = searchParams.get('q');
-  const sort = searchParams.get('sort');
+function SearchPage() {
+    // 获取 searchParams 对象和 setSearchParams 函数
+    const [searchParams, setSearchParams] = useSearchParams();
 
-  return (
-    <div>
-      <h1>搜索结果</h1>
-      <p>查询关键词: {query}</p>
-      <p>排序方式: {sort}</p>
-    </div>
-  );
+    // 获取名为 'keyword' 的查询参数的值
+    const keyword = searchParams.get('keyword');
+
+    const handleChange = (e) => {
+        const newKeyword = e.target.value;
+        setSearchParams({ keyword: newKeyword });
+    };
+
+    return (
+        <div>
+            <input
+                type="text"
+                placeholder="Search..."
+                value={keyword || ''}
+                onChange={handleChange}
+            />
+            <p>当前搜索关键词: {keyword || '无'}</p>
+        </div>
+    );
 }
+
+export default SearchPage;
 ```
+
+* **`useSearchParams`**：专<mark style="color:red;">门用于处理 URL 中的查询参数（即 URL 中</mark> <mark style="color:red;"></mark><mark style="color:red;">`?`</mark> <mark style="color:red;"></mark><mark style="color:red;">后面的部分）。它允许你读取、修改和监听查询参数的变化，提供了类似于</mark> <mark style="color:red;"></mark><mark style="color:red;">`URLSearchParams`</mark> <mark style="color:red;"></mark><mark style="color:red;">的 API 来操作查询参数。</mark>
+* **`useLocation`**：用于获取当前 URL 的完整信息，包括路径名（`pathname`）、查询字符串（`search`）、哈希值（`hash`）以及在导航时传递的状态数据（`state`）。它返回一个包含这些信息的对象，让你可以根据 URL 的不同部分执行相应的逻辑。
 
 ## Link 和 NavLink
 
