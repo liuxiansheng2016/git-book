@@ -777,7 +777,7 @@ function MyComponent() {
 * **调试与追踪**：中间件可以提供日志记录、错误处理等功能，方便开发者追踪和调试异步操作的过程。
 * **复杂控制流**：对于复杂的异步流程控制（例如取消请求、重试机制等），使用专门的中间件（如`redux-saga`）可能比手动编写效果更好。
 
-#### Redux Toolkit 的主要功能
+### Redux Toolkit 的主要功能
 
 Redux Toolkit 是 Redux 官方推荐的工具包，旨在简化 Redux 的使用。它提供了一组工具和最佳实践，帮助开发者更容易地编写 Redux 逻辑。Redux Toolkit 解决了 Redux 的一些常见问题，如样板代码过多、配置复杂等。
 
@@ -940,3 +940,125 @@ export default UserList;
 ```
 
 通过使用 Redux Toolkit，可以显著减少 Redux 代码的样板代码，使代码更加简洁和易于维护。
+
+
+
+### `createAsyncThunk`&#x20;
+
+是 Redux Toolkit 提供的一个实用函数，用于简化 Redux 中异步操作的处理。它帮助开发者更方便地处理异步逻辑，如网络请求，<mark style="color:red;">并自动管理异步操作的不同阶段（如加载中、成功、失败）对应的 action</mark>。以下从基本概念、工作原理、使用方法、应用场景等方面详细介绍。
+
+#### 基本概念
+
+在 Redux 里处理异步操作时，通常需要手动管理多个 action 来表示异步操作的不同状态，例如开始请求、请求成功、请求失败。`createAsyncThunk` 可以自动生成这些 action，减少模板代码，让异步操作的处理更加简洁和可维护。
+
+#### 工作原理
+
+`createAsyncThunk` 接收两个参数：
+
+* **动作类型前缀**：是一个字符串，用于标识这个异步操作，`createAsyncThunk` 会基于这个前缀自动生成三个 action type，分别对应异步操作的三个阶段：
+  * `pending`：表示异步操作正在进行中。
+  * `fulfilled`：表示异步操作成功完成。
+  * `rejected`：表示异步操作失败。
+* **payload 创建函数**：是一个异步函数，通常用于执行异步操作，如发送网络请求。这个函数接收两个参数，第一个是传递给异步操作的参数，第二个是包含 `dispatch` 和 `getState` 等有用方法的对象。
+
+#### 使用方法
+
+**1. 安装 Redux Toolkit**
+
+```bash
+npm install @reduxjs/toolkit
+```
+
+**2. 创建异步 thunk**
+
+```javascript
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+// 创建一个异步 thunk
+export const fetchUsers = createAsyncThunk(
+    'users/fetchUsers', // 动作类型前缀
+    async () => {
+        const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+        return response.data;
+    }
+);
+```
+
+**3. 在 reducer 中处理异步 thunk 的 action**
+
+```javascript
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchUsers } from './asyncThunks';
+
+const usersSlice = createSlice({
+    name: 'users',
+    initialState: {
+        data: [],
+        loading: false,
+        error: null
+    },
+    extraReducers: (builder) => {
+        // 处理 pending 状态
+        builder.addCase(fetchUsers.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        });
+        // 处理 fulfilled 状态
+        builder.addCase(fetchUsers.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+        });
+        // 处理 rejected 状态
+        builder.addCase(fetchUsers.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.error.message;
+        });
+    }
+});
+
+export default usersSlice.reducer;
+```
+
+**4. 在组件中使用异步 thunk**
+
+```jsx
+import React, { useEffect } from'react';
+import { useDispatch, useSelector } from'react-redux';
+import { fetchUsers } from './asyncThunks';
+
+const UsersList = () => {
+    const dispatch = useDispatch();
+    const { data, loading, error } = useSelector((state) => state.users);
+
+    useEffect(() => {
+        dispatch(fetchUsers());
+    }, [dispatch]);
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
+
+    if (error) {
+        return <p>Error: {error}</p>;
+    }
+
+    return (
+        <ul>
+            {data.map((user) => (
+                <li key={user.id}>{user.name}</li>
+            ))}
+        </ul>
+    );
+};
+
+export default UsersList;
+```
+
+#### 应用场景
+
+* **数据获取**：从服务器获取数据，如获取用户列表、商品列表等。
+* **数据提交**：向服务器提交数据，如用户注册、登录、提交表单等。
+* **数据更新和删除**：对服务器上的数据进行更新或删除操作，并同步更新本地状态。
+
+通过 `createAsyncThunk`，开发者可以更高效地处理 Redux 中的异步操作，减少样板代码，提高代码的可读性和可维护性。
