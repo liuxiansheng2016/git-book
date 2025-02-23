@@ -340,27 +340,3 @@ const App = () => {
 export default App;
 ```
 
-````
-```javascript
- <Route
-            path="/"
-            element={
-              isLoggedIn ? (
-                <LayoutComponent
-                  onLogout={handleLogout}
-                  isDarkMode={isDarkMode}
-                  onThemeChange={handleThemeChange}
-                >
-                  <Outlet />
-                </LayoutComponent>
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          >
-            <Route path="dashboard" element={<DashboardComponent />} />
-            <Route path="settings" element={<Settings />} />
-            <Route index element={<Navigate to="dashboard" replace />} />
-          </Route>
-```
-````
