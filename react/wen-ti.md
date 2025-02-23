@@ -58,6 +58,8 @@ const Parent = ({ isDarkMode, toggleTheme }) => {
 
 ### 在 React 中如何使用 innerHTML?
 
+React 默认会自动对所有嵌入到 JSX 中的文本进行转义，这意味着任何动态插入的内容都会被视为纯文本而非 HTML，从而防止了 XSS 攻击
+
 `dangerouslySetInnerHTML` 属性是 React 用来替代在浏览器 DOM 中使用 `innerHTML`。与 `innerHTML` 一样，考虑到跨站脚本攻击（XSS），使用此属性也是有风险的。使用时，你只需传递以 `__html` 作为键，而 HTML 文本作为对应值的对象。
 
 在本示例中 MyComponent 组件使用 `dangerouslySetInnerHTML` 属性来设置 HTML 标记：
