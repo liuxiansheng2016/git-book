@@ -1484,12 +1484,35 @@ removeItem(index) {
 
 ### React memo 函数是什么?
 
-当类组件的输入属性相同时，可以使用 **pureComponent** 或 **shouldComponentUpdate** 来避免组件的渲染。现在，你可以通过把函数组件包装在 **React.memo** 中来实现相同的功能。
+`React.memo` 是 React 提供的 **高阶组件（HOC）**，用于 **优化函数组件的渲染性能**。它的作用是 **记住（缓存）上一次的渲染结果**，**只有当 `props` 发生变化时才会重新渲染组件**。
+
+#### **适用场景**
+
+* 组件的 `props` 变化不频繁
+* 组件渲染开销较大
+* <mark style="color:red;">父组件频繁更新，但</mark> <mark style="color:red;"></mark><mark style="color:red;">`props`</mark> <mark style="color:red;"></mark><mark style="color:red;">没变</mark>
 
 ```jsx
-const MyComponent = React.memo(function MyComponent(props) {
- /* only rerenders if props change */
+import React from 'react';
+
+const MyComponent = React.memo(({ name }) => {
+  console.log('组件渲染:', name);
+  return <div>Hello, {name}!</div>;
 });
+```
+
+默认情况下，`React.memo` **浅比较 `props`**，如果 `props` 是对象或数组，可能会误判它们变化，导致不必要的渲染。
+
+**自定义 `props` 对比函数**
+
+```jsx
+const MyComponent = React.memo(
+  ({ user }) => {
+    console.log('渲染:', user);
+    return <div>{user.name}</div>;
+  },
+  (prevProps, nextProps) => prevProps.user.id === nextProps.user.id // 自定义对比
+);
 ```
 
 ### 严格模式有什么好处?
