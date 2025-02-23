@@ -987,8 +987,8 @@ setItems([...items, 4]); // 创建新数组实例，确保引用变化
 
 ### `setState写法`
 
-* **直接设置新值**：`setCount(newValue)`，适用于简单的状态更新。
-* **使用回调函数更新状态**, 基于前一个状态更新：`setCount(prevCount => prevCount + 1)`，适用于需要依赖于之前状态值的情况。
+* **`setCount(prevCount => prevCount + 1)`**：适用于状态更新依赖于前一个状态值的情况，特别是在批量更新或者异步更新的场景中，能确保状态更新的准确性。
+* **`setCount(count + 1)`**：适用于状态更新不依赖于前一个状态值，或者可以确定在更新状态时 `count` 是最新值的情况。例如，在某些简单的一次性更新场景中使用较为方便
 
 ### 为什么 useState 要使用数组而不是对象 ？
 
@@ -1120,7 +1120,7 @@ Context 适合小规模或低频率更新的全局状态。如果频繁更新，
 
 1. **Provider 和 Consumer**：Context 通过 `React.createContext()` 创建一个 Context 对象。这个对象包含两个主要的 React 组件：`Provider` 和 `Consumer`。`Provider` 允许消费组件订阅 context 的变化。你可以将 `Provider` 包裹在顶层组件周围，并通过 `value` prop 来传递数据。
 2. **值的变化触发重新渲染**：当 `Provider` 的 `value` 属性发生变化时，所有使用该 `Context` 的消费者（通过 `Context.Consumer` 或 `useContext` Hook）都会被强制重新渲染。这意味着，只有当 `Provider` 的 `value` 发生变化时，依赖于该 `Context` 的子组件才会更新。值得注意的是，即使父组件重新渲染，如果 `Provider` 的 `value` 没有改变，那么消费者也不会重新渲染 。
-3. **性能优化**：为了避免不必要的重新渲染，确保传递给 `Provider` 的 `value` 是稳定不变的（例如使用 `useMemo` 或 `useReducer`），除非确实需要更新。这是因为 React 使用浅比较来决定是否发生了变化。如果 `value` 是一个新的对象或数组引用，即使其内容未变，React 也会认为它是新的值并触发更新
+3. **性能优化**：为了避免不必要的重新渲染，确保传递给 `Provider` 的 `value` 是稳定不变的（例如使用 `useMemo` 或 `useReducer`），除非确实需要更新。这是因为 React 使用浅比较来决定是否发生了变化。如果 `value` 是一个新的对象或数组引用，即使其内容未变，React 也会认为它是新的useImperativeHandle并触发更新
 
 ### React 中如何避免因 Context 更新导致的性能问题
 
@@ -1534,6 +1534,50 @@ const MyComponent = React.memo(function MyComponent(props) {
 * **状态管理不可靠**：结果不确定，导致应用状态混乱，难以维护。
 * **调试困难**：难以追踪和重现问题，增加调试难度。
 * **性能下降**：不必要的组件重新渲染，降低应用性能。
+
+### 如何优化useSelector以减少无意义渲染？
+
+#### 1. 精准选取状态
+
+* **原理**：`useSelector` 默认进行浅比较，当选取的状态发生变化时组件会重新渲染。所以应精准选取所需状态，避免选取过多不必要的数据，从而减少不必要的重新渲染。
+
+```
+  const userName = useSelector(state => state.user.name);
+```
+
+选取 `state.user.name`，只有该状态改变时，`UserInfo` 组件才会重新渲染。若选取整个 `user` 对象，`user` 中任意属性变化都会触发组件重新渲染。
+
+#### 2.利用自定义比较函数
+
+* **原理**：`useSelector` 可接收第二个参数作为比较函数，默认是浅比较。若需复杂比较逻辑，可传入自定义比较函数，更精确地控制组件是否重新渲染。
+
+```
+const customCompare = (prevState, nextState) => {
+    // 自定义比较逻辑
+    return prevState.id === nextState.id;
+};
+
+const ProductInfo = () => {
+    const product = useSelector(state => state.product, customCompare);
+    return <p>Product ID: {product.id}</p>;
+};
+```
+
+#### 3. 借助 `shallowEqual` 函数
+
+* **原理**：`react-redux` 提供了 `shallowEqual` 函数，它能对对象进行浅比较，判断两个对象的第一层属性是否相同。将其作为 `useSelector` 的第二个参数，可避免因对象引用改变但值未变而导致的不必要重新渲染。
+
+```
+import React from'react';
+import { useSelector, shallowEqual } from'react-redux';
+
+const CartInfo = () => {
+    const cartItems = useSelector(state => state.cart.items, shallowEqual);
+    return <p>Cart Items Count: {cartItems.length}</p>;
+};
+
+export default CartInfo;
+```
 
 ### 在React中，如何进行表单验证
 
