@@ -419,6 +419,20 @@ function ProductPage({ productId, referrer }) {
 1. useMemo **缓存函数调用的结果** 。在这里，它缓存了调用 computeRequirements(product) 的结果。除非 product 发生改变，否则它将不会发生变化。这让你向下传递 requirements 时而无需不必要地重新渲染 ShippingForm。必要时，React 将会调用传入的函数重新计算结果。
 2. useCallback **缓存函数本身**。不像 useMemo，它不会调用你传入的函数。相反，它缓存此函数。从而除非 productId 或 referrer 发生改变，handleSubmit 自己将不会发生改变。这让你向下传递 handleSubmit 函数而无需不必要地重新渲染 ShippingForm。直至用户提交表单，你的代码都将不会运行。
 
+### 是否会一直缓存值
+
+\
+`useMemo` 不会一直缓存值，缓存值的有效性取决于依赖项数组。具体情况如下：
+
+**1. 依赖项变化**\
+如前面所述，当依赖项数组中的值发生变化时，`useMemo` 会重新计算并更新缓存值。
+
+**2. 组件卸载**\
+当组件卸载时，`useMemo` 的缓存会被清除。组件再次挂载时，`useMemo` 会重新进行初始渲染时的操作，即调用回调函数并缓存新的值。
+
+**3. 空依赖项数组**\
+如果依赖项数组为空 `[]`，则 `useMemo` 只会在组件首次渲染时计算并缓存值，之后不会再重新计算，除非组件卸载后重新挂载。
+
 ### `useRef`&#x20;
 
 const refContainer = useRef(initialValue);

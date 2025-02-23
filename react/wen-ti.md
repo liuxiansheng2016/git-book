@@ -27,6 +27,35 @@ React 通过\*\*虚拟 DOM（Virtual DOM）\*\*减少对真实 DOM 的直接操�
 
 对于基本数据类型（如 `number`、`string`、`boolean` 等），浅比较直接比较它们的值；对于引用数据类型（如 `object`、`array` 等），浅比较比较的是它们的引用地址，而不是对象或数组的内容。
 
+### PureComponent
+
+* `PureComponent` **内部实现了浅比较（shallow comparison）**，只有 `props` 或 `state` 发生**变化**时才会触发 `render`。
+* **默认实现 `shouldComponentUpdate` 方法**，不需要手写。
+
+`shouldComponentUpdate` 是 `PureComponent` **的可控版本**，允许**自定义比较逻辑**。
+
+`useMemo` 或 `useCallback` 缓存 `props`，防止 `PureComponent` 失效。
+
+\
+下面的例子中\
+<mark style="color:red;">如果不使用 useMemo 或 useCallback，每次父组件渲染时即使逻辑上没有变化，新建的对象或函数也会破坏 memo 的效果，导致子组件总是重新渲染，从而影响性能。</mark>
+
+```
+// Parent.js
+const Parent = ({ isDarkMode, toggleTheme }) => {
+  // 缓存 config 对象，确保引用稳定
+  const config = useMemo(() => ({ theme: isDarkMode ? 'dark' : 'light' }), [isDarkMode]);
+
+  // 缓存回调函数，避免子组件不必要的更新
+  const handleToggle = useCallback(() => {
+    toggleTheme();
+  }, [toggleTheme]);
+
+  return <Child config={config} onToggle={handleToggle} />;
+};
+
+```
+
 ### 在 React 中如何使用 innerHTML?
 
 `dangerouslySetInnerHTML` 属性是 React 用来替代在浏览器 DOM 中使用 `innerHTML`。与 `innerHTML` 一样，考虑到跨站脚本攻击（XSS），使用此属性也是有风险的。使用时，你只需传递以 `__html` 作为键，而 HTML 文本作为对应值的对象。
@@ -473,7 +502,7 @@ export default App;
 * **`useMemo`**：缓存**计算后的值**，适用于**昂贵的计算**，避免不必要的重复计算。
 * **`useCallback`**：缓存**函数本身**，适用于**避免子组件不必要的重新渲染**，特别是当这个函数作为 `props` 传递给子组件时。\
   \
-  **不会永久缓存**，组件卸载时缓存会被清除。
+  <mark style="color:red;">**不会永久缓存**</mark><mark style="color:red;">，组件卸载时缓存会被清除。</mark>
 
 ### `useRef`&#x20;
 
