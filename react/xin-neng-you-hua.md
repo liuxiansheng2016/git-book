@@ -154,3 +154,32 @@ function App() {
 
 export default App;
 ```
+
+### 在 React 中，实现代码拆分主要有以下几种方式：
+
+1.  **动态 import() 与 React.lazy**\
+    使用动态 import() 语法可以实现按需加载模块。React.lazy 配合 Suspense 组件，能很方便地实现组件级别的代码拆分。例如：
+
+    ```jsx
+    import React, { Suspense } from 'react';
+
+    const OtherComponent = React.lazy(() => import('./OtherComponent'));
+
+    function App() {
+      return (
+        <div>
+          <Suspense fallback={<div>Loading...</div>}>
+            <OtherComponent />
+          </Suspense>
+        </div>
+      );
+    }
+
+    export default App;
+    ```
+
+    在这个例子中，当 App 组件渲染时，OtherComponent 会被延迟加载，并在加载过程中显示 fallback 指定的内容。
+2. **第三方库（如 Loadable Components）**\
+   除了 React.lazy 外，还有一些第三方库（例如 loadable-components 或 react-loadable）可以提供更灵活的代码拆分方案，比如支持服务端渲染、预加载等功能。
+3. **打包工具（如 Webpack）的支持**\
+   Webpack 内置了对动态 import 的支持，通过配置也可以实现代码拆分。Webpack 会根据动态 import 自动将代码拆分成多个 chunk，并在需要时加载相应的代码文件。
