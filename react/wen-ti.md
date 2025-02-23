@@ -1251,8 +1251,8 @@ React中的Fiber架构是React核心算法的一次重大重构，旨在提高Re
 
 #### 理解Fiber架构
 
-* **Fiber是什么**：Fiber是React内部用于表示组件树的一种数据结构。每个Fiber节点代表一个React元素，包含组件的类型、状态、属性等信息，以及指向父节点、子节点和兄弟节点的指针，形成了一个链表结构，取代了之前的递归遍历方式。
-* **工作原理**：Fiber架构将渲染任务拆分成多个小任务，每个任务可以在浏览器空闲时执行。React通过维护一个Fiber树，在每次渲染时遍历这棵树，更新节点的状态。在遍历过程中，React可以根据当前帧的剩余时间决定是否继续执行下一个任务，或者暂停当前任务，将控制权交还给浏览器，确保页面的响应性。
+* **Fiber是什么**：<mark style="color:red;">Fiber是React内部用于表示组件树的一种数据结构。每个Fiber节点代表一个React元素，包含组件的类型、状态、属性等信息，以及指向父节点、子节点和兄弟节点的指针，形成了一个链表结构，取代了之前的递归遍历方式。</mark>
+* **工作原理**：模态框管理React通过维护一个Fiber树，在每次渲染时遍历这棵树，更新节点的状态。在遍历过程中，React可以根据当前帧的剩余时间决定是否继续执行下一个任务，或者暂停当前任务，将控制权交还给浏览器，确保页面的响应性。
 
 #### 解决的问题
 
@@ -1760,33 +1760,7 @@ export default MouseTracker;
 
 以下是更多关于Render Props模式的示例，展示了它在不同场景下的应用：
 
-#### 示例 5: 权限控制
-
-在需要基于用户权限控制UI展示的应用中，可以使用Render Props来封装权限检查逻辑。
-
-```javascript
-const PermissionChecker = ({ permission, children }) => {
-  const hasPermission = checkPermission(permission); // 假设有一个函数用于检查权限
-
-  return children({ hasPermission });
-};
-
-function App() {
-  return (
-    <PermissionChecker permission="admin">
-      {({ hasPermission }) => (
-        hasPermission? (
-          <button>管理设置</button>
-        ) : (
-          <p>您没有权限访问此内容。</p>
-        )
-      )}
-    </PermissionChecker>
-  );
-}
-```
-
-#### 示例 6: 无限滚动加载
+#### 6: 无限滚动加载
 
 创建一个可复用的无限滚动组件，当用户滚动到列表底部时加载更多数据。
 
