@@ -1014,10 +1014,10 @@ const setCount = state.setValue;
 
 ```
 changeText() {
-this.setState({
-message: "你好啊"
-})
-console.log(this.state.message); // Hello World
+    this.setState({
+        message: "你好啊"
+    })
+    console.log(this.state.message); // Hello World
 }
 ```
 
@@ -1025,12 +1025,19 @@ console.log(this.state.message); // Hello World
 
 ```
 changeText() {
-this.setState({
-message: "你好啊"
-}, () => {
-console.log(this.state.message); // 你好啊
-});
+    this.setState({
+        message: "你好啊"
+    }, () => {
+        console.log(this.state.message); // 你好啊
+    });
 }
+
+ this.setState((prevState, props) => {
+    return { count: prevState.count + 1 };
+}, () => {
+    // 回调函数，在状态更新完成后执行
+    console.log('State updated using function, new count:', this.state.count);
+});
 ```
 
 合并状态更新：如果在同一个事件循环中多次调用 setState 来更新相同的状态属性，React 会将这些更新合并，并只应用最后一次更新 1。
