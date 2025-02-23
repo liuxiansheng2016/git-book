@@ -1534,7 +1534,7 @@ const MyComponent = React.memo(({ name }) => {
 
 默认情况下，`React.memo` **浅比较 `props`**，如果 `props` 是对象或数组，可能会误判它们变化，导致不必要的渲染。
 
-**自定义 `props` 对比函数**
+<mark style="color:red;">**自定义**</mark><mark style="color:red;">**&#x20;**</mark><mark style="color:red;">**`props`**</mark><mark style="color:red;">**&#x20;**</mark><mark style="color:red;">**对比函数**</mark>
 
 ```jsx
 const MyComponent = React.memo(
