@@ -972,7 +972,18 @@ setItems([...items, 4]); // 创建新数组实例，确保引用变化
 
 ### `setState` 的异步行为
 
-大多数情况下，`setState` 是异步的。这是因为 React 可能会批量处理多个 `setState` 调用来优化性能。例如，<mark style="color:red;">在事件处理函数和生命周期方法（如</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidMount`</mark> <mark style="color:red;"></mark><mark style="color:red;">或</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidUpdate`</mark><mark style="color:red;">）中调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`setState`</mark> <mark style="color:red;"></mark><mark style="color:red;">时，它通常是异步的</mark>。
+<mark style="color:red;">18之前</mark>，`setState` 是异步的。这是因为 React 可能会批量处理多个 `setState` 调用来优化性能。例如，<mark style="color:red;">在事件处理函数和生命周期方法（如</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidMount`</mark> <mark style="color:red;"></mark><mark style="color:red;">或</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidUpdate`</mark><mark style="color:red;">）中调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`setState`</mark> <mark style="color:red;"></mark><mark style="color:red;">时，它通常是异步的</mark>。
+
+<mark style="color:red;">React 18 及后续版本中</mark>
+
+1. **默认情况下的异步更新**：当在事件处理器（如点击、输入等）或 React 生命周期方法中调用 `setState` 时，默认情况下它是异步的
+2. **强制同步更新**：如果你确实需要立即执行状态更新并重新渲染组件，可以使用 <mark style="color:red;">`ReactDOM.flushSync()`</mark> 方法包裹你的 `setState` 调用。这会强制 React 同步地应用状态更改，并且会导致相关的组件立刻重新渲染
+3.  **批处理机制**：React 18 引入了自动批处理功能，即使是在非 React 控制的环境中（例如 `setTimeout` 或者网络请求回调），状态更新也会被自动批处理
+
+    17。这意味着即使你在这些地方调用了多次 `setState`，它们也会被合并成一个更新批次，从而减少不必要的渲染。
+4.  **并发模式下的更新优先级**：在并发模式下，React 根据任务的重要性和紧急程度决定何时处理状态更新。因此，在这种情况下，`setState` 的表现可能会更加复杂，它可能不会严格按照顺序执行
+
+
 
 ### `setState写法`
 
@@ -1069,6 +1080,20 @@ return {count: prevState.count + 1};
 ```
 
 通过这种方式，你可以确保每次更新都是基于最新的状态进行的，从而避免了由于状态合并导致的问题。此外，这种做法也支持 React 的批处理机制，有助于提高性能并减少不必要的渲染次数。
+
+### **ReactDOM.flushSync()**
+
+`ReactDOM.flushSync()` 是 React 中用于处理 `setState` 异步更新行为的一个函数，它可以强制 React 同步更新状态并立即重新渲染组件。以下从基本概念、使用场景、使用方法、注意事项等方面详细介绍。
+
+#### 基本概念
+
+\
+在 React 里，`setState` 默认是异步更新的，这是为了提高性能，React 会对多次 `setState` 调用进行批量处理，合并成一次更新，减少不必要的渲染。但在某些情况下，我们可能需要立即更新状态并获取最新的 DOM 信息，这时就可以使用 `ReactDOM.flushSync()`。
+
+#### 使用场景
+
+* **需要同步获取最新 DOM 信息**：当你在更新状态后，需要立即访问更新后的 DOM 元素，比如获取元素的尺寸、位置等信息。
+* **确保状态更新和副作用操作同步执行**：在某些逻辑中，状态更新后需要立即执行一些依赖于最新状态的副作用操作，使用 `ReactDOM.flushSync()` 可以保证这些操作按顺序同步执行。
 
 ### 组件间通信
 
