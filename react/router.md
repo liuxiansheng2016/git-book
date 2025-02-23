@@ -302,7 +302,7 @@ NavLink 是基于 Link 构建的一个更高级别的组件，它不仅提供了
 
 ### `Outlet`
 
-&#x20;是 React Router v6 中引入的一个重要组件，用于实现嵌套路由的渲染。比如一个页面有侧边栏导航，点击不同的菜单项会在主内容区域显示不同的子页面。`Outlet` 就是为了处理这种嵌套路由而设计的，它相<mark style="color:red;">当于一个占位符，用于渲染当前路由匹配的子路由组件。</mark>
+&#x20;是 React Router v6 中引入的一个重要组件，用于实现嵌套路由的渲染。比如一个页面有侧边栏导航，点击不同的菜单项会在主内容区域显示不同的子页面。`Outlet` 就是为了处理这种嵌套路由而设计的，它相<mark style="color:red;">当于一个占位符，用于渲染当前路由匹配的子路由组件。可以进一步嵌套路由，</mark>使用多个 `Outlet` 来实现更复杂的布局。
 
 ```
 import React from 'react';
@@ -339,3 +339,28 @@ const App = () => {
 
 export default App;
 ```
+
+````
+```javascript
+ <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <LayoutComponent
+                  onLogout={handleLogout}
+                  isDarkMode={isDarkMode}
+                  onThemeChange={handleThemeChange}
+                >
+                  <Outlet />
+                </LayoutComponent>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          >
+            <Route path="dashboard" element={<DashboardComponent />} />
+            <Route path="settings" element={<Settings />} />
+            <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
+```
+````
