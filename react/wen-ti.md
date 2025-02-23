@@ -23,6 +23,10 @@ React 通过\*\*虚拟 DOM（Virtual DOM）\*\*减少对真实 DOM 的直接操�
 
 另外，React 通过 **Fiber 架构** 进一步优化了这个过程，让 UI 更新更加流畅，避免大规模的 UI 阻塞。
 
+### 浅比较
+
+对于基本数据类型（如 `number`、`string`、`boolean` 等），浅比较直接比较它们的值；对于引用数据类型（如 `object`、`array` 等），浅比较比较的是它们的引用地址，而不是对象或数组的内容。
+
 ### 在 React 中如何使用 innerHTML?
 
 `dangerouslySetInnerHTML` 属性是 React 用来替代在浏览器 DOM 中使用 `innerHTML`。与 `innerHTML` 一样，考虑到跨站脚本攻击（XSS），使用此属性也是有风险的。使用时，你只需传递以 `__html` 作为键，而 HTML 文本作为对应值的对象。
