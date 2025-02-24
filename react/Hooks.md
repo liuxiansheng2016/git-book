@@ -483,7 +483,7 @@ const refContainer = useRef(initialValue);
 
 <mark style="color:red;">函数组件没有实例</mark>，不能像类组件那样通过实例来存储数据，`useRef` 可以在函数组件的多次渲染之间保存值，并且不会因为组件重新渲染而重置。
 
-直接修改 `useRef` 的 `.current` 属性不会触发组件重新渲染。
+<mark style="color:red;">直接修改</mark> <mark style="color:red;"></mark><mark style="color:red;">`useRef`</mark> <mark style="color:red;"></mark><mark style="color:red;">的</mark> <mark style="color:red;"></mark><mark style="color:red;">`.current`</mark> <mark style="color:red;"></mark><mark style="color:red;">属性不会触发组件重新渲染。可以避免不必要的重新渲染</mark>
 
 #### &#x20;`useRef` 保存非状态值的例子
 
@@ -492,8 +492,6 @@ const refContainer = useRef(initialValue);
 * **存储表单输入值**（适用于不想因输入变更触发重新渲染的场景）。
 * **存储定时器 ID**，避免因组件重新渲染导致定时器被重置。
 * **存储前一次的 prop 或 state**，用于在 `useEffect` 中对比数据变化。
-
-
 
 ### **useTransition**
 

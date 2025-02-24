@@ -138,6 +138,11 @@ Const SomeComponnet = React.lazy(() => import(‘./SomeCoponment’))
 
 <mark style="color:red;">React 提供的一个 API，用于创建 refs，以便你可以直接访问 DOM 元素或者 React 组件实例</mark>。通常，你可以在组件的构造函数中使用 React.createRef() 来创建一个 ref，并通过 ref 属性将其附加到对应的元素或组件上。
 
+**特点**
+
+* **单一实例**：`createRef` 在组件实例化时创建一个新的 ref 对象，并且在组件的整个生命周期内保持不变。
+* **主要用于类组件**：因为它是为类组件设计的，所以在函数组件中通常不使用它。
+
 示例代码如下：
 
 <pre><code>class MyComponent extends React.Component {
@@ -533,14 +538,7 @@ export default App;
 * **在组件的整个生命周期内保持不变**。即使组件重新渲染，`useRef` 仍然会保持相同的对象，不会被重置。
 * **配合 `forwardRef` 让父组件获取子组件的 DOM 元素**，方便操作子组件的输入框、按钮等。
 
-### `createRef`
 
-`createRef` 是一个用于类组件的方法，<mark style="color:red;">用于创建 refs,  在类组件中需要访问 DOM 节点或子组件实例时</mark>
-
-**特点**
-
-* **单一实例**：`createRef` 在组件实例化时创建一个新的 ref 对象，并且在组件的整个生命周期内保持不变。
-* **主要用于类组件**：因为它是为类组件设计的，所以在函数组件中通常不使用它。
 
 ### React 事件传参数
 
