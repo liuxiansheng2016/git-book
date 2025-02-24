@@ -507,6 +507,45 @@ export default App;
 ```
 ````
 
+### 如何在 useEffect 里正确管理异步操作，防止内存泄漏？
+
+在 `useEffect` 中正确管理异步操作，可以通过使用 `useEffect` 的清理函数来防止内存泄漏。
+
+在这个示例中，通过设置 `isMounted` 标志位，可以确保只有在组件挂载时更新状态，防止组件卸载后进行状态更新导致的内存泄漏。
+
+```
+const MyComponent = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://api.example.com/data');
+        const result = await response.json();
+        if (isMounted) {
+          setData(result);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error(error);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  return <div>{data ? JSON.stringify(data) : 'Loading...'}</div>;
+};
+
+```
+
 ### `useMemo` 和 `useCallback` 有什么区别
 
 `useMemo` 和 `useCallback` 都是**用于性能优化的 Hooks**，但它们的作用不同：
@@ -740,11 +779,19 @@ react 事件不能采用 return false 的方式来阻止浏览器的默认行为
 * 使用 React.PureComponent React 提供了一个辅助对象来实现浅比较(shallowCompare)这种模式 - 继承自 React.PureComponent。当组件更新时，如果组件的 props 和 state 都没发生改变，render 方法就不会触发，省去 Virtual DOM 的生成和比对过程，达到提升性能的目的。
 * immutable.js 不可突变的数据结构
 
-Immutable Data 就是一旦创建，就不能再被更改的数据。对 Immutable 对象的任何修改或添加删除操作都会返回一个新的 Immutable 对象。Immutable 实现的原理是 Persistent Data Structure（持久化数据结构），也就是使用旧数据创建新数据时，要保证旧数据同时可用且不变
+<mark style="color:red;">Immutable Data 就是一旦创建，就不能再被更改的数据。对 Immutable 对象的任何修改或添加删除操作都会返回一个新的 Immutable 对象</mark>。Immutable 实现的原理是 Persistent Data Structure（持久化数据结构），也就是使用旧数据创建新数据时，要保证旧数据同时可用且不变
 
 #### Immutable 的好处
 
-**可预测性**：由于不可变对象不会改变，因此它们的行为更加可预测。 **易于调试**：状态不变意味着更容易追踪 bug，因为你可以确定某个状态在某个时间点的值。 **性能优化**：React 利用浅比较（shallow comparison）来决定是否重新渲染组件。不可变数据结构可以提高这种优化的有效性。 **并发安全**：不可变数据结构在多线程环境下更容易处理，因为不存在数据竞争（race conditions）的问题。 **易于理解**：不可变数据使得代码更容易理解和维护 最常用的库之一是 Immutable.js，它提供了一系列不可变的数据结构，如 Map, List, Set 等。
+**可预测性**：由于不可变对象不会改变，因此它们的行为更加可预测。&#x20;
+
+**易于调试**：状态不变意味着更容易追踪 bug，因为你可以确定某个状态在某个时间点的值。
+
+&#x20;<mark style="color:red;">**性能优化**</mark><mark style="color:red;">：React 利用浅比较（shallow comparison）来决定是否重新渲染组件。不可变数据结构可以提高这种优化的有效性。</mark>
+
+&#x20;**并发安全**：不可变数据结构在多线程环境下更容易处理，因为不存在数据竞争（race conditions）的问题。&#x20;
+
+**易于理解**：不可变数据使得代码更容易理解和维护 最常用的库之一是 Immutable.js，它提供了一系列不可变的数据结构，如 Map, List, Set 等。
 
 **使用 Redux 与 Immutable 数据**
 
@@ -1206,6 +1253,16 @@ Context 适合小规模或低频率更新的全局状态。如果频繁更新，
 ### React 中如何避免因 Context 更新导致的性能问题
 
 * #### 使用 `useMemo` 缓存 Context 值
+
+```
+const CountProvider = ({ children }) => {
+const [count, setCount] = useState(0);
+
+const value = useMemo(() => ({ count, setCount }), [count]);
+
+return <CountContext.Provider value={value}>{children}</CountContext.Provider>;
+```
+
 * **使用 `React.memo`**：对消费 Context 的组件进行优化，防止不必要的重新渲染。
 
 ```

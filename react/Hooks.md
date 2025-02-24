@@ -158,13 +158,13 @@ function Counter() {
 }
 ```
 
-#### UseEffect
+### UseEffect
 
 在组件执行过程中执行数据获取，订阅或者手动修改 DOM
 
 useEffect 就是一个 Effect hook,和 class 组件中 conponnetDidMount,DidUpdate 和 willUnmout 具有相同的用途，只是合成了一个 API
 
-#### UseContext
+### UseContext
 
 **用途**： useContext 允许你在函数组件中访问 React Context 的值。Context 提供了一种无需通过 props 层层传递就能共享数据的方式，特别适用于跨层级传递数据。
 
@@ -556,7 +556,16 @@ const refContainer = useRef(initialValue);
 
 ### **useTransition**
 
-使用 `useTransition` 可以帮助你在状态更新和UI渲染之间创建更流畅的用户体验。当你有一个耗时的状态更新操作时，你可以将其标记为过渡，这样用户界面就不会被阻塞，同时可以显示一个加载指示器，直到过渡完成并准备好进行最终的UI更新。
+`useTransition` 是 React 18 引入的一个钩子，<mark style="color:red;">用于处理用户界面中的低优先级更新</mark>。它有助于保持用户界面响应迅速，同时处理那些并不紧急但仍需要进行的状态更新。`useTransition` 的 <mark style="color:red;">`startTransition`</mark> <mark style="color:red;"></mark><mark style="color:red;">方法允许你将某些状态更新标记为</mark><mark style="color:red;">**非紧急**</mark>，从而让 React 可以在空闲时进行这些更新，而不会阻塞高优先级的交互。
+
+`useTransition` 的核心原理在于 React 18 引入的**并发模式**。并发模式允许 React 更好地管理多个状态更新的优先级，以便提供更流畅的用户体验。
+
+1. **优先级调度**：
+   * `startTransition` 方法将包裹在其内的状态更新标记为低优先级。这样，React 可以优先处理那些更重要的用户交互。
+2. **任务分配**：
+   * 通过 `useTransition` 和 `startTransition`，React 可以更智能地分配任务，使得高优先级的任务不会被低优先级的任务阻塞，从而提高整体的响应速度。
+3. **无缝体验**：
+   * 标记为低优先级的更新将在高优先级任务处理完毕后进行。用户在进行输入等交互时，不会感觉到延迟或卡顿，即使后台有耗时的操作在进行。
 
 #### 使用方法
 
@@ -668,5 +677,46 @@ function DesignButton() {
 }
 ```
 
-####
+### 如何自定义 Hooks
 
+\
+自定义 Hooks 是 React 中一种复用状态逻辑的方式，它本质上是一个 JavaScript 函数，函数名以 `use` 开头。以下是创建自定义 Hooks 的一般步骤和示例：
+
+**步骤**
+
+1. **创建函数**：创建一个以 `use` 开头的函数，这是 React 约定的命名规范，方便 React 识别这是一个 Hook。
+2. **使用其他 Hooks**：在自定义 Hook 内部可以使用 React 内置的 Hooks（如 `useState`、`useEffect` 等）来管理状态和副作用。
+3. **返回值**：根据需求返回需要的数据或函数。
+
+**示例**
+
+```
+import { useState, useEffect } from 'react';
+
+const useFetchData = (url) => {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const result = await response.json();
+                setData(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [url]);
+
+    return { data, loading, error };
+};
+```
