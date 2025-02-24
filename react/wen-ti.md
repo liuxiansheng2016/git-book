@@ -436,6 +436,10 @@ React 在检测依赖变化时，`useEffect` 依赖项会使用**浅比较（sha
 2. <mark style="color:red;">依赖项更新时执行</mark>
 3. **空依赖项数组**：当提供一个空的依赖项数组 `[]` 时，`useEffect` 将只在组件首次渲染执行
 
+**无限循环的关键在于** `useEffect` **的依赖项：**
+
+* **缺少依赖项**：<mark style="color:orange;">如果</mark> <mark style="color:orange;"></mark><mark style="color:orange;">`useEffect`</mark> <mark style="color:orange;"></mark><mark style="color:orange;">没有依赖项数组或依赖项数组中缺少依赖的状态，每次渲染都会重新运行</mark> <mark style="color:orange;"></mark><mark style="color:orange;">`useEffect`</mark><mark style="color:orange;">，从而导致无限循环。</mark>
+
 #### 清理函数作用
 
 1. **防止内存泄漏**：当组件卸载时，清理函数可以取消不再需要的订阅、定时器或网络请求，从而释放资源，避免不必要的内存占用。
@@ -993,11 +997,38 @@ const [state, setState] = useState(complexCalculation());
 const [state, setState] = useState(() => 
 ```
 
-###
+### 在 useState 里，如果 state 是对象或数组，如何正确更新它以避免不可变性问题？
+
+<mark style="color:red;">**不可变性**</mark><mark style="color:red;">（Immutability）原则是状态管理的核心之一。这意味着你在更新状态时，不能直接修改原始状态对象或数组，而是需要创建一个新的状态对象或数组来替换旧的</mark>
+
+1. **更新状态对象：**
+
+假设状态是一个对象，可以使用对象展开运算符（...）来创建一个新的对象，并保留原始对象的属性：
+
+```
+const [state, setState] = useState({ name: 'Alice', age: 25 });
+
+// 正确的更新方法
+setState(prevState => ({
+  ...prevState,
+  age: 26
+```
+
+2. **更新状态数组：**
+
+假设状态是一个数组，可以使用数组的展开运算符（...）来创建一个新的数组，并在需要的位置插入或删除元素：
+
+```
+const [state, setState] = useState([1, 2, 3]);
+
+// 正确的更新方法 - 添加元素
+setState(prevState => [...prevState, 4]);
+
+// 正确的更新方法 - 删除元素
+setState(prevState => prevState.filter(item => item !== 2));
+```
 
 ### React 为什么不要直接改 state
-
-**不可变性**（Immutability）原则是状态管理的核心之一。这意味着你在更新状态时，不能直接修改原始状态对象或数组，而是需要创建一个新的状态对象或数组来替换旧的
 
 #### **1. React 的状态更新机制**
 
@@ -1005,12 +1036,16 @@ React 依赖于状态的变化来决定组件何时需要重新渲染。具体�
 
 * **引用类型的比较：** 对于对象和数组等引用类型，React 只会比较它们的内存地址（引用），而不是深度比较内部的值。
 
-**直接修改原始状态对象或数组会导致以下问题：**
+<mark style="color:red;">**直接修改原始状态对象或数组会导致以下问题：**</mark>
 
-* **无法检测到变化：** 因为引用未变，React 无法察觉到状态的更新。
-* **潜在的副作用：** 其他依赖于原始状态的部分可能会受到影响，导致不可预测的行为。
+* <mark style="color:red;">**无法检测到变化：**</mark> <mark style="color:red;"></mark><mark style="color:red;">因为引用未变，React 无法察觉到状态的更新。</mark>
+* <mark style="color:red;">**潜在的副作用：**</mark> <mark style="color:red;"></mark><mark style="color:red;">其他依赖于原始状态的部分可能会受到影响，导致不可预测的行为</mark>。
 
 如果状态的引用没有变化，React 会认为状态没有变化，从而**不会触发重新渲染**。
+
+`setState` **会触发 React 的调度机制**，确保组件在状态更新后重新渲染。同时，React 可能会 **批量更新** `setState` 调用，以优化性能
+
+如果 <mark style="color:red;">useState 在条件语句或循环中使用，钩子调用的顺序可能会发生变化，导致 React 无法正确追踪状态变化，从而引发错误。</mark>
 
 ```
 const [items, setItems] = useState([1, 2, 3]);
@@ -1031,16 +1066,12 @@ setItems([...items, 4]); // 创建新数组实例，确保引用变化
 3.  **批处理机制**：React 18 引入了自动批处理功能，即使是在非 React 控制的环境中（例如 `setTimeout` 或者网络请求回调），状态更新也会被自动批处理
 
     17。这意味着即使你在这些地方调用了多次 `setState`，它们也会被合并成一个更新批次，从而减少不必要的渲染。
-4.  **并发模式下的更新优先级**：在并发模式下，React 根据任务的重要性和紧急程度决定何时处理状态更新。因此，在这种情况下，`setState` 的表现可能会更加复杂，它可能不会严格按照顺序执行
-
-
+4. **并发模式下的更新优先级**：在并发模式下，React 根据任务的重要性和紧急程度决定何时处理状态更新。因此，在这种情况下，`setState` 的表现可能会更加复杂，它可能不会严格按照顺序执行
 
 ### `setState写法`
 
 * **`setCount(prevCount => prevCount + 1)`**：适用于状态更新依赖于前一个状态值的情况，特别是在批量更新或者异步更新的场景中，能确保状态更新的准确性。
 * **`setCount(count + 1)`**：适用于状态更新不依赖于前一个状态值，或者可以确定在更新状态时 `count` 是最新值的情况。例如，在某些简单的一次性更新场景中使用较为方便
-
-
 
 ### 为什么 useState 要使用数组而不是对象 ？
 
@@ -1053,14 +1084,6 @@ const state = useState(0);
 const count = state.value;
 const setCount = state.setValue;
 ```
-
-### 为什么 `useState` 不能直接修改状态，而需要使用 `setState` 进行更新？
-
-`useState` 不能直接修改状态的原因是 **React 需要跟踪状态的变化**，如果你直接修改 `state`，React **不会检测到变化**，组件也就不会重新渲染。
-
-而 `setState` **会触发 React 的调度机制**，确保组件在状态更新后重新渲染。同时，React 可能会 **批量更新** `setState` 调用，以优化性能
-
-如果 <mark style="color:red;">useState 在条件语句或循环中使用，钩子调用的顺序可能会发生变化，导致 React 无法正确追踪状态变化，从而引发错误。</mark>
 
 ### setState
 
