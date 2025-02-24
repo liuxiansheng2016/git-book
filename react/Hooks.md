@@ -357,6 +357,48 @@ export default Parent;
 
 在上面的例子中，handleClick 函数只会在组件首次渲染时创建一次，不会因为组件重新渲染而创建新的实例。
 
+#### 使用 `useCallback` 时，如何避免闭包陷阱（stale closure）？
+
+1\. 正确管理依赖项
+
+2.函数式更新
+
+```
+ const incrementCount = useCallback(() => {
+    setCount(prevCount => prevCount + 1); // 使用函数式更新，确保基于最新状态
+  }, []);
+```
+
+3\. 使用 `useRef` 存储最新的值
+
+如果你有需要频繁更新的值，可以使用 `useRef` 来存储最新的值，并在回调函数中引用它。这可以确保回调函数总是使用最新的值。
+
+```
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+
+const MyComponent = () => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(count);
+
+  useEffect(() => {
+    countRef.current = count; // 更新 ref 中的值
+  }, [count]);
+
+  const logCount = useCallback(() => {
+    console.log('Count:', countRef.current); // 使用 ref 中的最新值
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment Count</button>
+      <button onClick={logCount}>Log Count</button>
+    </div>
+  );
+};
+
+```
+
 ### useMemo
 
 `useMemo` 是 React 中的一个 Hook，用于优化组件性能，避免不必要的计算和渲染。它通过缓存计算结果，在依赖项未发生变化时直接返回缓存值，从而减少重复计算。
