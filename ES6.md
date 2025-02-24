@@ -529,6 +529,11 @@ promiseAll([p1, p2, p3]).then(values => {
 
 ‌
 
+### Async 和 await
+
+* `async` 函数返回一个 `Promise`。
+* `await` 表达式会使异步函数暂停执行，直到 `Promise` 解析完成。
+
 ## Generator 函数
 
 Generator 函数是一个可以暂停执行和恢复执行的函数，使用 `function*` 语法声明，内部使用 `yield` 表达式来暂停函数的执行。
