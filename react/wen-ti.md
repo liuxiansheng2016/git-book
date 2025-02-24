@@ -968,7 +968,7 @@ React context
 
 ### 为什么 `useState` 的初始值可以是一个函数？
 
-`useState` 的初始值可以直接传一个值，也可以传一个 **函数**，当传入函数时，React **只会在组件初始化时调用一次该函数**，并将返回值作为初始 state。
+`useState` 的初始值可以直接传一个值，<mark style="color:red;">也可以传一个</mark> <mark style="color:red;"></mark><mark style="color:red;">**函数**</mark><mark style="color:red;">，当传入函数时，React</mark> <mark style="color:red;"></mark><mark style="color:red;">**只会在组件初始化时调用一次该函数**</mark><mark style="color:red;">，</mark>并将返回值作为初始 state。
 
 **示例 1（直接传值）**：
 
@@ -985,15 +985,32 @@ const [count, setCount] = useState(() => {
 });
 ```
 
+```
+// 非惰性初始化，复杂计算在每次渲染时都会执行
+const [state, setState] = useState(complexCalculation());
+
+// 惰性初始化，复杂计算仅在初次渲染时执行
+const [state, setState] = useState(() => 
+```
+
+###
+
 ### React 为什么不要直接改 state
 
-#### 1. **无法触发重新渲染**
+**不可变性**（Immutability）原则是状态管理的核心之一。这意味着你在更新状态时，不能直接修改原始状态对象或数组，而是需要创建一个新的状态对象或数组来替换旧的
 
-React 的组件重新渲染机制依赖于 `state` 和 `props` 的变化。当你直接修改 `state` 而不通过 `setState`（或其对应的 Hook `useState`），React 无法检测到这些变化，因此不会触发组件的重新渲染
+#### **1. React 的状态更新机制**
 
-直接修改 `state` 可能导致状态变得难以追踪和调试。React 设计为单向数据流，即父组件通过 `props` 向子组件传递数据，而子组件通过 `setState` 更新自己的 `state`。这种设计使得应用的状态变化更加可预测
+React 依赖于状态的变化来决定组件何时需要重新渲染。具体而言，React 通过比较新旧状态的**引用**来检测变化：
 
-**新旧 state 的比较**：React 内部会进行 **浅比较**，如果 `state` 没有变化（即引用没变），组件不会重新渲染
+* **引用类型的比较：** 对于对象和数组等引用类型，React 只会比较它们的内存地址（引用），而不是深度比较内部的值。
+
+**直接修改原始状态对象或数组会导致以下问题：**
+
+* **无法检测到变化：** 因为引用未变，React 无法察觉到状态的更新。
+* **潜在的副作用：** 其他依赖于原始状态的部分可能会受到影响，导致不可预测的行为。
+
+如果状态的引用没有变化，React 会认为状态没有变化，从而**不会触发重新渲染**。
 
 ```
 const [items, setItems] = useState([1, 2, 3]);
