@@ -1023,6 +1023,8 @@ setItems([...items, 4]); // 创建新数组实例，确保引用变化
 * **`setCount(prevCount => prevCount + 1)`**：适用于状态更新依赖于前一个状态值的情况，特别是在批量更新或者异步更新的场景中，能确保状态更新的准确性。
 * **`setCount(count + 1)`**：适用于状态更新不依赖于前一个状态值，或者可以确定在更新状态时 `count` 是最新值的情况。例如，在某些简单的一次性更新场景中使用较为方便
 
+
+
 ### 为什么 useState 要使用数组而不是对象 ？
 
 useState 返回一个数组而不是对象的主要原因是，数组的解构赋值更加灵活。这样，你可以自由地命名你的状态变量和更新函数，而不是被迫使用像 this.state 和 this.setState 这样的命名。
@@ -1040,6 +1042,8 @@ const setCount = state.setValue;
 `useState` 不能直接修改状态的原因是 **React 需要跟踪状态的变化**，如果你直接修改 `state`，React **不会检测到变化**，组件也就不会重新渲染。
 
 而 `setState` **会触发 React 的调度机制**，确保组件在状态更新后重新渲染。同时，React 可能会 **批量更新** `setState` 调用，以优化性能
+
+如果 <mark style="color:red;">useState 在条件语句或循环中使用，钩子调用的顺序可能会发生变化，导致 React 无法正确追踪状态变化，从而引发错误。</mark>
 
 ### setState
 

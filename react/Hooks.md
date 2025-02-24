@@ -437,7 +437,7 @@ function ProductPage({ productId, referrer }) {
 
 const refContainer = useRef(initialValue);
 
-`UseRef` 是一个 Hook，可以在函数组件中使用。<mark style="color:red;">它不仅限于获取 DOM 节点的引用，还可以用来保存任何可变值</mark>，且在整个组件的生命周期内保持不变。
+`UseRef` 是一个 Hook，可以在函数组件中使用。<mark style="color:red;">它不仅限于获取 DOM 节点的引用，还可以用来保存任何可变值</mark>，<mark style="color:red;">且在整个组件的生命周期内保持不变</mark>。
 
 <mark style="color:red;">函数组件没有实例</mark>，不能像类组件那样通过实例来存储数据，`useRef` 可以在函数组件的多次渲染之间保存值，并且不会因为组件重新渲染而重置。
 
