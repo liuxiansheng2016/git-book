@@ -11,6 +11,12 @@ https://zh-hans.react.dev/reference/react/useCallback
 1. 复杂组件变得难以理解
 2. 难以理解的 class
 
+<mark style="color:red;">React Hooks 的状态是通过 Fiber 架构中的链表形式来管理和追踪的</mark>。React 强制 Hooks 必须在组件的顶层调用，以此确保每一次渲染过程中 Hooks 的调用顺序一致，从而能够正确地恢复和更新状态
+
+#### 保证调用顺序
+
+React 依赖于 Hooks 的调用顺序来正确地关联状态和副作用。这<mark style="color:red;">是因为 React 在组件重新渲染时，按照与上次渲染相同的顺序重新执行所有的 Hooks。如果顺序改变，React 可能会将旧的状态值分配给错误的 Hook，导致不可预测的行为。</mark>
+
 随着 React Hooks 的引入，函数组件可以拥有类似于类组件的生命周期方法。主要使用的 Hooks 包括：
 
 1. **useState()**：用于添加组件的局部状态。

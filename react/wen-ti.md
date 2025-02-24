@@ -1110,7 +1110,7 @@ setItems([...items, 4]); // 创建新数组实例，确保引用变化
 
 <mark style="color:red;">18之前</mark>，`setState` 是异步的。这是因为 React 可能会批量处理多个 `setState` 调用来优化性能。例如，<mark style="color:red;">在事件处理函数和生命周期方法（如</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidMount`</mark> <mark style="color:red;"></mark><mark style="color:red;">或</mark> <mark style="color:red;"></mark><mark style="color:red;">`componentDidUpdate`</mark><mark style="color:red;">）中调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`setState`</mark> <mark style="color:red;"></mark><mark style="color:red;">时，它通常是异步的</mark>。
 
-<mark style="color:red;">React 18 及后续版本中</mark>
+<mark style="color:red;">**React 18 及后续版本中**</mark>
 
 1. **默认情况下的异步更新**：当在事件处理器（如点击、输入等）或 React 生命周期方法中调用 `setState` 时，默认情况下它是异步的
 2. **强制同步更新**：如果你确实需要立即执行状态更新并重新渲染组件，可以使用 <mark style="color:red;">`ReactDOM.flushSync()`</mark> 方法包裹你的 `setState` 调用。这会强制 React 同步地应用状态更改，并且会导致相关的组件立刻重新渲染
@@ -1118,6 +1118,12 @@ setItems([...items, 4]); // 创建新数组实例，确保引用变化
 
     17。这意味着即使你在这些地方调用了多次 `setState`，它们也会被合并成一个更新批次，从而减少不必要的渲染。
 4. **并发模式下的更新优先级**：在并发模式下，React 根据任务的重要性和紧急程度决定何时处理状态更新。因此，在这种情况下，`setState` 的表现可能会更加复杂，它可能不会严格按照顺序执行
+
+**调度机制**：
+
+* 当你调用 `setState` 时，React 将状态更新请求放入一个队列中。
+* React 将在空闲时间段内处理这些状态更新，并进行重新渲染。
+* 这种批量更新机制可以减少不必要的渲染，提高性能
 
 ### `setState写法`
 
