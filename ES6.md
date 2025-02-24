@@ -98,6 +98,24 @@ console.log(third); // 输出: 3
 console.log(fourth); // 输出: 4
 ```
 
+#### Rest 参数（Rest Parameters）
+
+<mark style="color:red;">Rest 参数允许我们将一个不定数量的参数表示为一个数组</mark>。它通常用于函数声明中，当你不确定会传递多少个参数给函数时特别有用。Rest 参数必须是函数定义中的最后一个参数。
+
+```
+function sum(...numbers) {
+  return numbers.reduce((acc, curr) => acc + curr, 0);
+}
+
+console.log(sum(1, 2, 3)); // 输出: 6
+console.log(sum(1, 2, 3, 4, 5)); // 输出: 15
+```
+
+#### Spread 操作符（Spread Operator）
+
+\
+Spread 操作符允许你将一个可迭代对象（如数组、字符串、Set 等）展开为多个独立的元素。它可以用于函数调用、数组字面量和对象字面量等场景。
+
 ## 箭头函数
 
 箭头函数提供了一种更简洁的语法来编写函数，并且其`this`值是在定义时确定的，而不是在执行时。
@@ -339,6 +357,20 @@ map.set('name', 'Alice');
 console.log(map.get('name')); // "Alice"
 console.log(map.has('age')); // false
 ```
+
+### Weakmap
+
+只接受对象作为键名
+
+`WeakMap` 是一个键值对的集合，其中的键必须是对象，而值可以是任意类型。这些键是弱引用的，意味着如果对象没有其他引用，垃圾回收器会自动回收这些对象，即使它们作为 `WeakMap` 的键存在。
+
+### Weakset
+
+Weakset结构和set结构类似；区别在于
+
+1\.    weakset结构只能是对象。
+
+2\.    weakset中的引用都是弱引用；只要这些对象在外部消失，它在 WeakSet 里面的引用就会自动消失。(所以weakset不可以遍历)
 
 ## Promise 对象
 
