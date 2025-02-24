@@ -319,9 +319,10 @@ return (
 
 在上述的示例中，不会对 Header 和 Footer 组件运行严格模式检查。但是，ComponentOne 和 ComponentTwo 以及它们的所有后代元素都将进行检查。
 
-不安全的生命周期
+严格模式用于检测潜在问题
 
-过时 API
+1. 不安全的生命周期
+2. 过时 API
 
 React.StrictMode 会导致某些生命周期方法和副作用函数被调用两次。这是为了帮助开发者发现副作用和潜在的错误。具体来说，React.StrictMode 会在开发模式下触发以下操作两次：
 
