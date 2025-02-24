@@ -956,9 +956,9 @@ React context
 
 ### 为什么推荐使用 useReducer 而不是 useState 来管理复杂的状态逻辑？
 
-`useReducer` 更适合管理复杂的状态逻辑，特别是在状态依赖于先前的状态或者有多个状态更新逻辑时
+`useReducer` 更适合管理复杂的状态逻辑，<mark style="color:red;">特别是当状态更新逻辑涉及多个子状态或复杂的状态转换时。适合处理状态的多步更新或嵌套状态。</mark>
 
-* **`useState` 的局限性**：`useState` 通常用于管理简单状态，其更新函数（如 `setState` ）会直接替换状态值。当状态更新依赖先前状态时，`useState` 需手动处理，例如 `setCount(prevCount => prevCount + 1)` ，代码会变得繁琐且难以维护。
+* **`useState` 的局限性**：`useState` 通常用于管理简单状态(<mark style="color:red;">通常用于管理单一状态值（例如字符串、数值、布尔值）或简单的状态对象</mark>。)，其更新函数（如 `setState` ）会直接替换状态值。当状态更新依赖先前状态时，`useState` 需手动处理，例如 `setCount(prevCount => prevCount + 1)` ，代码会变得繁琐且难以维护。
 * **`useReducer` 的优势**：`useReducer` 的更新基于 `reducer` 函数。`reducer` 是纯函数，接收当前状态和一个 `action` （描述状态更新的对象，一般含 `type` 属性说明操作），并返回新状态。在状态依赖先前状态时，`reducer` 能在一个函数内清晰定义所有更新逻辑<mark style="color:red;">，比如在一个购物车应用中，添加商品到购物车（状态改变依赖当前购物车状态）、更新商品数量等操作</mark>，都能在 `reducer` 中按不同 `action.type` 来处理，使状态更新逻辑更有条理。
 
 #### 1. 状态逻辑的集中管理
@@ -968,6 +968,11 @@ React context
 #### 2. 更清晰的状态转换
 
 * `useReducer` 通过定义不同的 action 类型来描述状态如何根据特定事件而改变，这样可以更清晰地表达状态转换逻辑。相比 `useState`，它避免了在事件处理函数中直接进行状态更新，减少了代码的耦合性。
+
+**和Redux的区别**&#x20;
+
+* **useReducer** <mark style="color:red;">适合用于单个组件或局部组件树中管理较复杂的状态逻辑，无需引入额外的状态管理库</mark>。
+* **Redux** 则用于全局状态管理，特别是当多个组件需要共享状态、需要中间件支持异步操作或需要调试工具时，Redux 提供了更完善的解决方案。
 
 ### 为什么 `useState` 的初始值可以是一个函数？
 

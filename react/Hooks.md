@@ -166,7 +166,9 @@ useEffect 就是一个 Effect hook,和 class 组件中 conponnetDidMount,DidUpda
 
 #### UseContext
 
-**用途**： useContext 允许你在函数组件中访问 React Context 的值。Context 提供了一种无需通过 props 层层传递就能共享数据的方式，特别适用于跨层级传递数据。 **适用场景**： 当你需要在多个嵌套层级较深的组件之间共享数据时（例如主题、认证状态等）。 避免“prop drilling”问题，即避免必须将 props 逐层传递给子组件。 全局配置或者需要被许多组件访问的数据。 首先创建 Context:
+**用途**： useContext 允许你在函数组件中访问 React Context 的值。Context 提供了一种无需通过 props 层层传递就能共享数据的方式，特别适用于跨层级传递数据。
+
+&#x20;**适用场景**： 当你需要在多个嵌套层级较深的组件之间共享数据时（例如主题、认证状态等）。 避免“prop drilling”问题，即避免必须将 props 逐层传递给子组件。 全局配置或者需要被许多组件访问的数据。 首先创建 Context:
 
 ```
 import React from 'react';
@@ -213,12 +215,22 @@ function ThemedButton() {
 }
 ```
 
-#### UseReducer
+### UseReducer
 
 useReducer 是 React 中的一个 Hook，它为复杂的状态逻辑提供了一种更可预测和结构化的方式来管理状态。 它类似于 Redux 的工作原理，通过一个 reducer 函数来管理状态的变化。
 
+**和Redux的区别**&#x20;
+
 * **useReducer** <mark style="color:red;">适合用于单个组件或局部组件树中管理较复杂的状态逻辑，无需引入额外的状态管理库</mark>。
 * **Redux** 则用于全局状态管理，特别是当多个组件需要共享状态、需要中间件支持异步操作或需要调试工具时，Redux 提供了更完善的解决方案。
+
+**和`useState`的区别**&#x20;
+
+1. **`useState`** 用于简单状态的管理。通常用于管理单一状态值（例如字符串、数值、布尔值）或简单的状态对象。
+2. **UseReducer**用于管理更复杂的状态逻辑，特别是当状态更新逻辑涉及多个子状态或复杂的状态转换时。适合处理状态的多步更新或嵌套状态。
+
+**用途**：用于简单状态的管理。通常用于管理单一状态值（例如字符串、数值、布尔值）或简单的状态对象。
+
 *   **与`useState`的区别**
 
     1. **状态更新方式**
@@ -243,7 +255,7 @@ reducer：这是一个函数，接收当前的 state 和一个 action，并返�
 const [state, dispatch] = useReducer(reducer, initialState);
 ```
 
-### useReducer
+`dispatch` **异步更新**： 当你调用 `dispatch` 方法时，React 会计划一个状态更新，并在下一个渲染周期中应用该更新。这与 `useState` 的行为一致。
 
 Reducer 函数通常遵循以下模式：
 
