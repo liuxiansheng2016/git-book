@@ -319,6 +319,55 @@ export default function Counter() {
 
 **中间件支持**：Redux 支持丰富的中间件生态系统，如异步操作处理、日志记录等，而 useReducer 则没有内置这样的功能。
 
+#### useReducer 和 useContext 结合使用
+
+```
+import React, { createContext, useReducer } from 'react';
+
+const StateContext = createContext();
+const DispatchContext = createContext
+
+const StateProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <StateContext.Provider value={state}>
+      <DispatchContext.Provider value={dispatch}>
+        {children}
+      </DispatchContext.Provider>
+    </StateContext.Provider>
+  );
+};
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(
+  <StateProvider>
+    <App />
+  </StateProvider>,
+  document.getElementById('root')
+);
+
+
+import React, { useContext } from 'react';
+import { StateContext, DispatchContext } from './StateProvider';
+
+const MyComponent = () => {
+  const state = useContext(StateContext);
+  const dispatch = useContext(DispatchContext);
+
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: 'increment' })}>Increment</button>
+      <button onClick={() => dispatch({ type: 'decrement' })}>Decrement</button>
+    </div>
+  );
+};
+```
+
 ### useCallback
 
 useCallback 是 React 的一个 hook，用于优化性能。它的作用是缓存一个函数，确保在组件重新渲染时，不会创建新的函数实例。
