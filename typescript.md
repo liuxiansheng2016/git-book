@@ -6,17 +6,65 @@
 
 主要是静态类型检测，更有利于构建大型项目
 
-### 类（Class）
+### 类 <a href="#lei" id="lei"></a>
 
-\
 <mark style="color:red;">类是一种面向对象编程的概念，它是对象的蓝图，描述了对象的属性和方法</mark>。TypeScript 中的类支持传统的面向对象特性<mark style="color:red;">，如封装、继承和多态</mark>。
 
-**访问修饰符**\
-TypeScript 提供了三种访问修饰符：`public`、`private` 和 `protected`，用于控制类成员的访问权限。
+抽象类
 
-* **`public`**：默认的访问修饰符，类的成员可以在任何地方被访问。
-* <mark style="color:red;">**`private`**</mark><mark style="color:red;">：类的成员只能在类的内部被访问。</mark>
-* <mark style="color:red;">**`protected`**</mark><mark style="color:red;">：类的成员可以在类的内部以及子类中被访问。</mark>
+<pre class="language-javascript"><code class="lang-javascript">abstract class Animal { 
+    // 抽象方法 
+    abstract makeSound(): void;
+<strong>    // 非抽象方法
+</strong>    move(): void {
+        console.log('Moving...');
+    }
+}
+</code></pre>
+
+&#x20;实现抽象类
+
+```typescript
+class Dog extends Animal {
+    makeSound(): void {
+        console.log('Bark!');
+    }
+}
+
+class Cat extends Animal {
+    makeSound(): void {
+        console.log('Meow!');
+    }
+}
+
+```
+
+<mark style="color:red;">如果子类继承的是一个抽象类，子类必须实现父类里的抽象方法</mark>，不然的话不能实例化，会报错。
+
+**Public private protected修饰符**
+
+**private**：
+
+* 只能在声明它的类内部访问。
+* 不能被子类继承或访问。
+
+**protected**：
+
+* <mark style="color:red;">可以在声明它的类及其子类中访问。</mark>
+* 可以被子类继承和访问。
+
+Constructor方法，类被实例化一次调用一次
+
+包含构造函数的派生类必须调用super()，它会执行基类的构造方法和其他方法。
+
+接口声明的方法 应用的类必须调用\
+类型声明文件里面只有类型代码，没有具体的代码实现
+
+抽象类是不允许被实例化的：
+
+其次，抽象类中的抽象方法必须被子类实现
+
+“内部模块”现在称做“命名空间”。 “外部模块”现在则简称为“模块”
 
 ### 模块（Module）
 
@@ -220,65 +268,7 @@ enum Color {
 }
 ```
 
-### 类 <a href="#lei" id="lei"></a>
 
-抽象类
-
-<pre class="language-javascript"><code class="lang-javascript">abstract class Animal { 
-    // 抽象方法 
-    abstract makeSound(): void;
-<strong>    // 非抽象方法
-</strong>    move(): void {
-        console.log('Moving...');
-    }
-}
-</code></pre>
-
-&#x20;实现抽象类
-
-```typescript
-class Dog extends Animal {
-    makeSound(): void {
-        console.log('Bark!');
-    }
-}
-
-class Cat extends Animal {
-    makeSound(): void {
-        console.log('Meow!');
-    }
-}
-
-```
-
-<mark style="color:red;">如果子类继承的是一个抽象类，子类必须实现父类里的抽象方法</mark>，不然的话不能实例化，会报错。
-
-**Public private protected修饰符**
-
-**private**：
-
-* 只能在声明它的类内部访问。
-* 不能被子类继承或访问。
-
-**protected**：
-
-* <mark style="color:red;">可以在声明它的类及其子类中访问。</mark>
-* 可以被子类继承和访问。
-
-Constructor方法，类被实例化一次调用一次
-
-包含构造函数的派生类必须调用super()，它会执行基类的构造方法和其他方法。
-
-接口声明的方法 应用的类必须调用\
-类型声明文件里面只有类型代码，没有具体的代码实现
-
-Void表示没有任何返回值的函数
-
-抽象类是不允许被实例化的：
-
-其次，抽象类中的抽象方法必须被子类实现
-
-“内部模块”现在称做“命名空间”。 “外部模块”现在则简称为“模块”
 
 ### 接口 <a href="#jie-kou" id="jie-kou"></a>
 
