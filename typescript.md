@@ -6,6 +6,10 @@
 
 主要是静态类型检测，更有利于构建大型项目
 
+### 常见的 TS 基本数据类型
+
+#### boolean/number/string/null /undefined /unknown/any/void/enum/tuple
+
 ### Const <a href="#const" id="const"></a>
 
 类型检查与安全性

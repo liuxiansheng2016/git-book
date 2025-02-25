@@ -4,27 +4,7 @@
 
 ## 基础
 
-let和const,
-
-变量的解构，
-
-字符串的拓展（模板字符串），
-
-数组的拓展，
-
-字符串的拓展，
-
-&#x20;symbol类型，
-
-迭代器：array，map,set,for in ,for of”,
-
-promise,&#x20;
-
-async,&#x20;
-
-generator.
-
-
+let和const,变量的解构，字符串的拓展（模板字符串），数组的拓展，字符串的拓展，symbol类型，迭代器：array，map,set,for in ,for of”,promise, async, generator。
 
 Bable转码let 给var加\_
 
