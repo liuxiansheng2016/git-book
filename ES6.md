@@ -14,7 +14,27 @@
 
 ## 基础
 
-let和const,变量的解构，字符串的拓展（模板字符串），数组的拓展，字符串的拓展， symbol类型，迭代器：array，map,set,for in ,for of”,promise, async, generator.
+let和const,
+
+变量的解构，
+
+字符串的拓展（模板字符串），
+
+数组的拓展，
+
+字符串的拓展，
+
+&#x20;symbol类型，
+
+迭代器：array，map,set,for in ,for of”,
+
+promise,&#x20;
+
+async,&#x20;
+
+generator.
+
+
 
 Bable转码let 给var加\_
 
@@ -116,6 +136,38 @@ console.log(sum(1, 2, 3, 4, 5)); // 输出: 15
 \
 Spread 操作符允许你将一个可迭代对象（如数组、字符串、Set 等）展开为多个独立的元素。它可以用于函数调用、数组字面量和对象字面量等场景。
 
+## super
+
+<mark style="color:red;">它让子类能够方便地访问和调用父类的属性、方法和构造函数</mark>
+
+1. 在子类的构造函数里，`super` 可用于调用父类的构造函数，以完成父类属性的初始化。子类定义了构造函数时，必须调用 `super`
+
+```
+// 定义父类
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+// 定义子类
+class Dog extends Animal {
+    constructor(name, breed) {
+        // 调用父类的构造函数
+        super(name);
+        this.breed = breed;
+    }
+}
+
+// 创建 Dog 类的实例
+const myDog = new Dog('Buddy', 'Golden Retriever');
+console.log(myDog.name); // 输出: Buddy
+console.log(myDog.breed); // 输出: Golden Retriever
+```
+
+2. #### 在子类方法中调用父类方法
+3. <mark style="color:red;">在子类的构造函数中，</mark><mark style="color:red;">`super`</mark> <mark style="color:red;"></mark><mark style="color:red;">必须在使用</mark> <mark style="color:red;"></mark><mark style="color:red;">`this`</mark> <mark style="color:red;"></mark><mark style="color:red;">之前调用。这是因为在调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`super`</mark> <mark style="color:red;"></mark><mark style="color:red;">之前，</mark><mark style="color:red;">`this`</mark> <mark style="color:red;"></mark><mark style="color:red;">还未被正确初始化</mark>
+
 ## 箭头函数
 
 箭头函数提供了一种更简洁的语法来编写函数，并且其`this`值是在定义时确定的，而不是在执行时。
@@ -181,9 +233,11 @@ console.log(a[s]); // 输出: "hello"
 
 ## Reflect 和 Proxy
 
+<mark style="color:red;">`Proxy`</mark> <mark style="color:red;"></mark><mark style="color:red;">主要用于拦截和自定义对象的基本操作，而</mark> <mark style="color:red;"></mark><mark style="color:red;">`Reflect`</mark> <mark style="color:red;"></mark><mark style="color:red;">则提供了一系列与对象交互的统一方法</mark>
+
 ### Reflect 对象
 
-`Reflect` 是一个内置的对象，它提供了一系列方法，这些方法与 `Proxy` 处理器方法相对应。通过 `Reflect`，可以更方便地执行语言内部的操作，并且提供了更一致的错误处理机制。
+`Reflect` 是一个内置的对象，它提供了一系列方法，这些方法与 `Proxy` 处理器方法相对应，与 `Object` 的某些方法功能相似。通过 `Reflect`，可以更方便地执行语言内部的操作，并且提供了更一致的错误处理机制。
 
 ### 主要特点和用途
 
@@ -220,9 +274,15 @@ console.log(a[s]); // 输出: "hello"
 4. **保持和 Proxy 对象的方法一一对应**
    * `Reflect` 提供的方法与 `Proxy` 的处理器方法是一一对应的，这意味着你可以使用 `Reflect` 来简化对目标对象的操作，尤其是在编写代理逻辑时。
 
-## Proxy 对象
+### Proxy 对象
 
-`Proxy` 对象用于定义基本操作的自定义行为（如属性查找、赋值等），从而修改某些默认行为或添加额外的功能。
+`Proxy` 是 ES6 引入的一个特性，<mark style="color:red;">它用于创建一个对象的代理</mark>，<mark style="color:red;">从而可以对该对象的基本操作</mark>（如属性查找、赋值、枚举、函数调用等）<mark style="color:red;">进行拦截和自定义处理</mark>。通过 `Proxy`，可以在不修改原始对象的基础上，对对象的行为进行扩展和控制。
+
+#### **应用场景**
+
+1\. 数据验证
+
+2\. 访问控制
 
 ### 示例：结合 `Reflect` 使用 `Proxy`
 
@@ -438,7 +498,7 @@ New Promise(resolve ={
 
 这张图片展示了一段 JavaScript 代码，该代码使用了 `Promise` 对象来处理异步操作。以下是代码的详细解释：
 
-## 代码结构
+#### 代码结构
 
 1. **`Promise.resolve(promise)`**:
    * `Promise.resolve(promise)` 会将 `promise` 转换为一个 `Promise`。
@@ -450,7 +510,7 @@ New Promise(resolve ={
      * `onFulfilled` 是成功回调，当 `Promise` 成功解析时调用。
      * `onRejected` 是失败回调，当 `Promise` 被拒绝时调用。
 
-## 代码详解
+#### 代码详解
 
 ```javascript
 Promise.resolve(promise).then(
@@ -473,7 +533,7 @@ Promise.resolve(promise).then(
   * **`onRejected` 回调**:
     * `(error) => { reject(error); }`: 当 `Promise` 被拒绝时，执行这个回调函数，并通过 `reject(error)` 抛出错误。
 
-## 总结
+总结
 
 这段代码的主要目的是处理多个 `Promise` 的结果，并在所有 `Promise` 都成功解析后收集结果。具体步骤如下：
 
@@ -529,7 +589,7 @@ promiseAll([p1, p2, p3]).then(values => {
 
 ‌
 
-### Async 和 await
+## Async 和 await
 
 * `async` 函数返回一个 `Promise`。
 * `await` 表达式会使异步函数暂停执行，直到 `Promise` 解析完成。
@@ -596,8 +656,34 @@ runGenerator(fetchDataGenerator, 'https://api.example.com/data')
 
 #### 核心概念
 
-* **`Symbol.iterator`**：这是 `Iterator` 接口的默认方法名。如果一个数据结构具有这个属性，则认为它是“可遍历的”（iterable）。
-* **迭代过程**：调用 `Symbol.iterator` 方法会返回一个迭代器对象，该对象必须包含一个名为 `next` 的方法。每次调用 `next()` 方法都会返回一个 `{ value, done }` 形式的对象，其中 `value` 是当前元素的值，`done` 是一个布尔值，表示是否遍历结束。
+* <mark style="color:red;">**`Symbol.iterator`**</mark><mark style="color:red;">：这是</mark> <mark style="color:red;"></mark><mark style="color:red;">`Iterator`</mark> <mark style="color:red;"></mark><mark style="color:red;">接口的默认方法名</mark>。如果一个数据结构具有这个属性，则认为它是“可遍历的”（iterable）。
+* **迭代过程**：<mark style="color:red;">调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`Symbol.iterator`</mark> <mark style="color:red;"></mark><mark style="color:red;">方法会返回一个迭代器对象，该对象必须包含一个名为</mark> <mark style="color:red;"></mark><mark style="color:red;">`next`</mark> <mark style="color:red;"></mark><mark style="color:red;">的方法。每次调用</mark> <mark style="color:red;"></mark><mark style="color:red;">`next()`</mark> <mark style="color:red;"></mark><mark style="color:red;">方法都会返回一个</mark> <mark style="color:red;"></mark><mark style="color:red;">`{ value, done }`</mark> <mark style="color:red;"></mark><mark style="color:red;">形式的对象，</mark>其中 `value` 是当前元素的值，`done` 是一个布尔值，表示是否遍历结束。
+
+```
+const range = {
+    start: 1,
+    end: 5,
+    // 实现 Symbol.iterator 方法
+    [Symbol.iterator]() {
+        let current = this.start;
+        return {
+            // 实现 next() 方法
+            next: () => {
+                if (current <= this.end) {
+                    return { value: current++, done: false };
+                }
+                return { value: undefined, done: true };
+            }
+        };
+    }
+};
+
+// 使用 for...of 循环迭代自定义可迭代对象
+for (const num of range) {
+    console.log(num);
+}
+// 输出:1 2 3 4 5
+```
 
 #### 示例：自定义数组的 `@@iterator` 方法
 

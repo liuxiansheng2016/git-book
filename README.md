@@ -391,6 +391,8 @@ obj2.b.c = 3;
 console.log(obj1.b.c); // 输出 2，说明修改 obj2 不影响 obj1
 ```
 
+3.第三方库（如 `lodash）`
+
 #### 注意事项
 
 * **`JSON.parse(JSON.stringify())`**：该方法有一些局限性，比如不能处理函数、`undefined`、`Symbol` 等类型，并且不会复制对象的原型链。
