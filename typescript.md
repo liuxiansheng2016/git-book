@@ -6,23 +6,179 @@
 
 主要是静态类型检测，更有利于构建大型项目
 
+### 类（Class）
+
+\
+<mark style="color:red;">类是一种面向对象编程的概念，它是对象的蓝图，描述了对象的属性和方法</mark>。TypeScript 中的类支持传统的面向对象特性<mark style="color:red;">，如封装、继承和多态</mark>。
+
+**访问修饰符**\
+TypeScript 提供了三种访问修饰符：`public`、`private` 和 `protected`，用于控制类成员的访问权限。
+
+* **`public`**：默认的访问修饰符，类的成员可以在任何地方被访问。
+* <mark style="color:red;">**`private`**</mark><mark style="color:red;">：类的成员只能在类的内部被访问。</mark>
+* <mark style="color:red;">**`protected`**</mark><mark style="color:red;">：类的成员可以在类的内部以及子类中被访问。</mark>
+
+### 模块（Module）
+
+TypeScript 中的模块是<mark style="color:red;">相关变量、函数、类和接口的集合</mark>
+
+**导出和导入模块**\
+使用 `export` 关键字将模块中的变量、函数、类等导出，使用 `import` 关键字将其他模块中的内容导入\
+每个模块可以有一个默认导出，使用 `export default` 关键字。在<mark style="color:red;">导入默认导出时，可以使用任意名称。</mark>
+
+```
+export default class Person {}
+import MyPerson from './person';
+```
+
 ### 常见的 TS 基本数据类型
 
 #### boolean/number/string/null /undefined /unknown/any/void/enum/tuple
 
-### Const <a href="#const" id="const"></a>
+**`void`** 类型通常用于表示一个函数没有返回值，也能用于变量声明，<mark style="color:red;">`void`</mark> <mark style="color:red;"></mark><mark style="color:red;">类型的变量只能被赋值为</mark> <mark style="color:red;"></mark><mark style="color:red;">`undefined`</mark> （在非严格空检查模式下还能赋值为 `null` ）
 
-类型检查与安全性
+```
+// 定义一个无返回值的函数，返回值类型为 void
+function printMessage(message: string): void {
+    console.log(message);
+    // 没有显式的 return 语句，或者 return 后面不跟表达式
+    // 隐式返回 undefined
+}
 
-当使用 const 修饰变量时，编译器会执行更严格的类型检查，确保该变量在其生命周期内不会被意外修改
+// 严格空检查模式下
+let emptyValue: void = undefined;
+```
 
-#### 内联替换与优化
+**`any`** 类型的变量可以被赋予任意类型的值，而不会受到类型检查的限制。
 
-对于局部 const 变量，编译器通常不会为它们分配实际的内存空间，而是直接在编译时将它们替换为对应的值（即所谓的“常量折叠”），从而避免了运行时访问内存的操作，提高了执行速度 19。此外，由于 const 表达式的值是在编译期确定的，因此可以更容易地进行各种编译优化，如循环展开、函数内联等
+**`unknown`** 类型也表示任意类型，但它比 `any` 类型更安全。与 `any` 不同的是，在对 `unknown` 类型的值进行操作之前，需要先进行类型检查，以确保操作的安全性
 
-```javascript
-const int BUFFER_SIZE = 1024;
-char buffer[BUFFER_SIZE]; // 编译器可以直接用 1024 替换 BUFFER_SIZE
+```
+let bar: unknown = 222; // OK 
+console.log(bar.msg); // Error
+let foo: any = 123;
+console.log(foo.msg); // 符合TS的语法
+
+
+let value: unknown;
+value = 10;
+
+// 直接操作会报错
+// let result = value + 5; 
+
+// 需要先进行类型检查
+if (typeof value === 'number') {
+    let result: number = value + 5;
+    console.log(result); 
+}
+```
+
+**`never`** 类型表示永远不会出现的值的类型。通常用于以下两种情况：
+
+* 函数永远不会返回值，例如函数抛出异常或进入无限循环。
+* 类型系统中的不可能类型，例如联合类型中没有任何可能的值。
+
+```
+// 函数永远抛出异常，返回值类型为 never
+function throwError(message: string): never {
+    throw new Error(message);
+}
+
+// 函数进入无限循环，返回值类型为 never
+function infiniteLoop(): never {
+    while (true) {}
+}
+
+// 不可能类型的示例
+type NonExistentUnion = string & number; 
+// NonExistentUnion 的类型为 never，因为字符串和数字类型没有交集
+```
+
+#### `keyof` 关键字
+
+<mark style="color:red;">`keyof`</mark> <mark style="color:red;"></mark><mark style="color:red;">关键字用于获取一个类型的所有属性名组成的联合类型</mark>
+
+```
+// 定义一个接口
+interface User {
+    name: string;
+    age: number;
+    email: string;
+}
+
+// 使用 keyof 获取 User 接口的所有属性名组成的联合类型
+type UserKeys = keyof User; 
+// UserKeys 的类型为 'name' | 'age' | 'email'
+
+// 可以使用 UserKeys 作为类型注解
+function getUserProperty(user: User, key: UserKeys) {
+    return user[key];
+}
+```
+
+#### `in` 关键字
+
+\
+在 TypeScript 中，`in` 关键字主要用于映射类型和条件类型中，<mark style="color:red;">用于遍历一个类型的属性名</mark>。在映射类型中，`in` 用于遍历 `keyof` 得到的属性名联合类型，对每个属性进行操作。
+
+```
+// 定义一个接口
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+}
+
+// 使用映射类型将 Product 接口的所有属性变为可选属性
+type PartialProduct = {
+    [P in keyof Product]?: Product[P];
+};
+
+const partialProduct: PartialProduct = {
+    name: 'Smartphone'Partial
+};
+```
+
+### 类型注解与类型推断
+
+**类型注解**\
+开发者可以在代码中显式地为变量、函数参数、返回值等添加类型注解，告诉 TypeScript 编译器这些变量或值应该是什么类型。例如：
+
+```
+
+// 函数参数和返回值的类型注解
+function add(a: number, b: number): number {
+    return a + b;
+}
+在上述代码中，num 变量被显式注解为 number 类型，add 函数的参数 a 和 b 以及返回值都被注解为 number 类型。
+```
+
+**类型推断**\
+TypeScript 编译器能够根据变量的初始值、上下文等信息自动推断出变量的类型，而不需要开发者显式地添加类型注解。例如：
+
+```
+// 类型推断
+function multiply(a: number, b: number) {
+    return a * b;
+}
+// 编译器会自动推断 multiply 函数的返回值类型为 number
+```
+
+### **`readonly和`**`const` 的区别
+
+* **`const`**：主要用于声明常量变量，侧重于变量引用的不可变性。对于基本数据类型，值不能改变；对于引用类型，引用不能改变，但对象内部的属性可以改变。
+* **`readonly`**：主要用于属性，侧重于属性值的不可变性，强调属性一旦初始化就不能再被重新赋值。
+
+```
+class Car {
+    readonly brand: string;
+    constructor(brand: string) {
+        this.brand = brand;
+    }
+}
+const myCar = new Car('Toyota');
+// myCar.brand = 'Honda'; 
+// 报错：Cannot assign to 'brand' because it is a read - only property.
 ```
 
 ### 元组类型tuple <a href="#yuan-zu-lei-xing-tuple" id="yuan-zu-lei-xing-tuple"></a>
@@ -38,6 +194,8 @@ char buffer[BUFFER_SIZE]; // 编译器可以直接用 1024 替换 BUFFER_SIZE
 元组类型是一个不可变的数组，长度、类型是不可变的。
 
 ### 枚举 <a href="#mei-ju" id="mei-ju"></a>
+
+TypeScript 的枚举类型为开发者提供了一种方便的方式来管理一组相关的常量
 
 #### **数字枚举**
 
@@ -128,101 +286,168 @@ Void表示没有任何返回值的函数
 
 ### interface 和 type 的区别 <a href="#interface-he-type-de-qu-bie" id="interface-he-type-de-qu-bie"></a>
 
-1. 定义
+`interface` 和 `type` 都可用于定义类型
 
-type关键字可以定义一个集合，可以包含各种类型的属性和值，以用来描述对象、函数、联合类型、交叉类型等。
-
-interface： 它定义了一个对象的形状，描述了对象应该具有的属性及类型
+<mark style="color:red;">interface： 它定义了一个对象的形状，描述了对象应该具有的属性及类型</mark>
 
 <mark style="color:red;">Interface只能表示 object、class、function 类型。</mark>
 
-type 还可以用来表示其他的类型，比如基本数据类型、联合类型、交叉类型等
+<mark style="color:red;">type 还可以用来表示其他的类型，比如基本数据类型、联合类型、交叉类型等</mark>
 
-2. 写法
+#### 语法差异
 
-type使用等号来定义类型别名，
+* **`interface`**：使用 `interface` 关键字来定义，其语法更接近传统面向对象编程中接口的定义方式，通过声明属性和方法的签名来描述对象的形状。
 
-而interface使用花括号直接定义接口的成员。
-
-3. 声明合并
-
-type 不支持声明合并
-
-interface支持声明合并
-
-4. 继承
-
-Interface支持继承\
-type：可以通过 & 符号创建交叉类型，以组合现有的多种类型
-
-**type和interface的定义**
-
-`type A = string; // 声明了一个类型别名A，同时它的类型等价于string类型`
-
-`type StatusCode = 200 | 301 | 400 | 500 | 502;`
-
-`type PossibleDataTypes = string | number | (() => unknown);`
-
-`type Person = { name: string; age: number; sex: 0 | 1; };`
-
-`type setPoint = (x: number, y: number) => void;`
-
-`// 定义一个【Function】类型`&#x20;
-
-`interface setPoint { (x: number, y: number): void }`
-
-联合类型（ | ）和交叉类型（&）
-
-**Type 组合方式**
-
-```javascript
-type Name = {
+```typescript
+interface Person {
     name: string;
-};
-
-type Age = {
     age: number;
+    sayHello(): void;
+}
+```
+
+* **`type`**：使用 `type` 关键字定义，它的语法更加灵活，可以定义基本类型、联合类型、交叉类型、元组类型等多种类型。
+
+```typescript
+type PersonType = {
+    name: string;
+    age: number;
+    sayHello: () => void;
+};
+```
+
+#### 扩展方式
+
+* **`interface`**：可以使用 `extends` 关键字实现继承，从而扩展已有的接口。这使得代码结构更加清晰，符合面向对象编程中接口继承的概念。
+
+```typescript
+interface Animal {
+    species: string;
+}
+
+interface Dog extends Animal {
+    bark(): void;
+}
+```
+
+* **`type`**：使用交叉类型（`&`）来实现类似扩展的功能。交叉类型可以将多个类型合并成一个新的类型，包含所有类型的属性。
+
+```typescript
+type AnimalType = {
+    species: string;
 };
 
-type Person = Name & Age;
-
+type DogType = AnimalType & {
+    bark(): void;
+};
 ```
 
-Interface 多次声明来合并声明
+#### 重复定义
 
-```javascript
-interface Person{
-    name:string;
+* **`interface`**：可以对同一个 `interface` 进行多次定义，TypeScript 会自动将这些定义合并。这在扩展第三方库或者模块化开发中非常有用。
+
+```typescript
+interface User {
+    name: string;
 }
 
-interface Person{
-    age:number;
+interface User {
+    age: number;
 }
 
-// 上面的两个等价于下面这个
-interface Person{
-    name:string;
-    age:number;
-}
-
+// 合并后的 User 接口包含 name 和 age 属性
+const user: User = { name: 'John', age: 30 };
 ```
 
-Interface extend继承
+* **`type`**：不允许重复定义相同名称的 `type`，否则会导致编译错误。每个 `type` 定义必须是唯一的。
 
-```javascript
-interface Fruit {
-    name: string
+```typescript
+type Point = {
+    x: number;
+};
+
+// 报错：Duplicate identifier 'Point'.
+// type Point = {
+//     y: number;
+// };
+```
+
+#### 定义类型的范围
+
+* **`interface`**：主要用于定义对象类型、函数类型、类的实现契约等，侧重于描述对象的结构和行为。
+
+```typescript
+// 定义对象类型
+interface Config {
+    apiKey: string;
+    timeout: number;
 }
-interface Apple extends Fruit {
-    kind: string
+
+// 定义函数类型
+interface SumFunction {
+    (a: number, b: number): number;
 }
 ```
+
+* **`type`**：可以定义更广泛的类型，除了对象类型外，还可以定义基本类型、联合类型、交叉类型、元组类型、字面量类型等。
+
+```typescript
+// 定义基本类型
+type ID = number | string;
+
+// 定义联合类型
+type Result = 'success' | 'error';
+
+// 定义元组类型
+type Coordinate = [number, number];
+```
+
+#### 与类的关系
+
+* **`interface`**：可以被类实现（`implements`），用于约束类的结构，确保类包含接口中定义的所有属性和方法。
+
+```typescript
+interface Shape {
+    area(): number;
+}
+
+class Circle implements Shape {
+    constructor(private radius: number) {}
+    area() {
+        return Math.PI * this.radius * this.radius;
+    }
+}
+```
+
+* **`type`**：一般不能被类直接实现，但可以通过将类型定义转换为接口的方式间接实现。
+
+```typescript
+type ShapeType = {
+    area(): number;
+};
+
+// 不能直接使用 implements ShapeType
+// 可以通过将其转换为接口来实现
+interface ShapeInterface extends ShapeType {}
+
+class Square implements ShapeInterface {
+    constructor(private side: number) {}
+    area() {
+        return this.side * this.side;
+    }
+}
+```
+
+#### 总结
+
+* 如果需要定义对象的结构、进行接口继承和合并，或者用于类的实现契约，使用 `interface` 更为合适。
+* <mark style="color:red;">如果需要定义基本类型、联合类型、交叉类型、元组类型等复杂类型</mark>，或者在类型定义中使用类型别名，使用 `type` 会更灵活。
 
 ### 泛型 <a href="#fan-xing" id="fan-xing"></a>
 
 泛型可以理解为宽泛的类型，通常用于类和函数
 
-TypeScript 的泛型（Generics）是一种强大的工具，它允许开发者在定义函数、类或接口时使用类型参数，而不是具体的类型。
+TypeScript 的泛型（Generics）是一种强大的工具<mark style="color:red;">，它允许开发者在定义函数、类或接口时使用类型参数，而不是具体的类型。</mark>
 
 一个组件可以支持多种类型的数据,为代码添加额外的抽象层和可重用性
 
@@ -237,7 +462,7 @@ getData<number>(123456);
 
 函数声明中的 \<T>:
 
-这是泛型类型的声明部分。它告诉 TypeScript 编译器，这个函数将会使用一个名为 T 的类型参数。T 可以代表任何类型，并且这个类型将在调用函数时由调用者提供或通过上下文推断出来。
+这是泛型类型的声明部分。它告诉 TypeScript 编译器，这个函数将会使用一个名为 <mark style="color:red;">T 的类型参数</mark>。T 可以代表任何类型，并且这个类型将在调用函数时由调用者提供或通过上下文推断出来。
 
 参数列表中的 value: T:
 
@@ -246,6 +471,77 @@ getData<number>(123456);
 返回值类型 : T:
 
 最后的 T 定义了函数的返回值类型。这表明 getData 函数将返回与输入参数 value 同一类型的值。因此，如果 value 是一个数字，则返回值也将是一个数字；如果 value 是一个对象，则返回值也是一个相同类型的对象。
+
+### 使用泛型约束
+
+<mark style="color:red;">你可以使用</mark> <mark style="color:red;"></mark><mark style="color:red;">`extends`</mark> <mark style="color:red;"></mark><mark style="color:red;">关键字来定义一个泛型约束</mark>，从而限制传入的类型必须符合某个结构或接口。这不仅限于类类型，也可以是任何具有兼容结构的类型。
+
+**基本语法**
+
+```
+function getProperty<T extends object, K extends keyof T>(obj: T, key: K): T[K] {
+    return obj[key];
+}
+```
+
+当我们希望泛型类型参数具有某些属性时
+
+```
+interface HasLength {
+    length: number;
+}
+
+function logLength<T extends HasLength>(arg: T): void {
+    console.log(`The length is ${arg.length}`);
+}
+
+logLength("Hello"); // 正确，字符串有 length 属性
+logLength([1, 2, 3]); // 正确，数组有 length 属性
+// logLength(42); // 错误，数字没有 length 属性
+
+// 使用泛型约束，确保 T 是 Animal 或其子类
+function performAction<T extends Animal>(animal: T) {
+    animal.eat();
+    // 如果 T 是 Dog 类型，还可以调用 bark 方法
+    if (animal instanceof Dog) {
+        animal.bark();
+    }
+}
+```
+
+### 条件类型（Conditional Types）
+
+&#x20;JavaScript 中的三元运算符，格式为 `T extends U ? X : Y`，表示如果 `T` 是 `U` 的子类型，那么结果类型为 `X`，否则为 `Y`
+
+```
+// 定义一个条件类型，根据传入的类型判断是否为数组类型
+type IsArray<T> = T extends any[] ? true : false;
+
+// 使用 IsArray 条件类型进行类型判断
+type Result1 = IsArray<number[]>; 
+// Result1 的类型为 true
+type Result2 = IsArray<number>; 
+// Result2 的类型为 false
+```
+
+#### 结合泛型使用 条件类型经常和泛型一起使用，以实现更灵活的类型操作。
+
+```
+// 定义一个条件类型，用于提取函数的返回值类型
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// 定义一个函数
+function add(a: number, b: number): number {
+    return a + b;
+}
+
+// 使用 ReturnType 条件类型获取 add 函数的返回值类型
+type AddReturnType = ReturnType<typeof add>; 
+// AddReturnType 的类型为 number
+```
+
+\
+这里，`ReturnType<T>` 是一个条件类型，它会判断 `T` 是否为函数类型。如果是，<mark style="color:red;">使用</mark> <mark style="color:red;"></mark><mark style="color:red;">`infer`</mark> <mark style="color:red;"></mark><mark style="color:red;">关键字推断函数的返回值类型并赋值给</mark> <mark style="color:red;"></mark><mark style="color:red;">`R`</mark>，最终结果类型为 `R`；如果 `T` 不是函数类型，结果类型为 `never`。
 
 ### 类型断言 <a href="#lei-xing-duan-yan" id="lei-xing-duan-yan"></a>
 
@@ -263,6 +559,42 @@ as 语法：值 as 类型
 ```javascript
 let someValue: any = 'this is a string'
 let strLength: number = (someValue as string).length
+```
+
+### `Partial<T>`、`Required<T>`、`Readonly<T>`、`Pick<T, K>` 和 `Omit<T, K>`
+
+&#x20;是非常实用的工具类型，它们基于泛型构建，用于对已有的类型进行转换和操作
+
+```
+interface User {
+    name: string;
+    age: number;
+    email: string;
+}
+
+// 使用 Partial<User> 将 User 类型的所有属性变为可选属性
+type PartialUser = Partial<User>;
+
+const partialUser: PartialUser = {
+    // 可以只提供部分属性，甚至不提供任何属性
+    name: 'John'
+};
+
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+}
+
+// 从 Product 类型中移除 description 属性来构造新类型
+type ProductSummary = Omit<Product, 'description'>;
+
+const productSummary: ProductSummary = {
+    id: 1,
+    name: 'Smartphone',
+    price: 999
+};
 ```
 
 ### 配置tsconfig.json <a href="#pei-zhi-tsconfigjson" id="pei-zhi-tsconfigjson"></a>
