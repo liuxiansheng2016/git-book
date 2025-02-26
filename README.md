@@ -80,15 +80,86 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 
 对象之间赋值赋的是引用地址，基本类型赋值赋的是值本身。
 
-### 作用域
+## 原型prototype
 
-作用域决定了变量和函数的使用范围（可访问性（即可见性和生命周期）。JavaScript 中主要有三种作用域：
+<mark style="color:red;">每个类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
+
+prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
+
+_**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象</mark>，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
+
+<pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
+</strong><strong>f1 = new Foo();
+</strong>即f1.__proto__ === Foo.prototype。
+</code></pre>
+
+**prototype** 属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法，即f1._proto_ === Foo.prototype。
+
+<mark style="color:red;">**constructor**</mark> <mark style="color:red;"></mark><mark style="color:red;">属性的含义就是指向该对象的构造函数</mark>，所有函数（此时看成对象了）最终的构造函数都指向Function。
+
+```
+f1.constructor === Foo
+```
+
+constructor：此属性只有原型对象才有，它默认指回prototype属性所在的构造函数。
+
+原型对象本身的类型是一个Object类的对象
+
+**原型链**：基本原理就是对象的\_\_proto\_\_，当一个对象调用某个成员（属性，方法）的时候，首先先查找当前对象实例，没有再查找当前的原型对象，如果还没有，在继续向上层查找，会一直查找到Object类型，如果还没有，直接报错
+
+### In 和 hasOwnProperty
+
+in语法：检测某个对象中（包括原型对象）是否拥有某个成员 '属性或者方法名称'in 对象
+
+hasOwnProperty方法：判断一个对象中（不包括原型对象）是否拥有某个成员
+
+如果希望任何一个对象都能拥有某个方法，那么这个方法应该定义到Object类的原型中，但是这样做对团队开发会有影响。
+
+**作用域链**：一个function中使用一个变量数据，如果当前作用域没有，就会向外层作用域查找，直至查找到全局作用域，要尽量减少对外层作用域的查找，比较耗费资源，尽量用传参来代替作用域查找。
+
+**继承**：一个类（子类）从另一个类（父类）中获得属性和方法，优点就是避免重复定义同样的属性和方法。继承实现：原型链，和 （基于伪装call的继承方式）构造器
+
+**isPrototypeOf**方法：判断当前对象是否继承了某个类的原型
+
+**propertyIsEnumerable**方法：判断对象的某个成员是否允许被遍历，默认的成员都是可以被遍历的，如果不想被遍历，需要对成员单独做特殊设置。
+
+## 作用域
+
+<mark style="color:red;">作用域决定了变量和函数的使用范围（可访问性</mark>（即可见性和生命周期）。JavaScript 中主要有三种作用域：
 
 1. **全局作用域**：在任何函数之外声明的变量拥有全局作用域。这些变量可以在整个代码中被访问。
 2. **局部作用域（函数作用域）**：在函数内部声明的变量只能在该函数内部访问。每个函数创建一个新的作用域。
 3. **块级作用域**：由 `{}` 定义的语句块（如 `if` 条件、循环等）内声明的变量仅在该块内有效。ES6 引入的 `let` 和 `const` 关键字支持块级作用域。
 
 变量如果没有加var声明，即时写在function内部，也算全局变量。
+
+### 块级作用域的函数声明
+
+#### 示例代码
+
+```javascript
+if (true) {
+  a = 10;
+  console.log(a, window.a); // 10 undefined
+
+  function a() {};
+  console.log(a, window.a); // 10 10
+}
+
+if (true) {
+  console.log(a, window.a); // ƒ a(){} undefined
+
+  function a() {};
+  a = 10;
+  console.log(a, window.a); // 10 ƒ a(){}
+}
+```
+
+在块级作用域中默认声明的变量，只有代码执行到声明语句之后，才可以进行访问，否则会报错。块级作用域中默认声明的变量会被提升到全局作用域。
+
+ECMAScript的作用域只有两种：全局作用域和函数作用域。但ES6的到来，为我们提供了“块级作用域”。凡是带 `{}` 的都是块级作用域。
+
+`window.a` 只有等块级作用域中函数声明的定义的那行代码执行过之后，才会被映射到全局作用域。
 
 ### 作用域链
 
@@ -162,11 +233,23 @@ console.log(result); // 输出: This is the result
 
 ### 声明提升
 
-1. 变量提升只会提升变量名的声明，而不会提升变量的赋值初始化。
-2. 函数提升优先于变量提升，即函数提升在变量提升之上。
-3. 函数声明会将函数提升（包括声明function和赋值=），函数表达式只会将变量var提升。
+**声明提升（Hoisting）** 是 JavaScript 中的一个重要概念，<mark style="color:red;">指的是在代码执行之前，JavaScript 引擎会将所有变量和函数声明“提升”到其作用域的顶部</mark>
 
-### 示例 1
+1. <mark style="color:red;">变量提升只会提升变量名的声明，而不会提升变量的赋值初始化。</mark>
+2. 函数提升优先于变量提升，即函数提升在变量提升之上。
+3. <mark style="color:red;">函数声明会将函数提升，函数表达式只会将变量var提升。</mark>
+4. **`let` 和 `const`**：虽然 `let` 和 `const` 声明的变量也会被提升，但是在声明之前访问这些变量会导致引用错误（ReferenceError），这是因为它们存在暂时性死区（Temporal Dead Zone, TDZ），直到变量声明的实际位置
+
+```javascript
+console.log(foo); // 输出: [Function: foo]
+var foo = 1;
+function foo() {
+    console.log('I am a function');
+}
+console.log(foo); // 输出: 1
+```
+
+#### 示例 1
 
 ```javascript
 {
@@ -180,7 +263,7 @@ console.log(foo);
 * **实际输出**：实际输出是 `function foo() {}`。
 * **解释**：这是因为函数声明会被提升到其所在作用域的顶部，而变量赋值 (`foo = 1;`) 不会被提升。
 
-### 示例 2
+#### 示例 2
 
 ```javascript
 {
@@ -194,20 +277,15 @@ console.log(foo);
 * **实际输出**：输出是 `1`。
 * **解释**：在这个例子中，变量赋值 `foo = 1;` 发生在函数声明之前。由于函数声明会被提升到块级作用域的顶部，但变量赋值会覆盖函数引用，因此 `foo` 的值被设置为 `1`。
 
-## 函数提升的解释
+### 函数提升
 
 1. **函数声明的提升**：函数声明会被提升到其所在作用域的顶部。
 2. **执行顺序**：当代码执行时，它首先遇到已经被提升的函数声明。
 3. **变量赋值**：变量赋值按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
 
-#### 总结
-
-* **函数声明**：会被提升到其所在作用域的顶部。
-* **变量赋值**：按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
-
 这解释了为什么在第一个示例中，`foo` 指向函数，而在第二个示例中，`foo` 是数字 `1`。
 
-### 示例代码
+#### 示例代码
 
 ```javascript
 function fn() {
@@ -230,37 +308,11 @@ new fn.getValue(); // 2
 new fn().getValue(); // 3
 ```
 
-### 块级作用域的函数声明
 
-#### 示例代码
-
-```javascript
-if (true) {
-  a = 10;
-  console.log(a, window.a); // 10 undefined
-
-  function a() {};
-  console.log(a, window.a); // 10 10
-}
-
-if (true) {
-  console.log(a, window.a); // ƒ a(){} undefined
-
-  function a() {};
-  a = 10;
-  console.log(a, window.a); // 10 ƒ a(){}
-}
-```
-
-在块级作用域中默认声明的变量，只有代码执行到声明语句之后，才可以进行访问，否则会报错。块级作用域中默认声明的变量会被提升到全局作用域。
-
-ECMAScript的作用域只有两种：全局作用域和函数作用域。但ES6的到来，为我们提供了“块级作用域”。凡是带 `{}` 的都是块级作用域。
-
-`window.a` 只有等块级作用域中函数声明的定义的那行代码执行过之后，才会被映射到全局作用域。
 
 函数声明中，整个函数体也都会被提升，而函数表达式中只会提升名称。
 
-### This 例子
+#### This 例子
 
 #### 示例代码
 
@@ -824,88 +876,97 @@ caller是函数对象的一个属性对象，永远代表调用了当前函数�
 
 [http://www.ruanyifeng.com/blog/2009/08/learning\_javascript\_closures.html](http://www.ruanyifeng.com/blog/2009/08/learning_javascript_closures.html)
 
-**闭包用途：**
+#### 闭包的作用
 
-1\. 就是能够读取其他函数内部变量的函数。
-
-2\. 变量始终保持在内存中
-
-**缺点：**
-
-1.内存泄漏
-
-2.会在父函数外部改变内部变量的值
-
-例子
+* **延长变量的生命周期**\
+  因为内部函数持有对外部函数作用域变量的引用，即使外部函数已经返回，这些变量也不会被垃圾回收，从而持续存在于内存中。
+* **实现数据的私有化**\
+  可以将一些变量封装在外部函数作用域中，只能通过内部函数访问和修改，外部无法直接更改这些变量，起到保护数据的作用。
+* **创建高阶函数**\
+  在函数式编程中，闭包常被用来返回一个新的函数，或者将函数作为参数传递，用于灵活地组合功能。
 
 ```
-　　function f1(){
+function createCounter() {
+  let count = 0; // 外部函数的局部变量
 
-　　　　var n=999;
+  // 内部函数可以访问外部函数的变量 count
+  return function() {
+    count++;
+    console.log(`当前计数: ${count}`);
+  };
+}
 
-　　　　nAdd=function(){n+=1}
+const counterA = createCounter();
+counterA(); // 当前计数: 1
+counterA(); // 当前计数: 2
 
-　　　　function f2(){
-
-　　　　　　alert(n);
-
-　　　　}
-
-　　　　return f2;
-
-　　}
-
-　　var result=f1();
-
-　　result(); // 999
-
-　　nAdd();
-
-　　result(); // 1000
-```
-
-## 原型prototype
-
-<mark style="color:red;">每个类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
-
-prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
-
-_**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象</mark>，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
-
-<pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
-</strong><strong>f1 = new Foo();
-</strong>即f1.__proto__ === Foo.prototype。
-</code></pre>
-
-**prototype** 属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法，即f1._proto_ === Foo.prototype。
-
-**constructor** 属性的含义就是指向该对象的构造函数，所有函数（此时看成对象了）最终的构造函数都指向Function。
+const counterB = createCounter();
+counterB(); // 当前计数: 1
 
 ```
-f1.constructor === Foo
+
+上面是一个简单的闭包示例，演示如何通过闭包实现计数器，并使 `count` 变量在外部无法直接访问：
+
+#### **缺点：**
+
+* **内存占用和内存泄漏**\
+  闭包会让其捕获的外部变量在内存中一直存在，即使外部函数已经返回。如果不慎管理，可能导致内存泄漏，特别是在长生命周期或大量创建闭包时。
+* **性能开销**\
+  闭包在创建时需要维护额外的作用域链，这可能带来一定的性能开销。在高频率调用的场景下，过多的闭包可能影响性能。
+* **代码可读性和调试难度**\
+  过度使用闭包可能会使代码变得难以理解和维护。闭包中的变量共享和依赖关系有时不易追踪，调试时可能会遇到作用域混淆的问题。
+
+#### 怎么避免
+
+#### 1. 减少不必要的嵌套函数
+
+如果可能的话，尽量减少嵌套函数的使用，尤其是那些捕获外部变量的函数。这不仅可以使代码更加清晰易读，还能避免潜在的闭包相关问题。
+
+#### 2. 使用局部作用域限制变量生命周期
+
+通过缩小变量的作用范围，可以减少它们被闭包引用的机会，从而降低内存泄漏的风险。ES6 引入的 `let` 和 `const` 关键字支持块级作用域，可以帮助实现这一点。
+
+{% code overflow="wrap" %}
+```
+function doSomething() {
+    if (true) {
+        let x = 10; // 使用 let 限制 x 的作用域为 if 块内
+        console.log(x);
+    }
+    // x 在这里不可用
+}
+```
+{% endcode %}
+
+3.及时清理不再需要的引用
+
+```
+function createFunctionWithCounter() {
+    let counter = 0;
+
+    function incrementCounter() {
+        return ++counter;
+    }
+
+    // 返回的对象包含方法和一个清除引用的方法
+    return {
+        increment: incrementCounter,
+        cleanup: () => { counter = null; } // 清理引用
+    };
+}
+
+const func = createFunctionWithCounter();
+console.log(func.increment()); // 输出: 1
+func.cleanup(); // 手动清理，帮助 GC 回收资源
 ```
 
-constructor：此属性只有原型对象才有，它默认指回prototype属性所在的构造函数。
+#### 4. 使用即时函数（IIFE）来创建独立作用域
 
-原型对象本身的类型是一个Object类的对象
+即时函数表达式（IIFE）可以在不污染全局命名空间的情况下创建独立的作用域，有助于管理变量的作用范围并减少意外的闭包形成。
 
-**原型链**：基本原理就是对象的\_\_proto\_\_，当一个对象调用某个成员（属性，方法）的时候，首先先查找当前对象实例，没有再查找当前的原型对象，如果还没有，在继续向上层查找，会一直查找到Object类型，如果还没有，直接报错
-
-### In 和 hasOwnProperty
-
-in语法：检测某个对象中（包括原型对象）是否拥有某个成员 '属性或者方法名称'in 对象
-
-hasOwnProperty方法：判断一个对象中（不包括原型对象）是否拥有某个成员
-
-如果希望任何一个对象都能拥有某个方法，那么这个方法应该定义到Object类的原型中，但是这样做对团队开发会有影响。
-
-**作用域链**：一个function中使用一个变量数据，如果当前作用域没有，就会向外层作用域查找，直至查找到全局作用域，要尽量减少对外层作用域的查找，比较耗费资源，尽量用传参来代替作用域查找。
-
-**继承**：一个类（子类）从另一个类（父类）中获得属性和方法，优点就是避免重复定义同样的属性和方法。继承实现：原型链，和 （基于伪装call的继承方式）构造器
-
-**isPrototypeOf**方法：判断当前对象是否继承了某个类的原型
-
-**propertyIsEnumerable**方法：判断对象的某个成员是否允许被遍历，默认的成员都是可以被遍历的，如果不想被遍历，需要对成员单独做特殊设置。
+```
+javascript深色版本(function() {    let localVariable = 'I am scoped locally';    console.log(localVariable);})();
+```
 
 ## `call()`、`apply()` 和 `bind()` 的区别
 
