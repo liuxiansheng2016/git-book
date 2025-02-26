@@ -5,7 +5,24 @@
 ### 基本数据类型（原始数据类型）
 
 * undefined 一般表示变量已声明但未赋值，或者函数没有返回值
+
+```typescript
+function printMessage(message: string): void {
+    console.log(message);
+    // 没有 return 语句
+}
+
+const messageResult = printMessage('Hello, TypeScript!');
+console.log(messageResult); 
+// 输出: undefined
+```
+
 * null 空对象（代表空指针）
+
+```
+typeof null 返回 "object"
+```
+
 * number 数字型 例如 100 3.14
 * string 字符型（字符串）常量需要用双引号或者单引号括起 例如 "中国" 'abcd' 空字符串"" ''
 * boolean 布尔值 就两个取值 true代表真 false代表假

@@ -311,7 +311,9 @@ console.log(proxy.nonExistent); // 输出: 属性 "nonExistent" 不存在，返�
 
 ## Array 新特性
 
-### Array.of方法用于将一组值，转换为数组。
+### Array.of
+
+方法用于将一组值，转换为数组。
 
 console.log(Array.of(1, 2, 3)); // \[1, 2, 3]
 
@@ -402,7 +404,7 @@ console.log(map.has('age')); // false
 
 只接受对象作为键名
 
-`WeakMap` 是一个键值对的集合，其中的键必须是对象，而值可以是任意类型。这些键是弱引用的，意味着如果对象没有其他引用，垃圾回收器会自动回收这些对象，即使它们作为 `WeakMap` 的键存在。
+`WeakMap` 是一个键值对的集合，其中的键必须是对象，而值可以是任意类型。这些键是弱引用的，<mark style="color:red;">意味着如果对象没有其他引用，垃圾回收器会自动回收这些对象，即使它们作为</mark> <mark style="color:red;"></mark><mark style="color:red;">`WeakMap`</mark> <mark style="color:red;"></mark><mark style="color:red;">的键存在</mark>。
 
 ### Weakset
 
@@ -455,7 +457,9 @@ resolve 只是改变了 Promise 的状态，并不会中断或提前结束执行
 
 ‌- 无法取消‌：Promise对象在创建后会立即执行，并且无法中途取消。这意味着如果有一个长时间运行的异步操作，我们无法在需要时停止它‌
 
-‌- 无法得知当前状态‌：Promise对象有三种状态：pending(进行中)、fulfilled(成功)和rejected(失败)。然而，一旦Promise的状态从pending变为fulfilled或rejected，我们就无法再获取到其当前的状态或进度。这意味着我们无法得知异步操作何时完成，或者已经完成了多少 ‌ -‌ 错误处理不够灵活‌：如果不设置回调函数，Promise内部抛出的错误不会反应到外部。如果忘记添加catch方法，Promise内部的错误可能会被忽略，这可能导致难以调试的问题
+‌- 无法得知当前状态‌：Promise对象有三种状态：pending(进行中)、fulfilled(成功)和rejected(失败)。然而，一旦Promise的状态从pending变为fulfilled或rejected，我们就无法再获取到其当前的状态或进度。这意味着我们无法得知异步操作何时完成，或者已经完成了多少 ‌&#x20;
+
+-‌ 错误处理不够灵活‌：如果不设置回调函数，Promise内部抛出的错误不会反应到外部。如果忘记添加catch方法，Promise内部的错误可能会被忽略，这可能导致难以调试的问题
 
 ### Promise.race()：
 
