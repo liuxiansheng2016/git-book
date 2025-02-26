@@ -712,7 +712,9 @@ https://juejin.cn/post/6877507011769008135
 
 ### &#x20;运营商劫持
 
-### JSON.stringify [https://zhuanlan.zhihu.com/p/478226524?utm\_id=0](https://zhuanlan.zhihu.com/p/478226524?utm_id=0)
+### JSON.stringify
+
+&#x20;[https://zhuanlan.zhihu.com/p/478226524?utm\_id=0](https://zhuanlan.zhihu.com/p/478226524?utm_id=0)
 
 ### 网页扫码登录的原理
 
@@ -1907,6 +1909,14 @@ Browser Object Model
 * Screen
 * Cookie
 * setTimeout
+
+### 如何避免内存泄漏？
+
+* **严格声明变量**：始终使用 `let`、`const` 或 `var` 声明变量，避免无意中创建全局变量。这个全局对象通常是 `window`
+* **及时清理定时器和回调**：在组件卸载或任务完成后，记得调用 `clearInterval`、`clearTimeout` 等清理定时器。
+* **注意闭包的使用**：避免在闭包中引用过多不再需要的数据；在不再需要时，解除引用。
+* **管理 DOM 引用**：在移除 DOM 元素前，移除所有与之关联的事件监听器或回调引用。
+* **合理设计缓存策略**：使用缓存时，设置合理的失效策略或定期清理缓存中的无用数
 
 ### 实现动态表单
 
