@@ -80,16 +80,13 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 
 对象之间赋值赋的是引用地址，基本类型赋值赋的是值本身。
 
-## 变量的作用域：变量的使用范围
+### 作用域
 
-[https://segmentfault.com/a/1190000014741472#articleHeader6](https://segmentfault.com/a/1190000014741472#articleHeader6)
+作用域决定了变量和函数的使用范围（可访问性（即可见性和生命周期）。JavaScript 中主要有三种作用域：
 
-分为两种作用域：
-
-* 全局变量：属于window对象（全局对象，是作用域中最大的对象），在整个js程序中都可以使用，声明在function的外部，尽可能少用全局变量，会造成全局污染。
-* 局部变量：属于某个function范围，仅限于在function内部使用
-
-JS中没有块级作用域这一说，最小的作用域就是一个function，声明在function里面的变量包括参数都是属于局部变量。
+1. **全局作用域**：在任何函数之外声明的变量拥有全局作用域。这些变量可以在整个代码中被访问。
+2. **局部作用域（函数作用域）**：在函数内部声明的变量只能在该函数内部访问。每个函数创建一个新的作用域。
+3. **块级作用域**：由 `{}` 定义的语句块（如 `if` 条件、循环等）内声明的变量仅在该块内有效。ES6 引入的 `let` 和 `const` 关键字支持块级作用域。
 
 变量如果没有加var声明，即时写在function内部，也算全局变量。
 
@@ -100,6 +97,189 @@ JS中没有块级作用域这一说，最小的作用域就是一个function，�
 ### 生命周期
 
 变量出现在内存开始，到从内存中销毁为止，中间的过程，就是一个变量的生命周期，一个局部变量的生命周期从函数调用开始，到函数执行完毕，全局变量的生命周期是整个js程序结束。
+
+## 避免全局变量
+
+* 立即执行函数
+* 声明命名空间
+* 模块化
+
+## 立即执行函数表达式（IIFE）
+
+### 错误示例
+
+```javascript
+function (){ /* code */ }() // 错误
+```
+
+在JavaScript中，遇到`function`关键字时，默认会将其视为函数声明。由于函数声明需要一个名称，并且不能直接跟一对括号来立即调用它，因此上述代码会导致语法错误。
+
+即使加上了函数名`foo`，这个例子也会出错。这里的括号`()`被解释为分组操作符而不是函数调用的一部分，因为JavaScript期望一个函数声明或表达式而非这种形式。正确的形式应为：
+
+```javascript
+function foo { /* code */ }
+
+() // 错误
+```
+
+### 正确形式
+
+要创建一个立即执行函数表达式（IIFE），你需要确保`function`关键字被视为函数表达式的一部分。这可以通过将整个函数包裹在括号内实现，如下所示：
+
+```javascript
+(function() { /* code */ })(); // 正确
+```
+
+或者
+
+```javascript
+(function() { /* code */ }()); // 也是正确的
+```
+
+### 立即执行函数的作用
+
+* 避免全局变量污染 IIFE允许你定义不需要命名的函数并立即执行它们，这样就不会向全局作用域添加额外的变量或函数名。
+* 创建独立的作用域 IIFE内部形成了一个新的作用域，这意味着你可以在此范围内定义局部变量，这些变量对外部是不可访问的，从而实现封装和隐藏数据的效果。
+* 封装变量 可以用来封装变量，防止它们泄露到全局作用域，同时提供了一种组织代码的方式。
+* 立即执行函数的参数 如果IIFE需要使用外部的全局变量，可以通过参数传递给IIFE，这种方式可以提高代码的可维护性和清晰度。例如：
+
+```javascript
+(function(j) {
+    // 在这里可以使用 j
+})(i); // i 是实参，j 是形参
+```
+
+* 立即执行函数的返回值 IIFE可以有返回值，但是通常情况下，除非特别需要，否则很少关注IIFE的返回值。如果你确实需要从IIFE获取返回值，可以直接将其赋值给一个变量：
+
+```javascript
+const result = (function() {
+    return "This is the result";
+})();
+console.log(result); // 输出: This is the result
+```
+
+## JavaScript 变量提升与作用域
+
+### 声明提升
+
+1. 变量提升只会提升变量名的声明，而不会提升变量的赋值初始化。
+2. 函数提升优先于变量提升，即函数提升在变量提升之上。
+3. 函数声明会将函数提升（包括声明function和赋值=），函数表达式只会将变量var提升。
+
+### 示例 1
+
+```javascript
+{
+    function foo() {}
+    foo = 1;
+}
+console.log(foo);
+```
+
+* **预期输出**：根据之前的知识，预期输出应该是 `1`。
+* **实际输出**：实际输出是 `function foo() {}`。
+* **解释**：这是因为函数声明会被提升到其所在作用域的顶部，而变量赋值 (`foo = 1;`) 不会被提升。
+
+### 示例 2
+
+```javascript
+{
+    foo = 1;
+    function foo() {}
+}
+console.log(foo);
+```
+
+* **预期输出**：输出是什么？
+* **实际输出**：输出是 `1`。
+* **解释**：在这个例子中，变量赋值 `foo = 1;` 发生在函数声明之前。由于函数声明会被提升到块级作用域的顶部，但变量赋值会覆盖函数引用，因此 `foo` 的值被设置为 `1`。
+
+## 函数提升的解释
+
+1. **函数声明的提升**：函数声明会被提升到其所在作用域的顶部。
+2. **执行顺序**：当代码执行时，它首先遇到已经被提升的函数声明。
+3. **变量赋值**：变量赋值按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
+
+#### 总结
+
+* **函数声明**：会被提升到其所在作用域的顶部。
+* **变量赋值**：按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
+
+这解释了为什么在第一个示例中，`foo` 指向函数，而在第二个示例中，`foo` 是数字 `1`。
+
+### 示例代码
+
+```javascript
+function fn() {
+  getValue = function () { console.log(1); };
+  return this;
+}
+
+fn.getValue = function () { console.log(2); };
+fn.prototype.getValue = function () { console.log(3); };
+var getValue = function () { console.log(4); };
+function getValue() { console.log(5); }
+var getValue = function () { console.log(4); };
+function getValue() { console.log(5); }
+
+// 请写出以下输出结果：
+getValue(); // 4
+fn().getValue(); // 1
+getValue(); // 1
+new fn.getValue(); // 2
+new fn().getValue(); // 3
+```
+
+### 块级作用域的函数声明
+
+#### 示例代码
+
+```javascript
+if (true) {
+  a = 10;
+  console.log(a, window.a); // 10 undefined
+
+  function a() {};
+  console.log(a, window.a); // 10 10
+}
+
+if (true) {
+  console.log(a, window.a); // ƒ a(){} undefined
+
+  function a() {};
+  a = 10;
+  console.log(a, window.a); // 10 ƒ a(){}
+}
+```
+
+在块级作用域中默认声明的变量，只有代码执行到声明语句之后，才可以进行访问，否则会报错。块级作用域中默认声明的变量会被提升到全局作用域。
+
+ECMAScript的作用域只有两种：全局作用域和函数作用域。但ES6的到来，为我们提供了“块级作用域”。凡是带 `{}` 的都是块级作用域。
+
+`window.a` 只有等块级作用域中函数声明的定义的那行代码执行过之后，才会被映射到全局作用域。
+
+函数声明中，整个函数体也都会被提升，而函数表达式中只会提升名称。
+
+### This 例子
+
+#### 示例代码
+
+```javascript
+var x = 3;
+let result = {
+  x: 2,
+  baz: {
+    x: 1,
+    bar: function() {
+      return this.x;
+    }
+  }
+};
+
+let go = result.baz.bar;
+console.log(result.baz.bar()); // 1
+console.log(go()); // 3
+```
 
 ## 面向对象编程
 
@@ -686,15 +866,24 @@ caller是函数对象的一个属性对象，永远代表调用了当前函数�
 
 ## 原型prototype
 
-**每个类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象**，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
+<mark style="color:red;">每个类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
 
-_**proto**_ 任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
+prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
+
+_**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象</mark>，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
+
+<pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
+</strong><strong>f1 = new Foo();
+</strong>即f1.__proto__ === Foo.prototype。
+</code></pre>
 
 **prototype** 属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法，即f1._proto_ === Foo.prototype。
 
 **constructor** 属性的含义就是指向该对象的构造函数，所有函数（此时看成对象了）最终的构造函数都指向Function。
 
+```
 f1.constructor === Foo
+```
 
 constructor：此属性只有原型对象才有，它默认指回prototype属性所在的构造函数。
 
@@ -996,188 +1185,7 @@ ES6模块不是对象，而是通过export命令显式指定输出的内容，�
 
 **CMD (Common Module Definition)** 浏览器端的实现之一是Sea.js，其设计目标类似于Require.js，但在模块定义和加载机制上有自己的特点，比如使用sea.use()来加载模块。
 
-## 避免全局变量
 
-* 立即执行函数
-* 声明命名空间
-* 模块化
-
-## 立即执行函数表达式（IIFE）
-
-### 错误示例
-
-```javascript
-function (){ /* code */ }() // 错误
-```
-
-在JavaScript中，遇到`function`关键字时，默认会将其视为函数声明。由于函数声明需要一个名称，并且不能直接跟一对括号来立即调用它，因此上述代码会导致语法错误。
-
-即使加上了函数名`foo`，这个例子也会出错。这里的括号`()`被解释为分组操作符而不是函数调用的一部分，因为JavaScript期望一个函数声明或表达式而非这种形式。正确的形式应为：
-
-```javascript
-function foo { /* code */ }
-
-() // 错误
-```
-
-### 正确形式
-
-要创建一个立即执行函数表达式（IIFE），你需要确保`function`关键字被视为函数表达式的一部分。这可以通过将整个函数包裹在括号内实现，如下所示：
-
-```javascript
-(function() { /* code */ })(); // 正确
-```
-
-或者
-
-```javascript
-(function() { /* code */ }()); // 也是正确的
-```
-
-### 立即执行函数的作用
-
-* 避免全局变量污染 IIFE允许你定义不需要命名的函数并立即执行它们，这样就不会向全局作用域添加额外的变量或函数名。
-* 创建独立的作用域 IIFE内部形成了一个新的作用域，这意味着你可以在此范围内定义局部变量，这些变量对外部是不可访问的，从而实现封装和隐藏数据的效果。
-* 封装变量 可以用来封装变量，防止它们泄露到全局作用域，同时提供了一种组织代码的方式。
-* 立即执行函数的参数 如果IIFE需要使用外部的全局变量，可以通过参数传递给IIFE，这种方式可以提高代码的可维护性和清晰度。例如：
-
-```javascript
-(function(j) {
-    // 在这里可以使用 j
-})(i); // i 是实参，j 是形参
-```
-
-* 立即执行函数的返回值 IIFE可以有返回值，但是通常情况下，除非特别需要，否则很少关注IIFE的返回值。如果你确实需要从IIFE获取返回值，可以直接将其赋值给一个变量：
-
-```javascript
-const result = (function() {
-    return "This is the result";
-})();
-console.log(result); // 输出: This is the result
-```
-
-## JavaScript 变量提升与作用域
-
-### 声明提升
-
-1. 变量提升只会提升变量名的声明，而不会提升变量的赋值初始化。
-2. 函数提升优先于变量提升，即函数提升在变量提升之上。
-3. 函数声明会将函数提升（包括声明function和赋值=），函数表达式只会将变量var提升。
-
-### 示例 1
-
-```javascript
-{
-    function foo() {}
-    foo = 1;
-}
-console.log(foo);
-```
-
-* **预期输出**：根据之前的知识，预期输出应该是 `1`。
-* **实际输出**：实际输出是 `function foo() {}`。
-* **解释**：这是因为函数声明会被提升到其所在作用域的顶部，而变量赋值 (`foo = 1;`) 不会被提升。
-
-### 示例 2
-
-```javascript
-{
-    foo = 1;
-    function foo() {}
-}
-console.log(foo);
-```
-
-* **预期输出**：输出是什么？
-* **实际输出**：输出是 `1`。
-* **解释**：在这个例子中，变量赋值 `foo = 1;` 发生在函数声明之前。由于函数声明会被提升到块级作用域的顶部，但变量赋值会覆盖函数引用，因此 `foo` 的值被设置为 `1`。
-
-## 函数提升的解释
-
-1. **函数声明的提升**：函数声明会被提升到其所在作用域的顶部。
-2. **执行顺序**：当代码执行时，它首先遇到已经被提升的函数声明。
-3. **变量赋值**：变量赋值按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
-
-#### 总结
-
-* **函数声明**：会被提升到其所在作用域的顶部。
-* **变量赋值**：按它们被编写的顺序发生，并且可以覆盖具有相同标识符的函数声明。
-
-这解释了为什么在第一个示例中，`foo` 指向函数，而在第二个示例中，`foo` 是数字 `1`。
-
-### 示例代码
-
-```javascript
-function fn() {
-  getValue = function () { console.log(1); };
-  return this;
-}
-
-fn.getValue = function () { console.log(2); };
-fn.prototype.getValue = function () { console.log(3); };
-var getValue = function () { console.log(4); };
-function getValue() { console.log(5); }
-var getValue = function () { console.log(4); };
-function getValue() { console.log(5); }
-
-// 请写出以下输出结果：
-getValue(); // 4
-fn().getValue(); // 1
-getValue(); // 1
-new fn.getValue(); // 2
-new fn().getValue(); // 3
-```
-
-### 块级作用域的函数声明
-
-#### 示例代码
-
-```javascript
-if (true) {
-  a = 10;
-  console.log(a, window.a); // 10 undefined
-
-  function a() {};
-  console.log(a, window.a); // 10 10
-}
-
-if (true) {
-  console.log(a, window.a); // ƒ a(){} undefined
-
-  function a() {};
-  a = 10;
-  console.log(a, window.a); // 10 ƒ a(){}
-}
-```
-
-在块级作用域中默认声明的变量，只有代码执行到声明语句之后，才可以进行访问，否则会报错。块级作用域中默认声明的变量会被提升到全局作用域。
-
-ECMAScript的作用域只有两种：全局作用域和函数作用域。但ES6的到来，为我们提供了“块级作用域”。凡是带 `{}` 的都是块级作用域。
-
-`window.a` 只有等块级作用域中函数声明的定义的那行代码执行过之后，才会被映射到全局作用域。
-
-函数声明中，整个函数体也都会被提升，而函数表达式中只会提升名称。
-
-### This 例子
-
-#### 示例代码
-
-```javascript
-var x = 3;
-let result = {
-  x: 2,
-  baz: {
-    x: 1,
-    bar: function() {
-      return this.x;
-    }
-  }
-};
-
-let go = result.baz.bar;
-console.log(result.baz.bar()); // 1
-console.log(go()); // 3
-```
 
 ## 继承
 

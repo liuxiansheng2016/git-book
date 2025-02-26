@@ -419,7 +419,7 @@ Weakset结构和set结构类似；区别在于
 `Promise` 是处理异步编程的一种解决方案，有三种状态：`Pending`（进行中）、`Fulfilled`（已完成）、`Rejected`（已失败）。
 
 * **主要方法**
-  * `Promise.all(iterable)`: 当所有 promises 都完成时调用。
+  * `Promise.all(iterable)`: 当所有 promises 状态都变成fulfilled或者某一个状态变成rejected时调用。
   * `Promise.race(iterable)`: 当其中一个 promise 完成或拒绝时立即调用。
   * `Promise.allSettled(iterable)`: 等待所有 promises 完成，无论结果如何。
   * `Promise.resolve(value)`: 返回一个新的 Promise 实例，并且会立即变为 Resolved 状态。
