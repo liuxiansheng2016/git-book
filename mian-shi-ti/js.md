@@ -1817,19 +1817,6 @@ M：model，模型层。代表数据库中的数据源。 V：view，视图层�
 调试难度较大：由于缺乏多线程环境中常见的调试工具和技术，某些类型的错误可能更难以定位和修复\
 
 
-### 同步任务 和异步任务
-
-1. 在执行过程中，同步和异步任务分别进入不同的执行场所，同步的是进入主线程，异步的进入Event Table并注册函数
-2. 指定的事情完成时，Event Tabel 会将这个函数移入Event Quene
-3. 主线程内的任务执行完毕时为空，会将Event Queue读取对应函数，进入主线程执行
-4. 以上过程重复时，就是Event Loop
-
-<figure><img src="../.gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
-
-* JavaScript 中的任务调度遵循以下顺序：\
-  先执行当前宏任务中的所有同步代码，接着执行所有微任务，然后再执行下一个宏任务。
-* 不同类型的异步任务会进入各自的队列：Promise、process.nextTick 进入微任务队列，而 setTimeout、setInterval 和（在 Node.js 中）setImmediate 则属于宏任务。
-
 ### 浏览器进程与线程：
 
 [https://zhuanlan.zhihu.com/p/133239925](https://zhuanlan.zhihu.com/p/133239925)\
