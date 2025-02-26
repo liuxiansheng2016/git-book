@@ -1593,9 +1593,9 @@ window.addEventListener('error', function(event) {
 * **`forEach` 和 `map`**：作为同步函数，不支持 `await` 语句；尝试在其中使用 `break` 或 `continue` 会导致错误。
 * **`for` 循环、`for...in`, `for...of`**：支持 `await`，允许在循环体内等待异步操作完成。`for` 和 `for...of` 可以使用 `break` 和 `continue` 控制流，而 `for...in` 对 `continue` 和 `break` 的支持较弱，可能会被忽略。
 
-### `[0] == true` 返回 `false`
+### `[0] == true`&#x20;
 
-JavaScript 在进行 `if(condition)` 判断时会将 `condition` 转换成布尔值然后做判断。`[0]` 是一个非空数组，转换成布尔值是 `true`。但在进行 `==` 比较时，如果类型不同，JavaScript 会尝试将两边转换为相同的类型，通常是数字。具体步骤如下：
+JavaScript 在进行 `i`<mark style="color:red;">`f(condition)`</mark> <mark style="color:red;"></mark><mark style="color:red;">判断时会将</mark> <mark style="color:red;"></mark><mark style="color:red;">`condition`</mark> <mark style="color:red;"></mark><mark style="color:red;">转换成布尔值然后做判断。</mark><mark style="color:red;">`[0]`</mark> <mark style="color:red;"></mark><mark style="color:red;">是一个非空数组，转换成布尔值是</mark> <mark style="color:red;"></mark><mark style="color:red;">`true`</mark>。但在进行 `==` 比较时，如果类型不同，JavaScript 会尝试将两边转换为相同的类型，通常是数字。具体步骤如下：
 
 ```javascript
 [0] == true;
@@ -1615,6 +1615,20 @@ JavaScript 在进行 `if(condition)` 判断时会将 `condition` 转换成布尔
 * 右边 `![] == false`
 * `False == 0`
 * 所以 `0 == 0` 为 `true`
+
+### `== 和 ===`
+
+<mark style="color:red;">`==`</mark> <mark style="color:red;"></mark><mark style="color:red;">和</mark> <mark style="color:red;"></mark><mark style="color:red;">`===`</mark> <mark style="color:red;"></mark><mark style="color:red;">的主要区别在于是否进行类型转换</mark>
+
+* **`==`（相等运算符）**：在进行比较时会进行类型转换，它会尝试将两个比较的值转换为相同的类型，然后再进行比较。
+* **`===`（严格相等运算符）**：在进行比较时不会进行类型转换，也称为严格相等。只有当两个值的类型和值都完全相同时，才会返回 `true`。
+
+```
+console.log(null == undefined); 
+// 输出: true，在使用 == 时，null 和 undefined 被视为相等
+console.log(null === undefined); 
+// 输出: false，因为使用 === 时，不会进行类型转换，null 和 undefined 类型不同
+```
 
 ### WebWorker多线程
 
