@@ -458,7 +458,7 @@ CDN 优化：使用内容分发网络（CDN）可以将资源分布到全球多�
 它的事件驱动、非阻塞I/O模型以及单线程事件循环架构
 ```
 
-## 请求时是否带Cookie
+### 请求时是否带Cookie
 
 ```
 ⦁fetch：通过设置 credentials: 'include' 来携带 Cookie。
@@ -1908,7 +1908,20 @@ Js 解释器
 
 {% embed url="https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/" %}
 
-实现动态表单
+### BOM
+
+Browser Object Model
+
+* Window是它的顶级对象 window.open/close
+* History
+* Document
+* Location
+* Navigator
+* Screen
+* Cookie
+* setTimeout
+
+### 实现动态表单
 
 ```
 // Some codeimport React from 'react';

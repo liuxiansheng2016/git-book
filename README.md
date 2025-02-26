@@ -1595,18 +1595,7 @@ console.log(curryingAdd(1)(2)); // 输出: 3
 
 需要注意的是：async script的资源请求时异步的，但script的执行仍然会阻塞后续渲染（单线程），defer是在html渲染完之后执行的所以不会阻塞后续html的解析。
 
-## BOM
 
-Browser Object Model
-
-* Window是它的顶级对象 window.open/close
-* History
-* Document
-* Location
-* Navigator
-* Screen
-* Cookie
-* setTimeout
 
 ## REM
 
