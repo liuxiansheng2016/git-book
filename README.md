@@ -946,7 +946,27 @@ counterB(); // 当前计数: 1
 
 ```
 
-上面是一个简单的闭包示例，演示如何通过闭包实现计数器，并使 `count` 变量在外部无法直接访问：
+上面是一个简单的闭包示例，演示如何通过闭包实现计数器，并使 `count` 变量在外部无法直接访问
+
+```
+// 高阶函数：接收一个 factor，返回一个新的函数 multiplier
+function createMultiplier(factor) {
+  // 这里形成了闭包，内部函数引用了外部函数的变量 factor
+  return function (num) {
+    return factor * num;
+  };
+}
+
+// 使用示例
+const double = createMultiplier(2);  // 生成一个“翻倍”的函数
+console.log(double(5)); // 输出 10
+console.log(double(10)); // 输出 20
+
+const triple = createMultiplier(3);  // 生成一个“三倍”的函数
+console.log(triple(5)); // 输出 15
+console.log(triple(10)); // 输出 30
+
+```
 
 #### **缺点：**
 
