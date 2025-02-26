@@ -551,7 +551,9 @@ let someValue: any = 'this is a string'
 let strLength: number = (someValue as string).length
 ```
 
-### `Partial<T>`、`Required<T>`、`Readonly<T>`、`Pick<T, K>` 和 `Omit<T, K>`
+### 工具类型
+
+`Partial<T>`、`Required<T>`、`Readonly<T>`、`Pick<T, K>` 和 `Omit<T, K>`
 
 &#x20;是非常实用的工具类型，它们基于泛型构建，用于对已有的类型进行转换和操作
 
