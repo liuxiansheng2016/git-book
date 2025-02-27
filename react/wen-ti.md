@@ -36,6 +36,9 @@ React 通过\*\*虚拟 DOM（Virtual DOM）\*\*减少对真实 DOM 的直接操�
 
 `useMemo` 或 `useCallback` 缓存 `props`，防止 `PureComponent` 失效。
 
+* **useMemo** 可以缓存计算结果（如对象、数组），使得在依赖项未变化时返回同一引用。
+* **useCallback** 用于缓存函数引用，避免因每次创建新函数而导致子组件不必要的重渲染。
+
 \
 下面的例子中\
 <mark style="color:red;">如果不使用 useMemo 或 useCallback，每次父组件渲染时即使逻辑上没有变化，新建的对象或函数也会破坏 memo 的效果，导致子组件总是重新渲染，从而影响性能。</mark>
