@@ -6,6 +6,22 @@
 * **添加浏览器前缀**：对于一些新的 CSS3 特性，不同浏览器可能需要不同的前缀来支持。例如，`-webkit-` 用于 Safari 和 Chrome，`-moz-` 用于 Firefox，`-ms-` 用于 IE 等。可以使用工具如 Autoprefixer 自动添加这些前缀。
 * **进行浏览器特定的样式调整**：通过媒体查询和浏览器检测，针对不同浏览器编写特定的 CSS 样式。例如，使用 `@supports` 来检测浏览器是否支持某个 CSS 特性，然后提供替代方案。
 
+```
+/* 使用 @supports 检测是否支持 flexbox */
+@supports (display: flex) {
+    .container {
+        display: flex;
+    }
+}
+
+@supports not (display: flex) {
+    .container {
+        /* 提供替代布局方案 */
+        display: block;
+    }
+}
+```
+
 ## **JavaScript 功能无法正常使用**
 
 * **使用 Babel 进行代码转换**：Babel 是一个 JavaScript 编译器，可以将新的 JavaScript 代码转换为向后兼容的版本，确保在旧版浏览器中也能正常运行。
