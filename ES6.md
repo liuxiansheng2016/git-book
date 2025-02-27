@@ -583,7 +583,7 @@ promiseAll([p1, p2, p3]).then(values => {
 JavaScript 在浏览器或 Node.js 环境中是单线程的，并且采用了事件循环机制来管理异步任务。这意味着所有的 JavaScript 代码都在一个线程上运行，但是通过事件循环和回调队列，可以有效地处理 I/O 密集型任务（如网络请求、文件系统访问等）而不阻塞主线程。
 
 * 当一个函数被标记为 `async` 时，它会自动返回一个 `Promise`，并且可以在其内部使用 `await` 来暂停执行直到 `Promise` 被解决（即完成或拒绝）。
-* 使用 `await` 暂停的是当前异步函数的执行流程，而不是整个主线程。这意味着其他代码（包括其他异步操作或者定时器等）仍然可以在后台继续运行
+* <mark style="color:red;">使用</mark> <mark style="color:red;"></mark><mark style="color:red;">`await`</mark> <mark style="color:red;"></mark><mark style="color:red;">暂停的是当前异步函数的执行流程，而不是整个主线程。</mark>这意味着其他代码（包括其他异步操作或者定时器等）仍然可以在后台继续运行
 
 ## Generator 函数
 
