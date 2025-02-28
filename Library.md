@@ -1,10 +1,147 @@
 # Library
 
-### D3
 
-### angular JS
 
-### GoJS
+## D3
+
+### 选择与操作 DOM 元素
+
+* **`d3.select()`**：选择文档中匹配指定选择器的第一个元素，返回一个包含该元素的选择集。
+* **`d3.selectAll()`**：选择文档中匹配指定选择器的所有元素，返回一个包含这些元素的选择集。
+* **`selection.attr()`**：设置或获取所选元素的属性。如`selection.attr('width', 100)`可设置元素宽度为 100。
+* **`selection.style()`**：设置或获取所选元素的 CSS 样式。例如`selection.style('fill', 'red')`将元素填充颜色设为红色。
+
+### 数据处理
+
+* **`d3.scaleLinear()`**：创建一个线性比例尺，用于将数据域映射到目标范围。如`const scale = d3.scaleLinear().domain([0, 100]).range([0, 500])`。
+* **`d3.scaleOrdinal()`**：创建一个序数比例尺，用于将离散的输入值映射到离散的输出值。
+* **`d3.shuffle()`**：打乱数组中元素的顺序。
+
+### 图表绘制
+
+* **`d3.axisBottom()`**：创建一个底部坐标轴生成器。结合比例尺使用，如`const xAxis = d3.axisBottom(xScale)`。
+* **`d3.axisLeft()`**：创建一个左侧坐标轴生成器。
+* **`d3.line()`**：创建一个折线生成器函数，用于生成折线图的路径数据。可设置`x`和`y`访问器函数，如`const line = d3.line().x(d => xScale(d.x)).y(d => yScale(d.y))`。
+* **`d3.arc()`**：创建一个弧生成器函数，用于绘制饼图、环形图等。
+
+### 数据绑定
+
+* **`selection.data()`**：将数据绑定到选择的元素上，返回一个更新选择集。
+* **`selection.enter()`**：返回一个包含新数据项对应的占位元素的选择集，通常用于创建新元素。
+* **`selection.exit()`**：返回一个包含与已删除数据项对应的元素的选择集，用于移除元素。
+
+### 交互
+
+* **`selection.on()`**：为元素添加事件监听器。如`selection.on('click', function() { console.log('Clicked!'); })`。
+* **`d3.event`**：包含当前正在处理的事件的相关信息，在事件处理函数中可获取鼠标位置等信息。
+
+<figure><img src=".gitbook/assets/image (12).png" alt=""><figcaption></figcaption></figure>
+
+## GoJS
+
+#### GoJS 特性
+
+* **性能**：<mark style="color:red;">`<canvas>`</mark> <mark style="color:red;"></mark><mark style="color:red;">提供更高的绘图性能，尤其适合处理大量图形和复杂动画</mark>。
+* **内存管理**：`<canvas>` 在处理大量数据和复杂图表时有更好的内存管理能力，因为所有的绘图操作都在内存中完成，然后一次性绘制到屏幕上。
+* **灵活性**：提供了更多的低级绘图控制，允许实现更复杂的绘图效果和优化。
+
+#### 基本使用步骤（GoJS）
+
+1. **初始化 Diagram**：
+   * 使用 `go.GraphObject.make` 函数创建 GoJS 对象。
+   * 设置图表的容器，并配置默认布局为树形布局(TreeLayout)。
+   * 允许用户删除和复制节点。
+2. **定义节点模板**：
+   * 创建节点并设置形状、填充颜色、边框颜色。
+   * 添加文本块，并绑定文本到节点的 key 属性。
+3. **定义链接模板**：
+   * 创建链接并设置路由方式（如正交路由Orthogonal），设置拐角半径。
+   * 定义链接的线条宽度和颜色。
+4. **添加初始数据**：
+   * 创建树形模型(TreeModel)，并添加初始节点数据，包括键(key)、颜色(color)、父节点(parent)等信息。
+
+#### 功能特性
+
+* **拖放操作**：支持节点的拖动。
+* **动态更新**：支持运行时动态添加、删除和修改节点及链接。
+* **自定义样式**：可自定义节点和链接的样式。
+* **动画效果**：支持添加动画效果，使图表更加生动。
+* **工具提示**：可为节点和链接添加工具提示。
+* **事件处理**：支持处理各种事件，如点击、双击、鼠标悬停等。
+
+通过上述内容可以看出，选择使用哪种技术取决于具体的应用场景和需求。对于需要高效处理大量数据和复杂动画的应用，GoJS 可能是更好的选择；而对于需要高度定制化的复杂图表，D3.js 则更为合适。
+
+```
+// 初始化 GoJS Diagram
+const myDiagram = new go.Diagram("myDiagramDiv", {
+    // 设置默认布局
+    layout: new go.TreeLayout(),
+    // 允许用户编辑图表
+    allowDelete: true,
+    allowCopy: true
+});
+
+// 定义节点模板
+myDiagram.nodeTemplate = new go.Node("Auto",
+    new go.Shape("RoundedRectangle",
+        { fill: "lightblue", stroke: "black" },
+        new go.Binding("figure", "fig") // 将 fig 属性绑定到 figure 属性
+    ),
+    new go.TextBlock(
+        { margin: 8 },
+        new go.Binding("text", "key")
+    )
+);
+
+// 定义链接模板
+myDiagram.linkTemplate = new go.Link(
+    { routing: go.Link.Orthogonal, corner: 5 },
+    new go.Shape({ strokeWidth: 2, stroke: "black" })
+);
+
+// 添加一些初始数据
+myDiagram.model = new go.TreeModel([
+    { key: "A", fig: "Circle", color: "lightblue" },
+    { key: "B", fig: "Rectangle", color: "lightgreen", parent: "A" },
+    { key: "C", fig: "Ellipse", color: "lightyellow", parent: "A" },
+    { key: "D", fig: "Diamond", color: "lightcoral", parent: "B" },
+    { key: "E", fig: "Triangle", color: "lightpink", parent: "B" },
+    { key: "F", fig: "Hexagon", color: "lightcyan", parent: "C" },
+    { key: "G", fig: "Pentagon", color: "lightgoldenrodyellow", parent: "C" }
+]);
+```
+
+## 可视化：SVG 与 Canvas
+
+**SVG (Scalable Vector Graphics)**
+
+* **基于 XML**：SVG 是一种基于 XML 的矢量图形格式，这意味着它使用文本描述图像。
+* **分辨率独立**：由于其矢量性质，SVG 图形可以无损缩放，非常适合高分辨率屏幕和打印。
+* **DOM 访问**：每个 SVG 元素都是 DOM 节点，允许单独访问和操作，便于动态更新和交互。
+* **适合复杂图形**：适用于创建复杂的、交互性强的图表和图形。
+
+**Canvas**
+
+* **基于像素**：Canvas 是一个位图画布，通过 JavaScript 绘制图形，所有绘图都是基于像素的操作。
+* **分辨率依赖**：Canvas 图形在放大时可能会失真，不适合高分辨率屏幕和打印。
+* **绘图上下文**：Canvas 提供了一个 2D 或 3D 绘图上下文，所有绘图操作都通过这个上下文进行。
+
+#### Echarts 和 D3.js 对比
+
+* **Echarts**
+  * 更加简单易用，适合快速实现数据可视化需求。
+* **D3.js**
+  * 更加灵活，容易定制，但学习曲线较陡峭。主要用于操作 SVG，但也能用于 Canvas。
+  * 适合创建复杂图表如散点图、热力图等。
+
+#### D3.js 与 GoJS 对比
+
+* **D3.js**
+  * 主要使用 SVG 进行绘图，适合创建各种复杂的图表。
+  * 需要开发者对底层绘图有更深入的理解。
+* **GoJS**
+  * <mark style="color:red;">主要使用</mark> <mark style="color:red;"></mark><mark style="color:red;">`<canvas>`</mark> <mark style="color:red;"></mark><mark style="color:red;">进行绘图，提供高效的绘图性能，特别适合处理大量图形和复杂动画。</mark>
+  * 提供了丰富的内置功能和高层次 API，<mark style="color:red;">使得开发复杂的图表（如流程图、组织结构图）</mark>变得简单快捷。
 
 
 
