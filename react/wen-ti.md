@@ -1396,7 +1396,7 @@ class ErrorBoundary extends React.Component {
 
 #### 什么是 React Fiber？
 
-React Fiber 是 React 16 引入的全新渲染架构，核心目标在于提升大型复杂应用的渲染性能，尤其解决长时间渲染任务导致的界面卡顿问题。
+React Fiber 是 React 16 引入的全新渲染架构，核心目标在于提升大型复杂应用的渲染性能，尤其<mark style="color:red;">解决长时间渲染任务导致的界面卡顿问题。</mark>
 
 ***
 
@@ -1832,7 +1832,7 @@ HTML5提供了一些内置的表单验证属性，如`required`、`pattern`、`m
 
 ### Render Props
 
-Render Props模式是一种在React中复用组件逻辑的强大方式。通过将渲染逻辑作为prop传递给组件，可以灵活地根据不同的场景渲染不同的UI，同时共享相同的业务逻辑
+<mark style="color:red;">Render Props模式是一种在React中复用组件逻辑的强大方式</mark>。通过将渲染逻辑作为prop传递给组件，可以灵活地根据不同的场景渲染不同的UI，同时共享相同的业务逻辑
 
 Render Props 是一种在 React 中共享代码的模式，它通过使用一个函数类型的 prop 来实现。这个函数通常接收一些数据并返回 React 元素。以下是一个具体的 Render Props 示例，该示例展示了如何使用 Render Props 模式来追踪鼠标的位置，并将这些信息传递给渲染逻辑。
 

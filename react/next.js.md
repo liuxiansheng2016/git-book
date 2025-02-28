@@ -13,7 +13,7 @@ Next.js 的 SSR 是通过 Node.js 环境来实现的，基本流程如下：
 4. **发送 HTML**\
    渲染好的 HTML 会作为响应返回给浏览器，用户可以立即看到预渲染的内容。
 5. **客户端水合（Hydration）**\
-   浏览器接收到 HTML 后，加载 React 客户端代码，并调用 `React.hydrate` 将静态 HTML 转变为可交互的 React 应用。此时，客户端会重新绑定事件监听器，完成整个交互系统的建立。
+   浏览器接收到 HTML 后，加载 React 客户端代码，并调用 `React.hydrate` <mark style="color:red;">将静态 HTML 转变为可交互的 React 应用</mark>。此时，客户端会重新绑定事件监听器，完成整个交互系统的建立。
 
 Next.js 在 React 的基础上构建，提供了完整的开发框架。它包括：
 
