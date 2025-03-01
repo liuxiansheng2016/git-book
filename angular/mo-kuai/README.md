@@ -99,7 +99,7 @@ export class AppModule {}
 
 
 
-**`@angular/core`**
+### **`@angular/core`**
 
 * **作用**：这是 Angular 的核心模块，包含所有基本功能，用于创建组件、指令、服务和依赖注入。
 * **主要内容**：
@@ -109,7 +109,7 @@ export class AppModule {}
 
 ***
 
-#### 2. **浏览器相关模块**
+### 2. **浏览器相关模块**
 
 **`@angular/platform-browser`**
 
@@ -127,7 +127,7 @@ export class AppModule {}
 
 ***
 
-#### 3. **表单模块**
+### 3. **表单模块**
 
 **`@angular/forms`**
 
@@ -139,7 +139,7 @@ export class AppModule {}
 
 ***
 
-#### 4. **HTTP 模块**
+### 4. **HTTP 模块**
 
 **`@angular/common/http`**
 
@@ -151,7 +151,7 @@ export class AppModule {}
 
 ***
 
-#### 5. **路由模块**
+### 5. **路由模块**
 
 **`@angular/router`**
 
@@ -170,7 +170,7 @@ export class AppModule {}
 
 ***
 
-#### 6. **动画模块**
+### 6. **动画模块**
 
 **`@angular/animations`**
 
@@ -181,7 +181,7 @@ export class AppModule {}
 
 ***
 
-#### 7. **通用工具模块**
+### 7. **通用工具模块**
 
 **`@angular/common`**
 
@@ -192,7 +192,7 @@ export class AppModule {}
 
 ***
 
-#### 8. **服务端渲染模块**
+### 8. **服务端渲染模块**
 
 **`@angular/platform-server`**
 
@@ -203,7 +203,7 @@ export class AppModule {}
 
 ***
 
-#### 9. **测试模块**
+### 9. **测试模块**
 
 **`@angular/core/testing`**
 
@@ -220,7 +220,7 @@ export class AppModule {}
 
 ***
 
-#### 10. **国际化模块**
+### 10. **国际化模块**
 
 **`@angular/localize`**
 
