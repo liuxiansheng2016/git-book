@@ -4,7 +4,7 @@ Angular 指令是 Angular 框架中的一个重要概念，它们允许你将行
 
 ## **1. 组件（Component）**
 
-* **定义**: 组件是带有模板的指令，用于定义用户界面。
+* **定义**: <mark style="color:red;">组件是带有模板的指令，用于定义用户界面。</mark>
 * **特点**:
   * 有模板（`template` 或 `templateUrl`）。
   * 结合 HTML 和业务逻辑。
