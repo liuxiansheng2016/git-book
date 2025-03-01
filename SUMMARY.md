@@ -24,6 +24,8 @@
   * [动态表单](angular/dong-tai-biao-dan.md)
   * [模板标签](angular/ngcontainer-he-ngtemplate.md)
   * [数据绑定](readme/shu-ju-bang-ding.md)
+  * [数据传输](readme/shu-ju-chuan-shu.md)
+  * [pipe](readme/pipe.md)
 * [React](react/README.md)
   * [问题](react/wen-ti.md)
   * [Hooks](react/Hooks.md)

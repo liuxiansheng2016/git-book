@@ -31,9 +31,13 @@ export class ChildComponent {}
 
 ## ng-container&#x20;
 
-是 Angular 提供的一个特殊的容器标签，它允许你在模板中创建逻辑分组而不向最终的 DOM 添加额外的节点。这意味着 ng-container 在渲染时不会出现在页面上，也不会影响样式或布局。
+`ng-container` 是一个逻辑容器，它本身不会在 DOM 中创建任何元素，主要用于分组和应用指令，而不会引入额外的 HTML 标签。例如，当需要在不引入额外元素的情况下使用 `*ngIf` 和 `*ngFor` 指令时，可以使用 `ng-container`：
 
-ng-container 还可以与 ngTemplateOutlet 结合使用来递归调用模板，这有助于减少不必要的 DOM 元素嵌套，并且能够更灵活地传递参数给子模板
+```
+<ng-container *ngFor="let item of items">
+  <p *ngIf="item.isVisible">{{ item.name }}</p>
+</ng-container>
+```
 
 ## ng-template
 

@@ -11,6 +11,19 @@
 5. 路由参数（Route Parameters）：可以从 URL 中提取动态参数
 6. 路由守卫（Route Guards）：用于控制路由的访问权限，如登录验证、权限检查等
 
+**RouterModule.forRoot()**：用于在根模块中配置主路由。它会创建一个路由服务的单例实例，并提供路由指令和服务。通常在根模块的 `imports` 数组中调用。
+
+**RouterModule.forChild()**:
+
+* 用于特性模块（Feature Modules），允许你为特定的功能区域定义路由，而不会与应用中的其他路由冲突。
+* 特性模块可能有自己的路由配置，当你想把特性模块作为独立的一部分集成进主应用时非常有用。
+
+**RouterModule.forRoot()**:
+
+* 用于应用的主模块（通常是 `AppModule`），它初始化顶级路由配置，并且会创建一个可以监听 URL 变化并导航到不同视图的路由器服务实例。
+* 通常在应用的根模块中调用一次，用来定义应用的基础路由。
+* **RouterModule.forChild()**：用于在特性模块中配置子路由。它不会创建新的路由服务实例，而是将子路由添加到现有的路由配置中。通常在特性模块的 `imports` 数组中调用。
+
 ## RouterModule.forRoot
 
 RouterModule.forRoot 是配置 Angular 应用程序路由的核心方法
