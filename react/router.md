@@ -16,6 +16,8 @@
 
 **服务器配置**：需要服务器配置来处理所有路由请求，将它们重定向到主入口文件（通常是 index.html）。否则，直接访问非根路径的 URL 会导致 404 错误。
 
+服务器端必须正确配置，以确保所有请求都返回 `index.html`
+
 ```
 const express = require("express");
 const path = require("path");
