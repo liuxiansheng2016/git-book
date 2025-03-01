@@ -93,6 +93,41 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
   先执行当前宏任务中的所有同步代码，接着执行所有微任务，然后再执行下一个宏任务。
 * 不同类型的异步任务会进入各自的队列：Promise、process.nextTick 进入微任务队列，而 setTimeout、setInterval 和（在 Node.js 中）setImmediate 则属于宏任务。
 
+```
+console.log('script start');
+
+setTimeout(() => {
+    console.log('setTimeout 1');
+}, 0);
+
+Promise.resolve().then(() => {
+    console.log('Promise 1');
+}).then(() => {
+    console.log('Promise 2');
+});
+
+setTimeout(() => {
+    console.log('setTimeout 2');
+}, 0);
+
+console.log('script end');
+```
+
+* **执行同步代码**
+  * `console.log('script start')`
+  * `setTimeout 1` 被加入 **宏任务队列**
+  * `Promise 1` 加入 **微任务队列**
+  * `Promise 2` 加入 **微任务队列**
+  * `setTimeout 2` 被加入 **宏任务队列**
+  * `console.log('script end')`
+* **执行微任务**
+  * 执行 `Promise 1`
+  * 执行 `Promise 2`
+* **执行宏任务（第一个 `setTimeout`）**
+  * `console.log('setTimeout 1')`
+* **执行宏任务（第二个 `setTimeout`）**
+  * `console.log('setTimeout 2')`
+
 ## 原型prototype
 
 <mark style="color:red;">每个类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
