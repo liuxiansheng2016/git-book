@@ -114,3 +114,74 @@ bootstrapApplication(AppComponent, {
 withInMemoryScrolling()：启用内存滚动恢复，确保用户在导航时保持滚动位置。
 withDebugTracing()：启用路由调试跟踪，有助于调试路由问题
 ```
+
+### 使用 Resolve 接口
+
+`Resolve` 是 Angular 路由提供的一个接口，允许你在导航到一个路由之前获取数据。这样可以确保当用户到达目标页面时，所有必要的数据已经准备好了。
+
+**实现步骤：**
+
+1.  **创建一个 Resolver 服务**: 首先，你需要创建一个实现了 `Resolve` 接口的服务。这个服务负责在路由激活之前获取数据。
+
+    <pre data-overflow="wrap"><code>import { Injectable } from '@angular/core';
+    import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+    import { Observable, of } from 'rxjs';
+    // 假设你有一个服务叫做 DataService
+    import { DataService } from './data.service';
+
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class DataResolver implements Resolve&#x3C;any> {
+      constructor(private dataService: DataService) {}
+
+    <strong>  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable&#x3C;any>|Promise&#x3C;any>|any {
+    </strong>    return this.dataService.getData();
+      }
+    }
+    </code></pre>
+2.  **配置路由以使用 Resolver**: 在你的路由配置中指定使用上述创建的 Resolver。
+
+    ```
+    import { NgModule } from '@angular/core';
+    import { Routes, RouterModule } from '@angular/router';
+    import { YourComponent } from './your.component';
+    import { DataResolver } from './data.resolver';
+
+    const routes: Routes = [
+      {
+        path: 'your-path',
+        component: YourComponent,
+        resolve: {
+          yourDataKey: DataResolver
+        }
+      }
+    ];
+
+    @NgModule({
+      imports: [RouterModule.forRoot(routes)],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {}
+    ```
+3.  **在组件中使用预取的数据**: 在目标组件中，你可以通过 `ActivatedRoute` 来访问预取的数据。
+
+    ```
+    import { Component, OnInit } from '@angular/core';
+    import { ActivatedRoute } from '@angular/router';
+
+    @Component({
+      selector: 'app-your',
+      templateUrl: './your.component.html',
+      styleUrls: ['./your.component.css']
+    })
+    export class YourComponent implements OnInit {
+      constructor(private route: ActivatedRoute) {}
+
+      ngOnInit() {
+        this.route.data.subscribe((data) => {
+          console.log(data.yourDataKey); // 访问预取的数据
+        });
+      }
+    }
+    ```
