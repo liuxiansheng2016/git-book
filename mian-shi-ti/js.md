@@ -1683,7 +1683,7 @@ M：model，模型层。代表数据库中的数据源。 V：view，视图层�
 
 * **在服务器端增加允许跨域请求的响应报头**，设置`Access-Control-Allow-Origin`为`*`。
 * **利用jsonp技术**，前端和后端配合实现跨域ajax。所谓的jsonp技术，就是利用浏览器并不禁止外联js是另一个域的js，所以jsonp跨域请求原理就是`<script src="其他域的js">`，而被外联的js是一个函数调用语句，通过实参把数据传递给请求客户端。动态创建script标签，只支持GET请求；存在脚本注入以及跨站请求伪造等安全问题。
-* **Postmessage**
+* **Postmessage：**&#x8BA9;不同源的 `iframe` 或 `window` 传递消息。
 * **Node 中间层代理**
 * **Nginx反向代理**
 * **Websocket**

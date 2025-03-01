@@ -439,6 +439,17 @@ React 在检测依赖变化时，`useEffect` 依赖项会使用**浅比较（sha
 
 依赖数组的作用就是控制 `useEffect` 何时执行，避免不必要的副作用触发。比如，<mark style="color:red;">如果</mark> <mark style="color:red;"></mark><mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">里有一个网络请求，每次组件渲染都会执行，那就会造成性能浪费</mark>
 
+### `useEffect`（无依赖数组）
+
+```
+useEffect(() => {
+  console.log("🔄 组件渲染后都会执行");
+});
+```
+
+* 每次组件渲染（包括初次渲染和每次状态更新后）都会执行。
+* 没有提供依赖数组，相当于监听所有的状态和 props 变化。
+
 #### <mark style="color:red;">`useEffect`</mark> <mark style="color:red;"></mark><mark style="color:red;">执行的基本规则：</mark>
 
 1. <mark style="color:red;">首次渲染后执行</mark>

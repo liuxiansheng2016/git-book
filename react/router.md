@@ -16,6 +16,27 @@
 
 **服务器配置**：需要服务器配置来处理所有路由请求，将它们重定向到主入口文件（通常是 index.html）。否则，直接访问非根路径的 URL 会导致 404 错误。
 
+```
+const express = require("express");
+const path = require("path");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// 静态文件服务
+app.use(express.static(path.join(__dirname, "build")));
+
+// 处理 React 前端路由
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+});
+
+```
+
 **不支持旧浏览器**：HTML5 History API 在一些旧浏览器中可能不可用。
 
 ：包裹应用以启用路由。

@@ -80,7 +80,7 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 
 对象之间赋值赋的是引用地址，基本类型赋值赋的是值本身。
 
-#### 同步任务 和异步任务
+### 同步任务 和异步任务
 
 1. 在执行过程中，同步和异步任务分别进入不同的执行场所，同步的是进入主线程，异步的进入Event Table并注册函数
 2. 指定的事情完成时（如定时器到期、Promise 解析完成），Event Tabel 会将这个函数移入Event Quene
@@ -127,6 +127,37 @@ console.log('script end');
   * `console.log('setTimeout 1')`
 * **执行宏任务（第二个 `setTimeout`）**
   * `console.log('setTimeout 2')`
+
+
+
+### `setTimeout` 推迟执行
+
+1. **事件循环延迟**：JavaScript 运行在一个单线程环境中，这意味着在同一时间内只能执行一个任务。如果在调用栈中有其他长时间运行的任务正在执行，那么即使定时器到期了，回调也不会立即执行，而是要等到当前任务完成后才会被处理
+2. **浏览器最小时间间隔**：大多数浏览器对 `setTimeout` 和 `setInterval` 的最小时间间隔有一个下限，通常是 4 毫秒。这意味着即使你设置了小于 4 毫秒的时间间隔，浏览器也会将其调整为至少 4 毫秒
+3. **累积误差**：对于 `setInterval` 来说，由于每次回调执行所需的时间可能不同，这会导致累积误差，即后续的执行可能会越来越偏离预期的时间点
+4. **页面不可见时的行为**：当页面处于后台或标签页不可见时，浏览器为了节省资源，可能会暂停或减缓定时器的执行频率
+5. **跨浏览器兼容性和实现差异**
+
+JavaScript 运行在**单线程**环境下，所有任务都要排队执行。如果**主线程有任务执行时间过长**，`setTimeout` 可能会被推迟执行。
+
+```
+setTimeout(() => console.log("⏳ 这里应该在 1 秒后执行"), 1000);
+
+// 模拟主线程任务执行 3 秒
+const start = Date.now();
+while (Date.now() - start < 3000) {}
+console.log("主线程任务完成");
+```
+
+* `setTimeout(1000)` 计划在 1 秒后执行
+* 但主线程被 `while` 循环**阻塞 3 秒**，所以 `setTimeout` 只能等到主线程空闲后才执行。
+
+解决方案
+
+1. Web Worker **不受 UI 线程阻塞**的影响，可以更稳定地执行定时任务
+2. 使用 `Date.now()` 计算实际误差，并调整下一次 `setTimeout`，可以减少累积误差。
+
+
 
 ## 原型prototype
 
@@ -1149,6 +1180,19 @@ Function.prototype.bind = function (context){
 * **localStorage方式**：永久性存储，没有失效时间。
 * **sessionStorage方式**：会话级存储，会话关闭就销毁。localStorage 与 sessionStorage 的唯一区别是 localStorage 属于永久性存储，而 sessionStorage 属于当会话结束的时候会被清空。
 
+### **1. sessionStorage vs localStorage 对比**
+
+| **特性**     | **sessionStorage**                                    | **localStorage**                                  |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------- |
+| **作用域**    | 仅限当前标签页（Tab）                                          | 所有同源页面共享                                          |
+| **存储时长**   | **会话级别**，关闭浏览器/标签页即清除                                 | **永久** 存储，除非手动清除                                  |
+| **跨标签页共享** | ❌ **不共享**（即使同一域名，新开标签页也无法访问）                          | ✅ **可共享**（同源下所有标签页都能访问）                           |
+| **数据大小限制** | 一般 **5MB**（不同浏览器可能有所不同）                               | 一般 **5MB**（同 `sessionStorage`）                    |
+| **适用场景**   | **临时存储**，如表单填写状态、会话数据                                 | **长期存储**，如用户偏好设置、缓存数据                             |
+| **API**    | `sessionStorage.setItem()`、`sessionStorage.getItem()` | `localStorage.setItem()`、`localStorage.getItem()` |
+
+`storage` 事件是 **`localStorage` 专属** 的事件，它在 **同源的多个标签页（Tab）或窗口** 之间同步数据变化。\
+\
 和Cookie一样，WEB本地存储的数据同源限制。
 
 ### 相关的API
@@ -1169,7 +1213,67 @@ Function.prototype.bind = function (context){
 
 基于web worker，不能访问dom。可以拦截当前网站的所有请求，进行判断。如果需要向服务器发起请求就转给服务器，如果可以使用缓存就返回缓存，提高浏览体验。
 
-#### nodejs中间层代理
+
+
+## **解决跨域问题的方案**
+
+* **在服务器端增加允许跨域请求的响应报头**，设置`Access-Control-Allow-Origin`为`*`。
+* **利用jsonp技术**，前端和后端配合实现跨域ajax。所谓的jsonp技术，就是利用浏览器并不禁止外联js是另一个域的js，所以jsonp跨域请求原理就是`<script src="其他域的js">`，而被外联的js是一个函数调用语句，通过实参把数据传递给请求客户端。动态创建script标签，只支持GET请求；存在脚本注入以及跨站请求伪造等安全问题。
+* **Postmessage** 通过 `window.postMessage()` 让不同源的 `iframe` 或 `window` 传递消息。
+* **Node 中间层代理**
+* **Nginx反向代理**
+* **Websocket** （适用于双向通信）
+
+### &#x20;**处理跨域时的 `credentials`（携带 Cookies）**
+
+默认情况下，跨域请求不会携带 `cookies`，如果需要携带，需要：
+
+1. **后端允许 `credentials`（设置 `Access-Control-Allow-Credentials: true`）**
+2. **前端 `fetch` 需要开启 `credentials: "include"`**
+
+📌 **示例：前端 fetch**
+
+```javascript
+fetch("https://api.example.com/data", {
+    method: "GET",
+    credentials: "include", // 允许携带 Cookie
+})
+    .then(response => response.json())
+    .then(data => console.log(data));
+```
+
+📌 **示例：Axios**
+
+```javascript
+axios.get("https://api.example.com/data", { withCredentials: true })
+    .then(response => console.log(response.data));
+```
+
+📌 **示例：后端（Node.js + Express）**
+
+```javascript
+app.use(cors({
+    origin: "https://your-frontend.com",
+    credentials: true
+}));
+```
+
+🚨 **注意**
+
+* `credentials: "include"` 不能与 `Access-Control-Allow-Origin: "*"` 一起使用，需要指定具体的域名。
+
+### **🔹 结论**
+
+| **场景**            | **前端需要做的事情**                                                            |
+| ----------------- | ----------------------------------------------------------------------- |
+| 服务器已配置 CORS       | 直接请求即可                                                                  |
+| 需要携带 `cookies`    | `credentials: "include"` & 服务器 `Access-Control-Allow-Credentials: true` |
+| 避免 `OPTIONS` 预检请求 | 确保 `Content-Type` 简单，避免不必要的请求头                                          |
+| 后端不支持 CORS        | 代理服务器（Vue/React 配置 `proxy`）                                             |
+
+
+
+### nodejs中间层代理
 
 利用http.request方法来转发请求
 
@@ -1250,7 +1354,7 @@ app.listen(PORT, () => {
 });
 ```
 
-#### Nginx 反向代理配置
+### Nginx 反向代理配置
 
 Nginx 是一个高性能的 HTTP 和反向代理服务器。使用 Nginx 作为反向代理，可以将客户端请求转发到后端服务器，并将响应返回给客户端，而客户端并不知道实际处理请求的服务器是哪一个。以下是配置 Nginx 反向代理的基本步骤和一个简单的例子。
 
@@ -1292,7 +1396,9 @@ server {
 
 listen 80; 表示监听标准HTTP端口80。 server\_name yourdomain.com; 定义了这个server块应该响应哪个域名的请求。 location /api/ { ... } 块指定了对于以 /api/ 开头的所有请求，Nginx 应该将其转发到 http://localhost:3000/。注意这里的 proxy\_pass URL 后面有一个斜杠 /，这意味着 /api/ 路径部分会被去掉后再拼接到目标URL后面。 proxy\_set\_header 指令用于设置转发请求时添加或修改HTTP头部信息，以便后端服务器能够获取客户端的真实信息。
 
-**区别** 设置 Access-Control-Allow-Origin 为 \*：
+### **区别**&#x20;
+
+设置 Access-Control-Allow-Origin 为 \*：
 
 优点：简单快捷，适用于简单的应用场景。
 

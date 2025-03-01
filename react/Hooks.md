@@ -170,6 +170,42 @@ function Counter() {
 
 useEffect 就是一个 Effect hook,和 class 组件中 conponnetDidMount,DidUpdate 和 willUnmout 具有相同的用途，只是合成了一个 API
 
+### 闭包问题
+
+在 `useEffect` 里面的回调函数会捕获**初次渲染时的变量状态**，即使之后组件状态更新，`useEffect` 内部的**旧闭包**仍然引用的是**旧的变量**。
+
+1. 把 `count` 添加到 `useEffect` 的依赖项
+2. 使用 `useRef` 持久化最新值
+
+```
+import { useState, useEffect, useRef } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(count);
+  
+//每次组件渲染（包括初次渲染和每次状态更新后）都会执行。
+//useEffect 确保 countRef.current 始终存储最新的 count。
+  useEffect(() => {
+    countRef.current = count; // 🔥 让 ref 始终存储最新的 count 值
+  });
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log("当前 count:", countRef.current); // 🔥 使用最新的 count
+    }, 3000);
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>增加</button>
+    </div>
+  );
+}
+
+```
+
 ### UseContext
 
 **用途**： useContext 允许你在函数组件中访问 React Context 的值。Context 提供了一种无需通过 props 层层传递就能共享数据的方式，特别适用于跨层级传递数据。
