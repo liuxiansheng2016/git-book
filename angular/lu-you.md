@@ -11,6 +11,12 @@
 5. 路由参数（Route Parameters）：可以从 URL 中提取动态参数
 6. 路由守卫（Route Guards）：用于控制路由的访问权限，如登录验证、权限检查等
 
+### **路由懒加载模块**
+
+```
+loadChildren: () => import('./product/product.module').then(m => m.ProductModule)
+```
+
 ### **RouterModule.forChild()**&#x548C; **RouterModule.forRoot()**
 
 **RouterModule.forRoot()**：用于在根模块中配置主路由。它会创建一个路由服务的单例实例，并提供路由指令和服务。通常在根模块的 `imports` 数组中调用。
