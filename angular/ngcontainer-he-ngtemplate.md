@@ -1,4 +1,33 @@
-# ng-container 和ng-template
+# 模板标签
+
+## `ng-content`&#x20;
+
+是 Angular 中的一个投影标签，用于将父组件中的内容投影到子组件的指定位置。它可以实现内容的复用和自定义，使得子组件可以灵活地展示不同的内容。例如：\
+收起typescript
+
+```
+// 子组件
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `
+    <div>
+      <h2>Child Component</h2>
+      <ng-content></ng-content>
+    </div>
+  `
+})
+export class ChildComponent {}
+
+// 父组件模板
+<app-child>
+  <p>This is content from the parent component.</p>
+</app-child>
+```
+
+\
+在上述例子中，父组件中的 `<p>` 标签内容会被投影到子组件的 `ng-content` 位置。
 
 ## ng-container&#x20;
 
