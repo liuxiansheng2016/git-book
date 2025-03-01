@@ -6,85 +6,84 @@ description: Angular 应用程序由多个模块组成，每个模块负责处�
 
 ## 常见的模块结构分类包括：
 
-1.  Ap**pModule**\
-    \
-    每个 Angular 应用程序至少有一个根模块，通常命名为 AppModule
+### Ap**pModule**
 
-    * 作用：
-      * 应用程序的根模块，用于引导整个应用。
-      * 包含应用启动时必须加载的全局内容。
-      * 仅包含一次性的全局配置，不应该包含太多功能逻辑。
-    * 主要内容：
-      * 引导组件（通常是 `AppComponent`）。
-      * 根级路由配置。
-    * 示例：
+每个 Angular 应用程序至少有一个根模块，通常命名为 AppModule
+
+* 作用：
+  * <mark style="color:red;">应用程序的根模块，用于引导整个应用。</mark>
+  * 包含应用启动时必须加载的全局内容。
+  * 仅包含一次性的全局配置，不应该包含太多功能逻辑。
+* 主要内容：
+  * 引导组件（通常是 `AppComponent`）。
+  * 根级路由配置。
+* 示例：
+
+```javascript
+@NgModule({
+  declarations: [
+    AppComponent, // 根组件
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule, // 路由模块
+    CoreModule,       // 核心模块
+    SharedModule,     // 共享模块
+  ],
+  bootstrap: [AppComponent], // 应用启动组件
+})
+export class AppModule {}
+```
+
+### **Feature modules**
+
+<mark style="color:red;">特性模块用于组织与特定功能相关的组件、服务、指令等。</mark>
+
+* 作&#x7528;**：**
+  * 按功能划分的业务模块，管理独立的业务逻辑。
+  * 便于功能模块的懒加载。
+* 设计原则：
+  * 遵循模块独立性，避免依赖共享模块以外的模块。
+  * 可以导入 `SharedModule` 以复用通用组件
+*   示例：
 
     ```javascript
     @NgModule({
       declarations: [
-        AppComponent, // 根组件
+        UserListComponent,
+        UserDetailsComponent,
       ],
       imports: [
-        BrowserModule,
-        AppRoutingModule, // 路由模块
-        CoreModule,       // 核心模块
-        SharedModule,     // 共享模块
+        CommonModule,
+        UserRoutingModule, // 功能模块路由
+        SharedModule,      // 共享模块
       ],
-      bootstrap: [AppComponent], // 应用启动组件
     })
-    export class AppModule {}
+    export class UserModule {}
     ```
-2.  #### **Feature modules**
 
+### co**remodule** <mark style="color:red;">通常包含核心模块和服务，如全局服务、拦截器等</mark> 
 
+* **作用：**
+  * 提供应用的核心功能和单例服务。
+  * 仅在 `AppModule` 中加载，避免被重复导入。
+  * 包含应用的全局配置逻辑，例如全局服务。
+* **主要**内容：
+  * 单例服务（如认证服务、API 服务）。
+  * 全局组件（如Error/pagenotfount/success）。
+  * 应用初始化逻辑（如拦截器、导航守卫）。
+* 设计原则：
+  * **只加载一次**：通过防止重复导入（`throwIfAlreadyLoaded` 方法）
 
-    特性模块用于组织与特定功能相关的组件、服务、指令等。
+### Share**dModule（共享模块）**  共享模块包含可以在多个特性模块中复用的组件、指令和服务
 
-    * 作&#x7528;**：**
-      * 按功能划分的业务模块，管理独立的业务逻辑。
-      * 便于功能模块的懒加载。
-    * 设计原则：
-      * 遵循模块独立性，避免依赖共享模块以外的模块。
-      * 可以导入 `SharedModule` 以复用通用组件
-    *   示例：
-
-        ```javascript
-        @NgModule({
-          declarations: [
-            UserListComponent,
-            UserDetailsComponent,
-          ],
-          imports: [
-            CommonModule,
-            UserRoutingModule, // 功能模块路由
-            SharedModule,      // 共享模块
-          ],
-        })
-        export class UserModule {}
-        ```
-3. co**remodule**\
-   通常包含核心模块和服务，如全局服务、拦截器等\
-
-   * **作用：**
-     * 提供应用的核心功能和单例服务。
-     * 仅在 `AppModule` 中加载，避免被重复导入。
-     * 包含应用的全局配置逻辑，例如全局服务。
-   * **主要**内容：
-     * 单例服务（如认证服务、API 服务）。
-     * 全局组件（如Error/pagenotfount/success）。
-     * 应用初始化逻辑（如拦截器、导航守卫）。
-   * 设计原则：
-     * **只加载一次**：通过防止重复导入（`throwIfAlreadyLoaded` 方法）
-4. Share**dModule（共享模块）**\
-   \
-   共享模块包含可以在多个特性模块中复用的组件、指令和服务
-   * 作用：
-     * 提供通用功能和组件，供多个模块共享。
-     * 避免重复定义组件或指令，提高代码复用性。
-   * **主**要内容：
-     * 通用组件（如按钮、模态框）。
-     * 常用指令（如 `HighlightDirective`）。
-     * 常用管道（如日期格式化）。\
+* 作用：
+  * 提供通用功能和组件，供多个模块共享。
+  * 避免重复定义组件或指令，提高代码复用性。
+* **主**要内容：
+  * 通用组件（如按钮、模态框）。
+  * 常用指令（如 `HighlightDirective`）。
+  * 常用管道（如日期格式化）。\
 
 
 ## 模块的属性
