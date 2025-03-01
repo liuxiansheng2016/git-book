@@ -1,4 +1,4 @@
-# 模板标签
+# 模板
 
 ## `ng-content`&#x20;
 
@@ -114,4 +114,59 @@ parent.component.html 中定义了一个名为 customContent 的模板，并通�
   <p>Item: {{ item }} and Another Value: {{ another }}</p>
 </ng-template>
 
+```
+
+## 获取子组件的实例
+
+使用 @ViewChild 获取单个子组件实例
+
+使用 @ViewChildren 获取多个子组件实例
+
+使用 @ContentChild 和 @ContentChildren 获取内容投影的子组件实例
+
+### **ContentChild**：
+
+* 用于访问通过 `<ng-content>` 投影进来的子组件或元素。
+
+```
+import { Component, ContentChild, AfterContentInit } from '@angular/core';
+import { ChildComponent } from './child.component';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <ng-content></ng-content>
+  `
+})
+export class ParentComponent implements AfterContentInit {
+  @ContentChild(ChildComponent) child: ChildComponent;
+
+  ngAfterContentInit() {
+    console.log(this.child);
+  }
+}
+
+```
+
+### **ViewChild**：
+
+用于访问组件模板中的子组件或元素。
+
+```
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { ChildComponent } from './child.component';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-child></app-child>
+  `
+})
+export class ParentComponent implements AfterViewInit {
+  @ViewChild(ChildComponent) child: ChildComponent;
+
+  ngAfterViewInit() {
+    console.log(this.child);
+  }
+}
 ```

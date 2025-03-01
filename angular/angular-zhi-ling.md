@@ -104,22 +104,3 @@ export class FeatureCheckDirective implements OnInit {
 3. \*gdFeatureCheck：用于结构型指令，影响 DOM 结构，可以传递静态值或动态值。\
 
 
-## 获取子组件的实例
-
-使用 @ViewChild 获取单个子组件实例
-
-使用 @ViewChildren 获取多个子组件实例
-
-使用 @ContentChild 和 @ContentChildren 获取内容投影的子组件实例
-
-## @Optional() @SkipSelf()
-
-用于构造函数参数的参数装饰器
-
-Optional
-
-将参数标记为可选依赖项。如果找不到依赖关系，DI框架将提供null。
-
-SkipSelf
-
-它告诉DI框架从父注入器开始依赖项解析。分辨率在注射器层次结构中向上工作，因此不会检查本地注射器的提供者。
