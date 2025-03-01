@@ -1,5 +1,23 @@
 # 动态表单
 
+### **模板驱动表单**
+
+\
+模板驱动表单是基于模板的表单处理方式，<mark style="color:red;">主要通过在模板中使用指令（如</mark> <mark style="color:red;"></mark><mark style="color:red;">`ngModel`</mark><mark style="color:red;">）来实现表单的双向数据绑定和验证</mark>。<mark style="color:red;">它适用于简单的表单场景，代码主要集中在模板中</mark>。例如：\
+收起html
+
+```
+<form #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+  <input type="text" name="username" [(ngModel)]="username" required>
+  <button type="submit">Submit</button>
+</form>
+```
+
+### **响应式表单**
+
+\
+响应式表单是基于响应式编程思想的表单处理方式，<mark style="color:red;">通过在组件类中创建表单控件和表单组来管理表单状态，提供了更强大的表单验证和控制功能</mark>，适用于复杂的表单场景。例如：
+
 1. FormGroup：表示一组控件（FormControl），可以是简单的输入字段，也可以是其他 FormGroup 或 FormArray。
 
 ```javascript
