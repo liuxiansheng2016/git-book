@@ -1,27 +1,56 @@
+---
+description: https://xie.infoq.cn/article/dda6d6d0004d7b22a21264d04
+---
+
 # 变更检测
 
-## 默认
+## 脏检查
 
-默认策略是最常用的策略，Angular 会自动检测组件及其子组件的所有变化
+在一些前端框架（如早期的 AngularJS）中，脏检查用于实现数据绑定和视图更新。当数据模型发生变化时，框架会通过脏检查机制检测到这些变化，并自动更新与之绑定的视图。
 
-适用于大多数情况，但可能会导致性能问题，特别是在大型应用中。
+1. **记录初始状态**：在某个时刻，记录下数据的当前状态，这通常是一个数据快照。
+2. **触发检查**：在特定的条件下（如用户交互事件、定时任务等），启动脏检查过程。
+3. **比较状态**：将当前数据状态与之前记录的初始状态进行比较。
+4. **处理变化**：如果发现数据状态发生了变化（即变 “脏”），则执行相应的处理逻辑，如更新视图、保存数据等。
 
-## Onpush
+## Angular 检测流程
 
-OnPush 策略
+\
+Angular 采用自上而下的深度优先遍历策略进行变更检测：
 
-OnPush 策略是一种优化策略，适用于纯组件（即组件的输出只依赖于输入）。启用 OnPush 策略后，Angular 只在以下情况下才会检查组件的变更：
+1. **从根组件开始**：变更检测从应用的根组件启动。
+2. **遍历子组件**：依次检查根组件及其所有子组件。
+3. **检查数据绑定**：查看组件模板中的数据绑定表达式，如插值表达式 `{{ property }}`、属性绑定 `[attr]="property"` 等，对比数据模型和视图的状态是否一致。
+4. **传播变更**：如果发现某个组件的数据发生变化，更新该组件的视图，并继续检查其子组件，确保变更能正确传播。
 
-1. 组件的输入属性发生变化
-2. 组件接收到新的事件（如 @Input、@Output）
-3. 组件内的异步操作完成（如 Promise、Observable）
-4. 通过 ChangeDetectorRef.markForCheck
+## 默认策略 (`ChangeDetectionStrategy.Default`)
 
-要启用 OnPush 策略，可以在组件装饰器中设置 changeDetection 属性：
+在使用默认策略时，<mark style="color:red;">Angular 的变更检测非常敏感且全面</mark>。每当有以下事件发生时，都会触发整个组件树的变更检测：
 
-<mark style="color:red;">仅在输入属性（@Input）发生变化或事件触发时进行变更检测。</mark>
+* 用户交互（如点击、输入等）。
+* 浏览器事件（如 `setTimeout`, `setInterval` 等异步操作）。
+* HTTP 请求或其他网络活动（如通过 Angular 的 `HttpClient` 发起的请求）。
+* 任何其他异步任务，比如 Promises 或者 Observables 的完成&#x20;
 
-适用于纯组件（没有副作用的组件），可以提高性能。
+这意味着，即使某个组件的状态没有发生变化，只要上述任意一个事件发生，Angular 都会检查该组件及其所有子组件是否有需要更新的内容。
+
+## OnPush 策略 (`ChangeDetectionStrategy.OnPush`)
+
+相比之下，`OnPush` 策略提供了一种更加高效的变更检测方式。它<mark style="color:red;">仅在特定条件下才会触发组件的变更检测</mark>，这使得它可以显著减少不必要的检查次数。以下是 `OnPush` 策略下变更检测被触发的情况：
+
+1. **输入属性变化**：当组件的 `@Input()` 装饰器接收的新值与旧值相比发生了变化时，变更检测将被触发。这里需要注意的是，对于引用类型的数据（如对象或数组），只有当它们的引用地址改变时，Angular 才认为这些数据发生了变化
+2. **DOM 事件**：如果组件本身或者其子组件触发了 DOM 事件（例如点击事件），也会触发变更检测
+3. **Observable 触发**：如果组件中绑定了 Observable，并且这个 Observable 发出了新的值，则会触发变更检测
+4. **手动调用变更检测**：开发者可以通过调用 `ChangeDetectorRef` 提供的方法来手动触发变更检测，如 `markForCheck()` 方法可以在当前组件以及其祖先组件上标记为“脏”，从而强制执行变更检测；而 `detectChanges()` 方法则直接对当前组件和它的子组件执行一次变更检测
+
+&#x20;使用 `HttpClient` 进行 HTTP 请求，并且你将请求的结果通过 <mark style="color:red;">`async`</mark> <mark style="color:red;"></mark><mark style="color:red;">管道绑定到了模板上，那么每当有新的数据到达时，Angular 都会自动进行变更检测并更新视图</mark>。
+
+需要注意的是在 `OnPush` 策略中，以下操作不会触发变化检测：
+
+* setTimeout()
+* setInterval()
+* Promise.resolve().then()
+* this.http.get('...').subscribe()
 
 ## ChangeDetectorRef&#x20;
 
