@@ -16,7 +16,7 @@
 
 定义：Observable 是一个可以被订阅的对象，它代表了一个可能异步发生的值或事件序列。一旦有观察者订阅它，Observable 就会开始发送通知给这个观察者。
 
-生产者与消费者：<mark style="color:red;">Observable 是生产者，负责生成数据流；而 Observer 是消费者，负责消费这些数据。</mark>
+生产者与消费者：<mark style="color:red;">Observable 是生产者，负责生成数据流；而 Observer 是消费者，负责消费这些数据。一个</mark> <mark style="color:red;"></mark><mark style="color:red;">`Observable`</mark> <mark style="color:red;"></mark><mark style="color:red;">可以有多个</mark> <mark style="color:red;"></mark><mark style="color:red;">`Observer`</mark> <mark style="color:red;"></mark><mark style="color:red;">订阅它</mark>
 
 ```javascript
 const observer = {
