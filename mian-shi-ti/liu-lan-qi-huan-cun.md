@@ -161,3 +161,232 @@ Cookie 和 Local Storage：虽然不是传统意义上的缓存，但它们也�
     ```
     <link rel="stylesheet" href="https://cdn.yourdomain.com/css/style.css">
     ```
+
+## &#x20;**前端单页面应用（SPA）的缓存策略**
+
+在单页面应用（SPA）中，缓存策略需要**兼顾性能和更新机制**，既要利用缓存提高加载速度，又要确保用户获取最新版本的资源。
+
+***
+
+### **🔹 1. SPA 的缓存核心问题**
+
+SPA 的主要资源包括：
+
+* `index.html`（入口文件）
+* `JS/CSS` 代码（应用逻辑）
+* `API 请求的数据`
+* `图片、字体等静态资源`
+
+**缓存策略的核心问题**：
+
+1. **如何让静态资源缓存更久，提高访问速度？**
+2. **如何确保 JS/CSS 更新后，用户能获取最新版本？**
+3. **如何避免 API 响应数据过期？**
+4. **如何避免缓存 `index.html` 造成的白屏问题？**
+
+***
+
+### **🔹 2. SPA 最佳缓存方案**
+
+| 资源类型         | 适合的缓存策略                        | 服务器配置                                        |
+| ------------ | ------------------------------ | -------------------------------------------- |
+| `index.html` | **不缓存 / 短缓存**                  | `Cache-Control: no-cache, must-revalidate`   |
+| `JS / CSS`   | **强制缓存 + 文件指纹**                | `Cache-Control: max-age=31536000, immutable` |
+| `API 数据`     | **协商缓存（ETag / Last-Modified）** | `Cache-Control: no-cache`                    |
+| `图片 / 字体`    | **强制缓存 + 文件指纹**                | `Cache-Control: max-age=31536000, immutable` |
+
+***
+
+### **🔹 3. 具体实现方案**
+
+#### **✅ 3.1 `index.html` 的缓存**
+
+**问题**：
+
+* `index.html` 作为 SPA 的入口文件，需要**始终获取最新版本**，避免引用旧的 `JS/CSS` 文件，导致页面异常或白屏。
+
+**解决方案**：
+
+* **禁用强制缓存，确保每次访问都检查更新**
+* **使用 `ETag` 或 `Last-Modified` 进行协商缓存**
+
+**服务器响应头（Nginx / Apache）**：
+
+```http
+Cache-Control: no-cache, must-revalidate
+ETag: "abcdef123456"
+```
+
+📌 **效果**：
+
+* **用户每次刷新页面，浏览器都会检查 `index.html` 是否有更新。**
+* **如果没有更新，服务器返回 304 Not Modified，减少带宽消耗。**
+* **如果有更新，用户会加载最新的 `index.html` 和新版本的 JS/CSS。**
+
+***
+
+#### **✅ 3.2 `JS / CSS` 资源的缓存**
+
+**问题**：
+
+* `JS` 和 `CSS` 资源通常较大，希望它们被缓存以加快加载速度。
+* 但如果 `JS/CSS` 代码更新，用户应该能够获取最新版本。
+
+**解决方案**：
+
+* **使用强制缓存（`max-age=31536000`）**
+* **通过 `文件指纹（hash）` 确保资源变更时获取最新版本**
+
+**示例：Webpack 生成文件指纹**
+
+```javascript
+output: {
+  filename: 'main.[contenthash].js',
+  chunkFilename: '[name].[contenthash].js'
+}
+```
+
+*   这样打包后，文件名会变成：
+
+    ```
+    main.abc123.js
+    styles.def456.css
+    ```
+
+**服务器响应头（Nginx / Apache）**：
+
+```http
+Cache-Control: max-age=31536000, immutable
+```
+
+📌 **效果**：
+
+* **JS/CSS 资源会被长期缓存，避免重复下载，提高性能。**
+* **当代码更新后，新的 `index.html` 会引用新的 `JS/CSS` 文件，确保用户获取最新资源。**
+
+***
+
+#### **✅ 3.3 API 请求的缓存**
+
+**问题**：
+
+* API 响应数据可能会变更，但也不希望每次都重新请求，增加服务器压力。
+
+**解决方案**：
+
+* **使用 `ETag` 或 `Last-Modified` 进行协商缓存**
+* **对于动态数据，使用 `Cache-Control: no-store` 直接禁止缓存**
+* **对于可缓存数据（如字典数据），使用 `max-age`**
+
+**服务器响应头示例**：
+
+1.  **对于动态数据（如用户信息、订单状态）**
+
+    ```http
+    Cache-Control: no-store
+    ```
+
+    **效果**：不缓存，每次都请求最新数据。
+2.  **对于不常更新的数据（如城市列表、字典数据）**
+
+    ```http
+    Cache-Control: max-age=3600
+    ```
+
+    **效果**：缓存 1 小时，减少重复请求。
+3.  **对于更新不频繁的 API**
+
+    ```http
+    Cache-Control: no-cache
+    ETag: "abcdef123456"
+    ```
+
+    **效果**：浏览器会先检查 ETag，若数据未变则返回 304 Not Modified，减少流量消耗。
+
+***
+
+#### **✅ 3.4 图片 / 字体等静态资源的缓存**
+
+**问题**：
+
+* 图片和字体一般不会频繁更新，适合长期缓存。
+
+**解决方案**：
+
+* **使用强制缓存（`max-age=31536000`）**
+* **使用 `文件指纹`（hash） 确保变更时加载新资源**
+
+**服务器响应头**：
+
+```http
+Cache-Control: max-age=31536000, immutable
+```
+
+📌 **效果**：
+
+* **浏览器会长期缓存这些资源，减少加载时间。**
+* **如果图片或字体更新，URL 变化（文件指纹），确保获取最新版本。**
+
+***
+
+### **🔹 4. Nginx 服务器完整配置**
+
+如果你的 SPA 部署在 Nginx，推荐以下完整的缓存策略：
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+    root /var/www/react-app/build;
+    index index.html;
+
+    # 不缓存 index.html，确保用户获取最新版本
+    location / {
+        try_files $uri /index.html;
+        add_header Cache-Control "no-cache, must-revalidate";
+    }
+
+    # 缓存 JS/CSS，使用文件指纹
+    location ~* \.(?:js|css|woff2|woff|ttf)$ {
+        add_header Cache-Control "max-age=31536000, immutable";
+    }
+
+    # 缓存图片
+    location ~* \.(?:png|jpg|jpeg|gif|svg|ico)$ {
+        add_header Cache-Control "max-age=31536000, immutable";
+    }
+
+    # API 缓存（可选）
+    location /api/ {
+        add_header Cache-Control "no-cache";
+    }
+}
+```
+
+📌 **效果**：
+
+* **HTML 每次请求都会检查更新**
+* **JS/CSS/图片长期缓存，使用文件指纹**
+* **API 可选择适当缓存策略**
+
+***
+
+### **✅ 5. 结论**
+
+| 资源类型         | 推荐缓存策略                         | 服务器配置                                        |
+| ------------ | ------------------------------ | -------------------------------------------- |
+| `index.html` | **不缓存 / 短缓存**                  | `Cache-Control: no-cache, must-revalidate`   |
+| `JS / CSS`   | **强制缓存 + 文件指纹**                | `Cache-Control: max-age=31536000, immutable` |
+| `API 数据`     | **协商缓存（ETag / Last-Modified）** | `Cache-Control: no-cache`                    |
+| `图片 / 字体`    | **强制缓存 + 文件指纹**                | `Cache-Control: max-age=31536000, immutable` |
+
+***
+
+### **🚀 最佳实践**
+
+1. **HTML 设置 `Cache-Control: no-cache`，避免白屏问题**
+2. **JS/CSS/图片使用 `max-age=31536000, immutable`，并通过文件指纹确保更新**
+3. **API 选择 `no-store`（禁用缓存）或 `ETag`（协商缓存）**
+4. **使用 Nginx/Apache 服务器进行合理缓存配置**
+
+💡 **这样既能提高性能，又能确保用户获取最新版本！** 🚀
