@@ -34,6 +34,10 @@ loadChildren: () => import('./product/product.module').then(m => m.ProductModule
 
 RouterModule.forRoot 是配置 Angular 应用程序路由的核心方法
 
+### 使用
+
+1. #### &#x20;配置路由
+
 ```javascript
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
@@ -67,6 +71,36 @@ export class AppPreloadingStrategy implements PreloadingStrategy {
       : of(null);
   }
 }
+```
+
+### 在根模块中导入路由模块
+
+在 `app.module.ts` 中导入 `AppRoutingModule`。
+
+```
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    AboutComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+**`routerLink`**\
+`routerLink` 用于创建导航链接，点击链接时会触发路由导航。
+
+```
+<!-- app.component.html -->
+<a routerLink="">Home</a>
+<a routerLink="/about">About</a>
 ```
 
 ### **路由守卫**
