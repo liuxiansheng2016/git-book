@@ -183,3 +183,42 @@ export default App;
    除了 React.lazy 外，还有一些第三方库（例如 loadable-components 或 react-loadable）可以提供更灵活的代码拆分方案，比如支持服务端渲染、预加载等功能。
 3. **打包工具（如 Webpack）的支持**\
    Webpack 内置了对动态 import 的支持，通过配置也可以实现代码拆分。Webpack 会根据动态 import 自动将代码拆分成多个 chunk，并在需要时加载相应的代码文件。
+
+### 自定义比较函数的方法
+
+### **`React.memo(Component, areEqual?)`**
+
+**用于：** 组件级别优化，避免不必要的重新渲染\
+**自定义比较：** `areEqual(prevProps, nextProps)`
+
+```jsx
+const MyComponent = React.memo(
+  function MyComponent({ value }) {
+    console.log("组件渲染:", value);
+    return <div>{value}</div>;
+  },
+  (prevProps, nextProps) => {
+    return prevProps.value === nextProps.value; // 自定义比较函数
+  }
+);
+```
+
+* 只有 `value` 发生变化时才重新渲染组件
+* 如果 `value` 一样，则跳过渲染
+
+### **🔹2. `useSelector(selector, equalityFn?)`**
+
+**用于：** 从 Redux store 读取状态并决定是否更新组件\
+**自定义比较：** `equalityFn(prevSelectedState, nextSelectedState)`
+
+```jsx
+import { useSelector, shallowEqual } from "react-redux";
+
+const userData = useSelector(
+  state => ({ name: state.user.name, age: state.user.age }),
+  shallowEqual // 浅比较，防止对象地址变更导致不必要渲染
+);
+```
+
+* 只有 `name` 或 `age` 发生变化时才触发组件更新
+* 使用 `shallowEqual` 进行浅比较，避免对象引用变化导致无意义的重新渲染
