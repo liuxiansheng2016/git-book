@@ -1690,7 +1690,7 @@ const MyComponent = React.memo(
 
 选取 `state.user.name`，只有该状态改变时，`UserInfo` 组件才会重新渲染。若选取整个 `user` 对象，`user` 中任意属性变化都会触发组件重新渲染。
 
-#### 2.利用自定义比较函数
+#### 2.<mark style="color:red;">利用自定义比较函数</mark>
 
 * **原理**：`useSelector` 可接收第二个参数作为比较函数，默认是浅比较。若需复杂比较逻辑，可传入自定义比较函数，更精确地控制组件是否重新渲染。
 
