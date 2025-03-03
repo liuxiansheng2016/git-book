@@ -145,7 +145,7 @@ export class OrderModule { }
 * `OrderRoutingModule` 负责 `OrderModule` 的路由。
 * `OrderModule` 仅导入 `CommonModule`，不需要 `BrowserModule`。
 
-**3. 在 `app-routing.module.ts` 进行懒加载**
+### **3. 在 `app-routing.module.ts` 进行懒加载**
 
 在 `app-routing.module.ts` 统一管理 `OrderModule` 和 `UserModule`：
 
