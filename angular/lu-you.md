@@ -73,7 +73,7 @@ export class AppPreloadingStrategy implements PreloadingStrategy {
 }
 ```
 
-### 在根模块中导入路由模块
+2. 在模块中导入路由模块
 
 在 `app.module.ts` 中导入 `AppRoutingModule`。
 
@@ -94,8 +94,155 @@ export class AppPreloadingStrategy implements PreloadingStrategy {
 export class AppModule { }
 ```
 
-**`routerLink`**\
-`routerLink` 用于创建导航链接，点击链接时会触发路由导航。
+## 实际使用
+
+在 **Angular** 中，如果项目包含多个 **Feature Module**（例如 `OrderModule`、`UserModule` 等），我们应该为每个 Feature Module 创建独立的 **Routing Module**，然后在 `AppRoutingModule` 统一管理这些路由，通常使用 **懒加载（Lazy Loading）** 来优化性能。
+
+**1. 创建 feature`-routing.module.ts`**
+
+```typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { OrderListComponent } from './order-list/order-list.component';
+import { OrderDetailComponent } from './order-detail/order-detail.component';
+
+const routes: Routes = [
+  { path: '', component: OrderListComponent }, // 订单列表
+  { path: ':id', component: OrderDetailComponent } // 订单详情
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)], // forChild() 用于 Feature Module
+  exports: [RouterModule]
+})
+export class OrderRoutingModule { }
+```
+
+### **2. 创建 feature`.module.ts`**
+
+```typescript
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { OrderRoutingModule } from './order-routing.module';
+import { OrderListComponent } from './order-list/order-list.component';
+import { OrderDetailComponent } from './order-detail/order-detail.component';
+
+@NgModule({
+  declarations: [
+    OrderListComponent,
+    OrderDetailComponent
+  ],
+  imports: [
+    CommonModule,
+    OrderRoutingModule
+  ]
+})
+export class OrderModule { }
+```
+
+📌 **注意**：
+
+* `OrderRoutingModule` 负责 `OrderModule` 的路由。
+* `OrderModule` 仅导入 `CommonModule`，不需要 `BrowserModule`。
+
+**3. 在 `app-routing.module.ts` 进行懒加载**
+
+在 `app-routing.module.ts` 统一管理 `OrderModule` 和 `UserModule`：
+
+```typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/order', pathMatch: 'full' }, // 默认路由
+  { path: 'order', loadChildren: () => import('./order/order.module').then(m => m.OrderModule) },
+  { path: 'user', loadChildren: () => import('./user/user.module').then(m => m.UserModule) },
+  { path: '**', redirectTo: '/order' } // 404 重定向到订单页面
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+&#x20;**使用 `loadChildren` 进行懒加载**：
+
+* 只有访问 `order` 或 时 其他feature，相关模块才会被加载，提升首屏性能。
+
+### &#x20;**4. 在 `app.module.ts` 中导入 `AppRoutingModule`**
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule // 仅需导入 AppRoutingModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### **在 `app.component.html` 中添加导航**
+
+```html
+<nav>
+  <a routerLink="/order">订单管理</a>
+  <a routerLink="/user">用户管理</a>
+</nav>
+
+<router-outlet></router-outlet>
+```
+
+**额外优化**
+
+#### **（1）守卫**
+
+如果 `order` 页面需要 **身份验证**，可以使用 `AuthGuard`：
+
+```typescript
+{ path: 'order', loadChildren: () => import('./order/order.module').then(m => m.OrderModule), canActivate: [AuthGuard] }
+```
+
+#### **（2）预加载**
+
+默认懒加载会等到访问路由才加载模块，可以使用 **预加载** 提前加载：
+
+```typescript
+import { PreloadAllModules } from '@angular/router';
+
+const routes: Routes = [
+  { path: 'order', loadChildren: () => import('./order/order.module').then(m => m.OrderModule) },
+  { path: 'user', loadChildren: () => import('./user/user.module').then(m => m.UserModule) }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+```
+
+### **总结**
+
+| **步骤** | **操作**                                            |
+| ------ | ------------------------------------------------- |
+| **1**  | 在 `feature` 模块创建 `xxx-routing.module.ts`          |
+| **2**  | 在 `xxx.module.ts` 中 `imports: [XxxRoutingModule]` |
+| **3**  | 在 `app-routing.module.ts` 中 `loadChildren` 懒加载    |
+| **4**  | 在 `app.module.ts` 仅导入 `AppRoutingModule`          |
+| **5**  | 在 `app.component.html` 使用 `router-outlet`         |
+
+这样，我们的 **Angular 项目路由清晰、可维护，并且支持懒加载提升性能！**
+
+### **`routerLink`** `routerLink` 用于创建导航链接，点击链接时会触发路由导航。
 
 ```
 <!-- app.component.html -->
