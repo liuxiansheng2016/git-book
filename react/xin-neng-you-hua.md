@@ -22,27 +22,27 @@ Https://zhuanlan.zhihu.com/p/559922432
 
 在React中，优化组件的渲染性能可以从以下几个方面入手：
 
-#### 减少不必要的渲染
+### 减少不必要的渲染
 
 * **使用`React.memo()`**：对函数组件使用`React.memo()`，通过浅比较props来避免不必要的渲染。可以传递一个自定义的比较函数作为第二个参数，实现更深层次的对比。
 * **使用`shouldComponentUpdate()`或`PureComponent`**：在类组件中，重写`shouldComponentUpdate()`方法或继承`React.PureComponent`，通过比较新旧props和state来决定是否重新渲染。
 
-#### 优化渲染过程
+### 优化渲染过程
 
 * **避免在`render()`中创建新对象**：在`render()`方法内部创建新对象（如数组、函数等）会导致每次渲染时引用变化，触发<mark style="color:red;">子组件的重新渲染</mark>。应将这些对象移到组件外部或利用`useMemo()`进行缓存。
 * **使用`useCallback()`**：对回调函数使用`useCallback()`，仅在依赖项变化时才重新创建函数，避免不必要的子组件渲染。
 
-#### 优化数据传递
+### 优化数据传递
 
 * **合理使用props和state**：尽量将数据传递限制在必要的组件范围内，避免不相关的组件因接收数据而触发渲染。
 * **使用`context`**：对于需要跨多层级传递的数据，使用`context`可以避免逐层传递props，减少不必要的渲染。
 
-#### 代码拆分和懒加载
+### 代码拆分和懒加载
 
 * **代码拆分**：利用React的代码拆分功能，将应用拆分为多个代码块，按需加载，减少初始加载时间。
 * **懒加载组件**：使用`React.lazy()`和`Suspense`组件，实现组件的按需加载，提升应用性能。
 
-#### 使用生产环境构建
+### 使用生产环境构建
 
 * **启用生产环境模式**：在生产环境中构建应用，React会启用各种优化，如减少不必要的检查、优化渲染算法等，提升运行性能。
 
@@ -186,7 +186,7 @@ export default App;
 
 ### 自定义比较函数的方法
 
-### **`React.memo(Component, areEqual?)`**
+#### **`React.memo(Component, areEqual?)`**
 
 **用于：** 组件级别优化，避免不必要的重新渲染\
 **自定义比较：** `areEqual(prevProps, nextProps)`
@@ -206,7 +206,7 @@ const MyComponent = React.memo(
 * 只有 `value` 发生变化时才重新渲染组件
 * 如果 `value` 一样，则跳过渲染
 
-### **🔹2. `useSelector(selector, equalityFn?)`**
+#### **2. `useSelector(selector, equalityFn?)`**
 
 **用于：** 从 Redux store 读取状态并决定是否更新组件\
 **自定义比较：** `equalityFn(prevSelectedState, nextSelectedState)`
