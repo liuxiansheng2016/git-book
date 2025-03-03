@@ -1,6 +1,10 @@
 # 国际化
 
-## 实现工厂类（<mark style="color:red;">来动态加载和合并翻译文件</mark>）
+使用TranslateModule 和TranslateLoaderFactory 工厂类来加载国际化的文件
+
+结合 `TranslateService` 来动态切换语言
+
+### 实现工厂类（来动态加载和合并翻译文件）
 
 TranslateLoaderFactory 这是一个工厂类，返回一个新的类 LazyTranslateLoader，该类实现了 TranslateLoader 接口。
 
