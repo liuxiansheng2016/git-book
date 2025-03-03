@@ -59,6 +59,10 @@ import { TranslateLoaderFactory } from 'path-to-translate-loader-factory';
 
 ## 使用 TranslateService
 
+```
+import { TranslateService } from '@ngx-translate/core';
+```
+
 通过Providers: \[brandTranslateService] 使用：
 
 ```javascript
