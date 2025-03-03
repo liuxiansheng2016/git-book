@@ -36,7 +36,7 @@ RouterModule.forRoot 是配置 Angular 应用程序路由的核心方法
 
 ### 使用
 
-1. #### &#x20;配置路由
+#### &#x20;配置路由
 
 ```javascript
 import { NgModule } from '@angular/core';
@@ -73,7 +73,7 @@ export class AppPreloadingStrategy implements PreloadingStrategy {
 }
 ```
 
-2. 在模块中导入路由模块
+#### 在模块中导入路由模块
 
 在 `app.module.ts` 中导入 `AppRoutingModule`。
 
