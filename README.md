@@ -89,8 +89,6 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 
 <figure><img src=".gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
 
-* JavaScript 中的任务调度遵循以下顺序：\
-  先执行当前宏任务中的所有同步代码，接着执行所有微任务，然后再执行下一个宏任务。
 * 不同类型的异步任务会进入各自的队列：Promise、process.nextTick 进入微任务队列，而 setTimeout、setInterval 和（在 Node.js 中）setImmediate 则属于宏任务。
 
 ```
