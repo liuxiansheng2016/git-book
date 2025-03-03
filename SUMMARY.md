@@ -21,7 +21,7 @@
   * [执行初始化逻辑](angular/zhi-xing-chu-shi-hua-luo-ji.md)
   * [拦截器](angular/lan-jie-qi.md)
   * [订阅](angular/ding-yue.md)
-  * [动态表单](angular/dong-tai-biao-dan.md)
+  * [表单](angular/dong-tai-biao-dan.md)
   * [模板](angular/ngcontainer-he-ngtemplate.md)
   * [数据绑定](readme/shu-ju-bang-ding.md)
   * [数据传输](readme/shu-ju-chuan-shu.md)
