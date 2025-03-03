@@ -98,7 +98,7 @@ export class AppModule { }
 
 在 **Angular** 中，如果项目包含多个 **Feature Module**（例如 `OrderModule`、`UserModule` 等），我们应该为每个 Feature Module 创建独立的 **Routing Module**，然后在 `AppRoutingModule` 统一管理这些路由，通常使用 **懒加载（Lazy Loading）** 来优化性能。
 
-**1. 创建 feature`-routing.module.ts`**
+### **1. 创建 feature`-routing.module.ts`**
 
 ```typescript
 import { NgModule } from '@angular/core';
