@@ -1,7 +1,6 @@
 # Table of contents
 
-* [Readme](README.md)
-* [Js](js.md)
+* [Js](README.md)
 * [Angular](<README (1).md>)
   * [常见的生命周期钩子](angular/chang-jian-de-sheng-ming-zhou-qi-gou-zi.md)
   * [模块](angular/mo-kuai/README.md)
