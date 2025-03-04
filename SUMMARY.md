@@ -64,7 +64,7 @@
 * [git](git.md)
 * [Css](CSS.md)
 * [面试题](mian-shi-ti/README.md)
-  * [JS](mian-shi-ti/js.md)
+  * [JavaScript](mian-shi-ti/js.md)
   * [CSS](mian-shi-ti/css.md)
   * [Npm](mian-shi-ti/npm.md)
   * [安全问题](mian-shi-ti/an-quan-wen-ti.md)
