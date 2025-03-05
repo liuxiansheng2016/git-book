@@ -12,5 +12,7 @@ Angular 是一个由 Google 开发和维护的开源前端 JavaScript 框架，�
 6. 指令系统
 7. 变更检测机制
 
+**Angular** 适用于**企业级应用、大型单页应用（SPA）**
+
 
 

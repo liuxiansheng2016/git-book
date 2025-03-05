@@ -4,6 +4,16 @@ description: https://xie.infoq.cn/article/dda6d6d0004d7b22a21264d04
 
 # 变更检测
 
+### **Angular 的变更检测机制**
+
+Angular 使用 **Zone.js + 组件树遍历（Change Detection Tree）** 进行变更检测，核心流程如下：
+
+1. **Zone.js 监听异步操作**（如事件、HTTP 请求、定时器等）。
+2. **当 Zone.js 发现有异步任务完成后，Angular 触发变更检测**。
+3. **Angular 逐层检查组件树中的 `@Input()` 数据和模板绑定的数据**：
+   * 如果数据变化，更新 DOM。
+   * 如果数据未变，跳过更新。
+
 ## 脏检查
 
 在一些前端框架（如早期的 AngularJS）中，脏检查用于实现数据绑定和视图更新。当数据模型发生变化时，框架会通过脏检查机制检测到这些变化，并自动更新与之绑定的视图。
