@@ -2315,3 +2315,77 @@ export default App;
 
 ```
 
+## 取消请求
+
+#### **AbortController 是什么？**
+
+`AbortController` 是 **浏览器内置 API**，用于**取消** `fetch` 请求或其他支持 `AbortSignal` 的操作。
+
+&#x20;**组件卸载时自动取消请求**
+
+```jsx
+jsx复制编辑import { useEffect, useState } from "react";
+
+function FetchWithAbortController() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    fetch("https://api.example.com/data", { signal })
+      .then(res => res.json())
+      .then(result => setData(result))
+      .catch(error => {
+        if (error.name !== "AbortError") {
+          console.error("请求错误:", error);
+        }
+      });
+
+    return () => controller.abort(); // 组件卸载时取消请求
+  }, []);
+
+  return <div>{data ? "数据已加载" : "加载中..."}</div>;
+}
+```
+
+✅ **优点：**
+
+* 真正取消 `fetch` 请求，减少服务器负担
+* 适用于 `fetch`，兼容 `XMLHttpRequest`
+* 轻量级，不需要额外库
+
+### **用 `useRef` 追踪组件是否已卸载**
+
+**思路：**
+
+* 组件挂载时，`isMounted` 设为 `true`
+* 组件卸载时，`isMounted` 设为 `false`
+* 在 `setState` 之前检查 `isMounted`，如果组件已卸载，则不更新状态
+
+```
+import { useState, useEffect, useRef } from "react";
+
+function FetchDataComponent() {
+  const [data, setData] = useState(null);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true; // 组件挂载时
+    fetch("https://api.example.com/data")
+      .then(res => res.json())
+      .then(result => {
+        if (isMounted.current) {
+          setData(result); // 只有组件挂载时才更新状态
+        }
+      });
+
+    return () => {
+      isMounted.current = false; // 组件卸载时
+    };
+  }, []);
+
+  return <div>{data ? "数据已加载" : "加载中..."}</div>;
+}
+
+```
