@@ -2233,7 +2233,7 @@ function FetchWithAbortController() {
 * 适用于 `fetch`，兼容 `XMLHttpRequest`
 * 轻量级，不需要额外库
 
-### **用 `useRef` 追踪组件是否已卸载**
+#### **用 `useRef` 追踪组件是否已卸载**
 
 **思路：**
 
