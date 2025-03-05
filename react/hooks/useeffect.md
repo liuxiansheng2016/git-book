@@ -213,7 +213,9 @@ export default App;
 
 ### useEffect 进入无限循环的原因
 
-1. `useEffect` 内部直接修改依赖的状态，并且没有依赖数组或者依赖数组为状态值
+需要在副作用（side effect）中更新了状态，它会触发组件重新渲染，并且由于依赖项发生了变化，`useEffect` 会被再次调用
+
+1. #### 缺少依赖项或者依赖的状态在 effect 内部被更新
 
 ````
 ```javascript
@@ -232,18 +234,94 @@ function App() {
 
 export default App;
 ```
+````
 
-解决
+解决办法： 添加正确的依赖项或者空数组
 
+```
   useEffect(() => {
     console.log("🔥 useEffect 执行");
     setCount(count + 1); // 触发状态更新
   }, []);
+```
 
-````
+2. useEffect 依赖于一个非稳定的引用（对象/数组/函数）
 
-### **总结：如何避免 useEffect 无限循环**
+使用 `useMemo` 或 `useCallback`
+
+```
+import React, { useEffect, useState } from "react";
+
+function App() {
+    const [count, setCount] = useState(0);
+    const myArray = [1, 2, 3];
+    //const myArray = useMemo(() => [1, 2, 3], []);
+
+    useEffect(() => {
+        console.log("useEffect 执行");
+        setCount(count + 1);
+    }, [myArray]);
+
+    return (
+        <div>
+            <p>Count: {count}</p>
+            <button onClick={() => setCount(count + 1)}>增加</button>
+        </div>
+    );
+}
+
+export default App;
+```
+
+提取对象属性或者数组元素作为依赖项，如myObject.key 或者myArray\[0]
+
+```
+function App() {
+    const [count, setCount] = useState(0);
+    const myObject = { key: "value" };
+
+    useEffect(() => {
+        console.log("useEffect 执行");
+        setCount(count + 1); 
+    }, [myObject.key]);
+
+    return (
+        <div>
+            <p>Count: {count}</p>
+            <button onClick={() => setCount(count + 1)}>增加</button>
+        </div>
+    );
+}
+
+```
+
+```
+import React, { useEffect, useState, useCallback } from "react";
+
+function App() {
+    const [count, setCount] = useState(0);
+    // 使用 useCallback 缓存函数
+    const getData = useCallback(() => {
+        console.log("获取数据");
+    }, []);
+
+    useEffect(() => {
+        console.log("useEffect 执行");
+        setCount(count + 1); 
+    }, [getData]);
+
+    return (
+        <div>
+            <p>Count: {count}</p>
+            <button onClick={() => setCount(count + 1)}>增加</button>
+        </div>
+    );
+}
+
+export default App;
+```
 
 * 如果 `useEffect` 只应该执行一次，使用 `[]`。
-* 如果 `useEffect` 需要依赖某些值，确保这些值不会在每次渲染时改变（使用 `useMemo` 和 `useCallback`）。
-* 避免在 `useEffect` 内部直接修改依赖的状态，必要时使用条件判断。如useref保存值
+* 如果 `useEffect` 需要依赖某些值，确保这些值不会在每次渲染时改变（使用 `useMemo` 和 `useCallback`。
+* 避免在 `useEffect` 内部直接修改依赖的状态，必要时使用条件判断。
+
