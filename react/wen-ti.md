@@ -2267,3 +2267,77 @@ function FetchDataComponent() {
 }
 
 ```
+
+### 如何修复 React 组件状态在热更新（HMR）时丢失的问题
+
+#### 1.  使用 `useLocalStorage` 或 `useSessionStorage` 自定义 Hook（适用于函数组件）
+
+\
+可以创建自定义 Hook，将组件状态存储在 `localStorage` 或 `sessionStorage` 中，在组件重新渲染时恢复状态。
+
+**自定义 `useLocalStorage` Hook**
+
+```
+import { useState, useEffect } from 'react';
+
+const useLocalStorage = (key, initialValue) => {
+  const [value, setValue] = useState(() => {
+    const storedValue = localStorage.getItem(key);
+    return storedValue !== null ? JSON.parse(storedValue) : initialValue;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+
+  return [value, setValue];
+};
+
+export default useLocalStorage;
+```
+
+**在组件中使用 `useLocalStorage`**
+
+```
+import React from 'react';
+import useLocalStorage from './useLocalStorage';
+
+const App = () => {
+  const [count, setCount] = useLocalStorage('count', 0);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+};
+
+export default App;
+```
+
+2. 将状态提升到父级组件或者使用全局状态管理工具（如 Redux、Context API）
+3.  使用 `module.hot.accept`
+
+    适用于 Webpack 5：
+
+    ```js
+    import React from 'react';
+    import ReactDOM from 'react-dom';
+    import App from './App';
+
+    const render = () => {
+      ReactDOM.render(<App />, document.getElementById('root'));
+    };
+
+    // 初始渲染
+    render();
+
+    // 检查是否启用了 HMR
+    if (module.hot) {
+      module.hot.accept('./App', () => {
+        // 当 App 组件更新时，仅重新渲染它而不是刷新整个页面
+        render();
+      });
+    }
+    ```
