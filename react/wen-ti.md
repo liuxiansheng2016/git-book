@@ -431,13 +431,6 @@ export default MyComponent;
 1. 比如你需要获取某个 DOM 元素的尺寸，并在渲染前进行调整
 2. 比如当你想让页面在组件渲染后立即滚动到顶部
 
-
-
-####
-
-```
-```
-
 ### `useMemo` 和 `useCallback` 有什么区别
 
 `useMemo` 和 `useCallback` 都是**用于性能优化的 Hooks**，但它们的作用不同：
@@ -494,6 +487,14 @@ export default MyComponent;
 ### React 事件绑定
 
 `onClick={handleClick}` 用于函数组件，而 `onClick={this.handleClick}` 用于类组件。
+
+在 class 组件中，事件处理函数的 `this` 默认未绑定。
+
+**构造函数中绑定**：可以在构造函数中使用 `bind` 方法手动绑定 `this` 到每个需要的回调函数。
+
+**箭头函数**：由于箭头函数不拥有自己的 `this`，它会捕获其所在作用域的 `this` 值，所以你可以定义事件处理函数为箭头函数。
+
+
 
 **1. 在构造函数中使用 bind 方法**
 
