@@ -2317,27 +2317,37 @@ export default App;
 ```
 
 2. 将状态提升到父级组件或者使用全局状态管理工具（如 Redux、Context API）
-3.  使用 `module.hot.accept`
+3. `module.hot.accept`
 
-    适用于 Webpack 5：
+`module.hot.accept` 是 **Webpack 的 Hot Module Replacement (HMR) API**，用于在 **代码变更时** 允许模块**热替换**（即更新代码但不刷新整个页面），从而保持 React 组件的状态。
 
-    ```js
-    import React from 'react';
-    import ReactDOM from 'react-dom';
-    import App from './App';
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
 
-    const render = () => {
-      ReactDOM.render(<App />, document.getElementById('root'));
-    };
+const render = () => {
+  ReactDOM.render(<App />, document.getElementById('root'));
+};
 
-    // 初始渲染
+// 初始渲染
+render();
+
+// 检查是否启用了 HMR
+if (module.hot) {
+  module.hot.accept('./App', () => {
+    // 当 App 组件更新时，仅重新渲染它而不是刷新整个页面
     render();
+  });
+}
+```
 
-    // 检查是否启用了 HMR
-    if (module.hot) {
-      module.hot.accept('./App', () => {
-        // 当 App 组件更新时，仅重新渲染它而不是刷新整个页面
-        render();
-      });
-    }
-    ```
+#### **`4. react-refresh`？**
+
+`react-refresh` 是 React 官方提供的 HMR（Hot Module Replacement）方案，它可以在代码修改时，仅更新受影响的 React 组件，而不会刷新整个页面，从而保持组件状态。
+
+**适用于：**
+
+* **Vite**（默认支持）
+* **Create React App（CRA）**（默认支持）
+* **Next.js**（默认支持）
