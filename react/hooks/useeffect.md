@@ -151,36 +151,65 @@ const MyComponent = () => {
 
 在 `useEffect` 里面的回调函数会捕获**初次渲染时的变量状态**，即使之后组件状态更新，`useEffect` 内部的**旧闭包**仍然引用的是**旧的变量**。
 
-1. 把 `count` 添加到 `useEffect` 的依赖项
-2. 使用 `useRef` 持久化最新值
-
-```
+````
+```javascript
 import { useState, useEffect, useRef } from "react";
 
-function Counter() {
-  const [count, setCount] = useState(0);
-  const countRef = useRef(count);
+function App() {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      const timer = setInterval(() => {
+        console.log(count); // 这里总是打印初始值 0
+      }, 1000);
+      return () => clearInterval(timer);
+    }, []); // 空数组意味着 effect 只会在组件挂载和卸载时运行
   
-//每次组件渲染（包括初次渲染和每次状态更新后）都会执行。
-//useEffect 确保 countRef.current 始终存储最新的 count。
-  useEffect(() => {
-    countRef.current = count; // 🔥 让 ref 始终存储最新的 count 值
-  });
-
-  useEffect(() => {
-    setTimeout(() => {
-      console.log("当前 count:", countRef.current); // 🔥 使用最新的 count
-    }, 3000);
-  }, []);
-
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>增加</button>
-    </div>
-  );
+    return <button onClick={() => setCount(count + 1)}>Increment {count}</button>;
 }
+
+export default App;
 ```
+````
+
+1. 把 `count` 添加到 `useEffect` 的依赖项
+
+```
+useEffect(() => {
+  const timer = setInterval(() => {
+    console.log(count); // 现在可以正确打印出最新的 count 值
+  }, 1000);
+  return () => clearInterval(timer);
+}, [count]); // 将 count 添加到依赖项数组中
+```
+
+2. 使用 `useRef` 持久化最新值
+
+````
+```javascript
+import { useState, useEffect, useRef } from "react";
+
+function App() {
+    const [count, setCount] = useState(0);
+    const countRef = useRef();
+    
+    useEffect(() => {
+      countRef.current = count;
+    }, [count]);
+    
+    useEffect(() => {
+      const timer = setInterval(() => {
+        console.log(countRef.current); // 使用 ref 获取最新值
+      }, 1000);
+      return () => clearInterval(timer);
+    }, []);
+  
+    return <button onClick={() => setCount(count + 1)}>Increment {count}</button>;
+}
+
+export default App;
+```
+````
 
 ### useEffect 进入无限循环的原因
 
