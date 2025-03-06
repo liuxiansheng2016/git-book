@@ -1259,7 +1259,7 @@ class ErrorBoundary extends React.Component {
 
 ### Key
 
-<mark style="color:red;">提供唯一的 key 可以帮助 React 更快地识别和更新元素</mark>，从而提高性能。当列表中有大量元素时，这一点尤为重要。
+在 React 中，`key` 是用于 **标识列表中每个元素的唯一性** 的特殊属性。当 React 进行 <mark style="color:red;">**列表的动态更新**</mark> 时，<mark style="color:red;">它会通过</mark> <mark style="color:red;"></mark><mark style="color:red;">`key`</mark> <mark style="color:red;"></mark><mark style="color:red;">来</mark> <mark style="color:red;"></mark><mark style="color:red;">**高效地识别哪些元素被添加、删除或更新**</mark><mark style="color:red;">，从而优化渲染性能，避免不必要的 DOM 操作。</mark>
 
 1.使<mark style="color:red;">用唯一标识符</mark>：确保提供的 key 是唯一的，并且在每次渲染时都保持一致。
 
@@ -1274,7 +1274,11 @@ class ErrorBoundary extends React.Component {
 
 数组中使用的键在其同级中应该是唯一的，但它们不需要是全局唯一的。也就是说，你可以在两个不同的数组中使用相同的键
 
-![image](https://github.com/user-attachments/assets/10503c61-a656-40c6-bd30-a2805cb23913)
+当 React 进行 **列表的 Diff 计算** 时，它主要依赖 `key` 来判断：
+
+* **元素是否相同**（`key` 相同，React 复用该元素）
+* **元素是否需要更新**（`key` 相同但内容变更，React 仅更新内容）
+* **元素是否新增或删除**（`key` 发生变化，React 重新创建或移除该元素）
 
 ### 展示组件和 容器组件
 
