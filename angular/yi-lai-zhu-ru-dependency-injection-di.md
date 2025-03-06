@@ -4,6 +4,59 @@ description: "Angular 的依赖注入系统是其核心特性之一。通过依�
 
 # 依赖注入（Dependency Injection, DI）
 
+#### 依赖注入的作用
+
+1. **解耦组件**：通过依赖注入，组件不需要知道它们所依赖的服务是如何被创建或配置的。这意味着你可以更轻松地替换依赖项，而无需修改依赖于该服务的组件代码。
+2. **促进单元测试**：由于依赖关系是在运行时注入的，因此可以在测试环境中提供模拟或假的依赖项来替代真实的依赖项，从而更容易进行单元测试。
+3. **提高模块化和重用性**：依赖注入有助于将应用程序分解成独立的模块，每个模块都有明确的责任范围。这样做的好处是提高了代码的复用性，因为一个模块可以在不同的上下文中重复使用。
+4. **简化配置管理**：通过外部配置文件或编程方式来管理依赖关系，可以使配置更加集中和易于管理。
+5. **支持延迟加载**：某些情况下，你可能不希望在应用启动时就加载所有的依赖项，而是根据需要动态加载它们。依赖注入可以帮助实现这一点。
+
+### **手动提供依赖项（`providers`）**
+
+除了在 `@Injectable({ providedIn: 'root' })` 中全局注册服务，我们也可以 **手动提供依赖项**。
+
+&#x20;**在 `AppModule` 或 `FeatureModule` 中手动提供**
+
+```typescript
+typescript复制编辑import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { LoggerService } from './logger.service'; // 导入服务
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule],
+  providers: [LoggerService], // 在模块中提供服务
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+* `providers: [LoggerService]` 让 `LoggerService` 只在 `AppModule` 作用域内可用，而不是全局。
+
+&#x20;**在 `Component` 级别提供**
+
+如果你想让某个组件拥有独立的 `LoggerService` 实例（而不是共享全局的），可以 **在组件的 `providers` 里定义**。
+
+```typescript
+typescript复制编辑import { Component } from '@angular/core';
+import { LoggerService } from './logger.service';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  providers: [LoggerService] // 组件级别提供
+})
+export class HomeComponent {
+  constructor(private logger: LoggerService) {
+    this.logger.log('HomeComponent 的 logger 实例');
+  }
+}
+```
+
+* `providers: [LoggerService]` **让每个 `HomeComponent` 都拥有自己的 `LoggerService` 实例**，
+
 ### providedIn: 'root'
 
 * **说明**：这个选项告诉 Angular，在根注入器中提供这个服务。这意味着服务在整个应用程序中都是单例的，可以在任何组件中注入和使用。
