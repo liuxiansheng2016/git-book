@@ -84,7 +84,7 @@ export class MyService {
       *   如果需要配置服务的提供范围（如 `providedIn`），`@Injectable()` 是必要的。例如：
 
           ```typescript
-          typescript复制代码@Injectable({
+          @Injectable({
             providedIn: 'root'
           })
           ```
@@ -165,63 +165,173 @@ export class AppComponent {
 }
 ```
 
-#### **InjectionToken**
+### **InjectionToken**
 
 * 用途：用于创建标识符，以便在依赖注入系统中注入非类类型的值。
 * 注入非类类型的值：通过 `@Inject` 装饰器和 `InjectionToken` 来实现。
 
+
+
+### `@Inject` 装饰器 使用场景
+
 #### **注入令牌**
 
 * 定义：注入令牌是 Angular 的依赖注入系统用来识别和提供特定依赖项的唯一标识符。
-*   使用场景：
-
-    * 当你需要注入非类类型的值时，如字符串、数字、布尔值等。
-    * 当你有多个实现同一个接口的服务，并且需要明确指定哪个实现应该被注入时。
-
+* 使用场景：
+  * 当你需要注入非类类型的值时，如字符串、数字、布尔值等。
+  * 当你有多个实现同一个接口的服务，并且需要明确指定哪个实现应该被注入时。
 
 
-```javascript
-// 定义 InjectionToken
-export const API_URL = new InjectionToken<string>('apiUrl');
-export const TIMEOUT = new InjectionToken<number>('timeout');
 
+#### 1. 注入非类类型的依赖
+
+Angular 的依赖注入系统默认使用类作为令牌来解析依赖。但有时候，你可能需要注入一些非类类型的值，比如字符串、数字、对象等。这时就可以使用 `@Inject` 装饰器结合自定义令牌来实现。
+
+**示例代码**
+
+```typescript
+import { Component, Inject } from '@angular/core';
+import { InjectionToken } from '@angular/core';
+
+// 定义一个 InjectionToken 作为自定义令牌
+export const API_URL = new InjectionToken<string>('API_URL');
+
+// 组件
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [HttpClientModule], // 确保导入 HttpClient Module
+  selector: 'app-my-component',
   template: `
-    <h1>Hello from {{ name }}!</h1>
-    <a target="_blank" href="https://angular.dev/overview">
-      Learn more about Angular
-    </a>
-  `,
+    <p>API URL: {{ apiUrl }}</p>
+  `
 })
-export class App implements OnInit {
-  name = 'Angular';
+export class MyComponent {
+  constructor(@Inject(API_URL) public apiUrl: string) {}
+}
 
-  constructor(
-    private httpClient: HttpClient,
-    @Inject(API_URL) private apiUrl: string,
-    @Inject(TIMEOUT) private timeout: number
-  ) {}
+// 在模块中提供依赖
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
-  ngOnInit() {
-    console.log('API URL:', this.apiUrl);
-    console.log('Timeout:', this.timeout);
+@NgModule({
+  declarations: [MyComponent],
+  imports: [BrowserModule],
+  providers: [
+    { provide: API_URL, useValue: 'https://example.com/api' }
+  ],
+  bootstrap: [MyComponent]
+})
+export class AppModule {}
+```
 
-    // 你可以在这里使用这些配置进行其他操作
-    // 例如，发起一个 HTTP 请求
-    this.httpClient.get(this.apiUrl).subscribe(response => {
-      console.log('Response from API:', response);
-    });
+#### 2. 解决依赖注入的歧义
+
+当存在多个相同类型的依赖时，使用 `@Inject` 可以明确指定要注入的具体依赖。
+
+**示例代码**
+
+```typescript
+import { Component, Inject } from '@angular/core';
+
+// 定义服务接口
+interface Logger {
+  log(message: string): void;
+}
+
+// 定义两个不同的日志服务实现
+class ConsoleLogger implements Logger {
+  log(message: string) {
+    console.log('Console Logger: ', message);
   }
 }
 
-// 使用 bootstrapApplication 启动应用
-bootstrapApplication(App, {
+class FileLogger implements Logger {
+  log(message: string) {
+    console.log('File Logger: ', message);
+  }
+}
+
+// 定义 InjectionToken 作为自定义令牌
+const CONSOLE_LOGGER = new InjectionToken<Logger>('ConsoleLogger');
+const FILE_LOGGER = new InjectionToken<Logger>('FileLogger');
+
+// 组件
+@Component({
+  selector: 'app-my-component',
+  template: `
+    <button (click)="logMessage()">Log Message</button>
+  `
+})
+export class MyComponent {
+  constructor(
+    @Inject(CONSOLE_LOGGER) private consoleLogger: Logger,
+    @Inject(FILE_LOGGER) private fileLogger: Logger
+  ) {}
+
+  logMessage() {
+    this.consoleLogger.log('This is a console log message');
+    this.fileLogger.log('This is a file log message');
+  }
+}
+
+// 在模块中提供依赖
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+@NgModule({
+  declarations: [MyComponent],
+  imports: [BrowserModule],
   providers: [
-    { provide: API_URL, useValue: 'https://api.example.com' },
-    { provide: TIMEOUT, useValue: 5000 },
+    { provide: CONSOLE_LOGGER, useClass: ConsoleLogger },
+    { provide: FILE_LOGGER, useClass: FileLogger }
   ],
-});
+  bootstrap: [MyComponent]
+})
+export class AppModule {}
 ```
+
+在这个例子中，我们定义了两个不同的日志服务 `ConsoleLogger` 和 `FileLogger`，它们都实现了 `Logger` 接口。为了区分这两个服务，我们创建了两个 `InjectionToken` 作为自定义令牌 `CONSOLE_LOGGER` 和 `FILE_LOGGER`。在 `MyComponent` 的构造函数中，使用 `@Inject` 装饰器分别注入这两个服务。在 `AppModule` 的 `providers` 数组中，为每个令牌提供对应的服务类。
+
+#### 3. 注入外部库或第三方服务
+
+当需要注入外部库或第三方服务时，由于这些库或服务可能没有遵循 Angular 的依赖注入规则，使用 `@Inject` 可以方便地将它们集成到 Angular 应用中。
+
+**示例代码**
+
+```typescript
+import { Component, Inject } from '@angular/core';
+import * as moment from 'moment';
+import { InjectionToken } from '@angular/core';
+
+// 定义 InjectionToken 作为自定义令牌
+export const MOMENT = new InjectionToken<typeof moment>('Moment');
+
+// 组件
+@Component({
+  selector: 'app-my-component',
+  template: `
+    <p>Current date: {{ currentDate }}</p>
+  `
+})
+export class MyComponent {
+  currentDate: string;
+
+  constructor(@Inject(MOMENT) private momentService: typeof moment) {
+    this.currentDate = this.momentService().format('YYYY-MM-DD');
+  }
+}
+
+// 在模块中提供依赖
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+@NgModule({
+  declarations: [MyComponent],
+  imports: [BrowserModule],
+  providers: [
+    { provide: MOMENT, useValue: moment }
+  ],
+  bootstrap: [MyComponent]
+})
+export class AppModule {}
+```
+
+在这个示例中，我们使用 `@Inject` 装饰器将第三方库 `moment` 注入到 `MyComponent` 中。通过定义 `InjectionToken` 类型的 `MOMENT` 作为自定义令牌，并在 `AppModule` 的 `providers` 数组中使用 `useValue` 提供 `moment` 库的引用。在 `MyComponent` 的构造函数中，使用 `@Inject(MOMENT)` 来注入这个第三方库。
