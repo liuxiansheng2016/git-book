@@ -131,39 +131,179 @@ export class HeroArena {
 }
 ```
 
-### 构造函数注入
+### 怎么注入
 
-在 Angular 中，依赖项通常是通过构造函数注入的。Angular 的编译器会分析构造函数参数，并从 DI 系统中获取相应的依赖项。
+在 Angular 中，除了 **构造函数注入（Constructor Injection）**，还有其他方式可以将依赖项提供给组件或服务。以下是几种常见的依赖注入（DI）方式：
 
-<pre class="language-javascript"><code class="lang-javascript"><strong>@Injectable({
-</strong>  providedIn: 'root'
-})
-export class MyService {
-  constructor(private anotherService: AnotherService) {}
+***
+
+#### <mark style="color:red;">**1. 构造函数注入（Constructor Injection）**</mark>
+
+🔹 **最常见、最推荐的方式**，Angular 会自动解析并注入依赖项。
+
+```typescript
+export class HeroComponent {
+  constructor(private heroService: HeroService) {}
 }
-</code></pre>
+```
 
-### 生命周期钩子和注入
+✅ **适用于**：
 
-```javascript
-import { Component, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+* **大多数情况**，特别是**服务（Service）和组件（Component）**。
+* **类型可推断**的依赖（例如 `HeroService`）。
 
-@Component({
-  selector: 'app-root',
-  template: `<h1>Hello, {{ title }}!</h1>`
-})
-export class AppComponent {
-  title = 'Angular App';
-  private http = inject(HttpClient);
+❌ **局限性**：
 
-  ngOnInit() {
-    this.http.get('https://api.example.com/data').subscribe(data => {
-      console.log(data);
-    });
+* **不能动态更改依赖**（只能在组件创建时注入）。
+* **如果依赖是可选的或动态的，构造函数可能不是最佳选择**。
+
+***
+
+#### <mark style="color:red;">**2.**</mark><mark style="color:red;">**&#x20;**</mark><mark style="color:red;">**`@Inject`**</mark><mark style="color:red;">**&#x20;**</mark><mark style="color:red;">**显式注入**</mark>
+
+🔹 **用于无法自动推断类型的情况，例如 `InjectionToken` 或字符串、数字、对象等**。
+
+```typescript
+constructor(@Inject('API_URL') private apiUrl: string) {
+  console.log(this.apiUrl);
+}
+```
+
+✅ **适用于**：
+
+* **非类依赖项（string、number、object）**。
+* **多个实现（useClass/useExisting）**。
+
+***
+
+#### **3. `@Optional()` 可选依赖注入**
+
+🔹 **有时候，依赖项可能不存在，例如：某些服务是可选的，或者仅在某些情况下提供**。
+
+```typescript
+constructor(@Optional() private loggerService?: LoggerService) {}
+```
+
+✅ **适用于**：
+
+* **某些服务不是必须的，组件应该在服务不存在时仍能正常工作**。
+* **避免未提供依赖项时报错**。
+
+***
+
+#### **4. `@Self()` 仅从当前组件或指令的 `providers` 获取依赖**
+
+🔹 **防止 Angular 解析父级 `Injector`，强制只从当前 `Injector` 获取依赖**。
+
+```typescript
+constructor(@Self() private service: MyService) {}
+```
+
+✅ **适用于**：
+
+* **确保某个依赖项仅在当前组件或指令中注入**，而不会从父级模块继承。
+
+❌ **局限性**：
+
+* **如果当前 `providers` 未提供该依赖项，则会抛出错误**。
+
+***
+
+#### **5. `@SkipSelf()` 跳过当前级别，从父级 `Injector` 获取依赖**
+
+🔹 **用于指令或服务时，跳过当前 `Injector`，从父级 `Injector` 获取依赖**。
+
+```typescript
+constructor(@SkipSelf() private parentService: ParentService) {}
+```
+
+✅ **适用于**：
+
+* **子组件或指令不应该创建自己的实例，而应使用父级提供的实例**。
+
+❌ **局限性**：
+
+* **如果父级 `Injector` 也没有提供依赖项，则会抛出错误**。
+
+***
+
+#### **6. `@Host()` 限制依赖项查找范围到宿主组件**
+
+🔹 **用于指令或子组件时，只允许依赖项来自宿主组件，而不是更高层级的 `Injector`**。
+
+```typescript
+constructor(@Host() private parentService: ParentService) {}
+```
+
+✅ **适用于**：
+
+* **指令依赖于宿主组件的某个服务**。
+* **防止意外使用了更高层级 `Injector` 提供的实例**。
+
+***
+
+#### <mark style="color:red;">**7.**</mark><mark style="color:red;">**&#x20;**</mark><mark style="color:red;">**`inject()`**</mark><mark style="color:red;">**&#x20;**</mark><mark style="color:red;">**在函数或生命周期钩子中手动注入**</mark>
+
+🔹 **适用于非构造函数上下文，比如工厂函数、`useFactory` 提供者，或类的静态方法**。
+
+```typescript
+import { inject } from '@angular/core';
+
+export class HeroComponent {
+  private heroService = inject(HeroService);
+
+  getHero() {
+    return this.heroService.getHeroes();
   }
 }
 ```
+
+✅ **适用于**：
+
+* **函数式注入，例如在独立函数或静态方法中获取依赖**。
+* **不依赖构造函数，可以在类的其他部分动态注入**。
+
+***
+
+#### **8. `ViewChild` / `ContentChild` 组件内获取子组件或指令**
+
+🔹 **可以获取组件模板中的子组件或指令，而不是通过 `providers` 注入**。
+
+```typescript
+@ViewChild(ChildComponent) childComponent!: ChildComponent;
+```
+
+✅ **适用于**：
+
+* **组件内部需要访问子组件的方法或属性**。
+
+***
+
+#### **总结**
+
+| **方式**                           | **使用场景**      | **适用情况**                    |
+| -------------------------------- | ------------- | --------------------------- |
+| **构造函数注入**                       | 最常见、推荐        | 适用于所有 `Service`、`Component` |
+| **`@Inject()`**                  | 需要显式指定 Token  | `InjectionToken`、字符串、对象等    |
+| **`@Optional()`**                | 依赖项可能不存在      | 依赖项是可选的                     |
+| **`@Self()`**                    | 限制从当前组件获取     | 确保当前 `Injector` 提供依赖        |
+| **`@SkipSelf()`**                | 仅从父级获取依赖      | 避免子组件创建自己的实例                |
+| **`@Host()`**                    | 依赖项仅来自宿主组件    | 限制 `Injector` 查找范围          |
+| **`inject()`**                   | 需要在非构造函数中获取依赖 | `useFactory` 或非类方法          |
+| **`ViewChild` / `ContentChild`** | 获取模板子组件       | 组件模板中的组件或指令                 |
+
+***
+
+💡 **最佳实践**
+
+1. **首选构造函数注入**，它是最简单、最推荐的方式。
+2. **当依赖项是可选的时，使用 `@Optional()`**，避免应用崩溃。
+3. **如果依赖项不能自动推断，使用 `@Inject()`**。
+4. **如果不希望从父级继承依赖项，使用 `@Self()`**。
+5. **如果希望依赖项只来自父级，而非当前组件，使用 `@SkipSelf()`**。
+6. **如果在组件内部需要获取子组件，使用 `ViewChild` 或 `ContentChild`**。
+
+这样可以 **合理利用 Angular 依赖注入的各种方式，提高代码的灵活性和可维护性** 🚀
 
 ### **InjectionToken**
 
