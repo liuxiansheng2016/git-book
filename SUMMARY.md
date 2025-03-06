@@ -39,7 +39,6 @@
   * [性能优化](react/xin-neng-you-hua.md)
   * [生命周期](react/lifecycle.md)
   * [Next.js](react/next.js.md)
-  * [问题](react/wen-ti.md)
   * [更新](react/geng-xin.md)
   * [面试题](react/mian-shi-ti.md)
 * [Node](node/README.md)
