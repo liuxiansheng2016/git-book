@@ -74,7 +74,7 @@ export class MyService {
 }
 ```
 
-#### `@Injectable()` 和 `@Inject`
+### `@Injectable()` 和 `@Inject`
 
 1. `@Injectable()`
    1. **启用依赖注入**：
@@ -129,6 +129,85 @@ export class HeroArena {
     @Inject(HttpClient) private http: HttpClient,
   ) {}
 }
+```
+
+```javascript
+import { Inject, Injectable, InjectionToken } from '@angular/core';
+export const BROWSER_STORAGE = new InjectionToken<Storage>('Browser Storage', {
+  providedIn: 'root',
+  factory: () => localStorage
+});
+@Injectable({
+  providedIn: 'root'
+})
+export class BrowserStorageService {
+  constructor(@Inject(BROWSER_STORAGE) public storage: Storage) {}
+  get(key: string) {
+    return this.storage.getItem(key);
+  }
+  set(key: string, value: string) {
+    this.storage.setItem(key, value);
+  }
+}
+```
+
+### @Inject 和inject()
+
+* **`@Inject`** 适用于**构造函数参数**，主要用于显式注入 `InjectionToken` 或无法自动推断的依赖。
+* **`inject()`** 适用于**非构造函数上下文**，尤其适用于**服务、工厂函数、APP\_INITIALIZER**，简化注入方式。
+
+`@Inject` 是一个参数装饰器，通常用于构造函数参数中，显式指定依赖项。它主要在某些情况下用于**绕过类型推断的限制**，例如：
+
+* 依赖项是 `InjectionToken`
+* 依赖项的类型无法被 Angular 解析
+* 需要显式指定提供者
+
+```
+import { Injectable, Inject, InjectionToken } from '@angular/core';
+
+// 创建一个 InjectionToken
+export const API_URL = new InjectionToken<string>('apiUrl');
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ApiService {
+  constructor(@Inject(API_URL) private apiUrl: string) {}
+
+  getApiUrl() {
+    return this.apiUrl;
+  }
+}
+```
+
+* 这里 `API_URL` 不是一个类，而是 `InjectionToken`，Angular 无法自动推断类型，所以需要 `@Inject(API_URL)`。
+* `ApiService` 通过 `@Inject(API_URL)` 让 Angular 知道如何解析 `apiUrl` 依赖。
+
+#### `inject()` 方法（Angular 14+）
+
+`inject()` 是一个函数，主要用于在**非构造函数上下文**中获取依赖，如：
+
+* 在工厂函数中
+* 在类的静态方法或生命周期钩子中（如 `ngOnInit`）
+* 在 `APP_INITIALIZER` 里
+
+如果你不想在构造函数中显式声明依赖，而是在**类的内部**使用依赖项（例如私有属性），可以使用 `inject()`，它更简洁。此外，在 **工厂函数** 或 **APP\_INITIALIZER** 这种没有构造函数的地方，它也是唯一选择。
+
+```
+import { APP_INITIALIZER } from '@angular/core';
+import { ConfigService } from './config.service';
+
+export function initializeApp() {
+  const configService = inject(ConfigService);
+  return () => configService.loadConfig();
+}
+
+export const appInitializerProvider = {
+  provide: APP_INITIALIZER,
+  useFactory: initializeApp,
+  multi: true,
+};
+
 ```
 
 ### 怎么注入
