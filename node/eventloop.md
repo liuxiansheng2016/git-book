@@ -43,6 +43,7 @@ Node.js 的事件循环由 **libuv** 负责管理，主要分为以下 6 个阶�
 ### `setImmediate` 和 `setTimeout`
 
 * 在 **主线程** 中，`setImmediate` 和 `setTimeout(..., 0)` 的执行顺序不确定，取决于事件循环的调度。
+  * 在主模块中，事件循环启动时，定时器阶段和检查阶段的执行顺序可能因 Node.js 版本、系统性能或环境因素而变化。
 
 <pre><code>```javascript
 <strong>// 示例：在主模块中使用
