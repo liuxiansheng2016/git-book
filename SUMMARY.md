@@ -9,7 +9,7 @@
   * [装饰器 decorator](angular/zhuang-shi-qi-decorator.md)
   * [依赖注入（Dependency Injection, DI）](angular/yi-lai-zhu-ru-dependency-injection-di/README.md)
     * [提供不同的实现](angular/yi-lai-zhu-ru-dependency-injection-di/ti-gong-bu-tong-de-shi-xian.md)
-    * [设计理念](angular/yi-lai-zhu-ru-dependency-injection-di/she-ji-li-nian.md)
+    * [设计模式](angular/yi-lai-zhu-ru-dependency-injection-di/she-ji-mo-shi.md)
   * [Angular 指令](angular/angular-zhi-ling.md)
   * [HttpClient](angular/httpclient.md)
   * [路由](angular/lu-you.md)
