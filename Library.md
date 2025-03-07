@@ -2,42 +2,42 @@
 
 
 
-## D3
+### D3
 
-### 选择与操作 DOM 元素
+#### 选择与操作 DOM 元素
 
 * **`d3.select()`**：选择文档中匹配指定选择器的第一个元素，返回一个包含该元素的选择集。
 * **`d3.selectAll()`**：选择文档中匹配指定选择器的所有元素，返回一个包含这些元素的选择集。
 * **`selection.attr()`**：设置或获取所选元素的属性。如`selection.attr('width', 100)`可设置元素宽度为 100。
 * **`selection.style()`**：设置或获取所选元素的 CSS 样式。例如`selection.style('fill', 'red')`将元素填充颜色设为红色。
 
-### 数据处理
+#### 数据处理
 
 * **`d3.scaleLinear()`**：创建一个线性比例尺，用于将数据域映射到目标范围。如`const scale = d3.scaleLinear().domain([0, 100]).range([0, 500])`。
 * **`d3.scaleOrdinal()`**：创建一个序数比例尺，用于将离散的输入值映射到离散的输出值。
 * **`d3.shuffle()`**：打乱数组中元素的顺序。
 
-### 图表绘制
+#### 图表绘制
 
 * **`d3.axisBottom()`**：创建一个底部坐标轴生成器。结合比例尺使用，如`const xAxis = d3.axisBottom(xScale)`。
 * **`d3.axisLeft()`**：创建一个左侧坐标轴生成器。
 * **`d3.line()`**：创建一个折线生成器函数，用于生成折线图的路径数据。可设置`x`和`y`访问器函数，如`const line = d3.line().x(d => xScale(d.x)).y(d => yScale(d.y))`。
 * **`d3.arc()`**：创建一个弧生成器函数，用于绘制饼图、环形图等。
 
-### 数据绑定
+#### 数据绑定
 
 * **`selection.data()`**：将数据绑定到选择的元素上，返回一个更新选择集。
 * **`selection.enter()`**：返回一个包含新数据项对应的占位元素的选择集，通常用于创建新元素。
 * **`selection.exit()`**：返回一个包含与已删除数据项对应的元素的选择集，用于移除元素。
 
-### 交互
+#### 交互
 
 * **`selection.on()`**：为元素添加事件监听器。如`selection.on('click', function() { console.log('Clicked!'); })`。
 * **`d3.event`**：包含当前正在处理的事件的相关信息，在事件处理函数中可获取鼠标位置等信息。
 
 <figure><img src=".gitbook/assets/image (12).png" alt=""><figcaption></figcaption></figure>
 
-## GoJS
+### GoJS
 
 #### GoJS 特性
 
@@ -111,7 +111,7 @@ myDiagram.model = new go.TreeModel([
 ]);
 ```
 
-## 可视化：SVG 与 Canvas
+### 可视化：SVG 与 Canvas
 
 **SVG (Scalable Vector Graphics)**
 
@@ -510,6 +510,11 @@ window.electronAPI.receive('show-dialog-reply', (result) => {
 * **主进程 (main.js)** 使用 `ipcMain.on('show-dialog', callback)` 监听渲染进程的消息，调用 `dialog.showMessageBox` 显示对话框，并通过 `event.reply` 将结果返回。
 * **预加载脚本 (preload.js)** 使用 `contextBridge.exposeInMainWorld` 暴露 `send` 和 `receive` 方法，确保渲染进程只能访问允许的 IPC 通道。
 * **渲染进程 (renderer.js)** 通过 `electronAPI.send` 发送消息，通过 `electronAPI.receive` 接收主进程返回的结果。
+
+#### 主进程与渲染进程通信
+
+**1. `ipcMain` 和 `ipcRenderer`**\
+这是 Electron 中最常用的主进程与渲染进程通信的方式，`ipcMain` 用于主进程，`ipcRenderer` 用于渲染进程。
 
 #### preload.js
 
