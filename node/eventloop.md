@@ -123,3 +123,146 @@ Next tick
 Timer 1
 Immediate
 ```
+
+在 Node.js 中，错误处理是开发中至关重要的部分。不同类型的错误（同步错误和异步错误）需要不同的处理方式。以下是详细的错误处理方法：
+
+***
+
+### **1. 同步错误处理**
+
+同步代码的错误可以直接使用 `try...catch` 捕获。例如：
+
+```javascript
+try {
+  let data = JSON.parse('invalid json'); // 解析错误
+  console.log(data);
+} catch (error) {
+  console.error("捕获到同步错误:", error.message);
+}
+```
+
+* **特点**：
+  * 代码在 `try` 语句块中执行，如果发生错误会立即抛出，并被 `catch` 捕获。
+  * 适用于**同步代码**，不能捕获**异步操作中的错误**。
+
+***
+
+### **2. 异步错误处理**
+
+在 Node.js 中，大部分操作（如文件 I/O、网络请求等）都是异步的。异步错误不能直接用 `try...catch` 处理，而需要根据不同的编程模式来捕获。
+
+#### **2.1 回调模式（Error-First Callback）**
+
+传统的 Node.js 异步 API 采用**错误优先回调**模式，即回调函数的**第一个参数是错误对象**，如果没有错误，则该参数为 `null`。
+
+```javascript
+const fs = require('fs');
+
+fs.readFile('nonexistent.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error("读取文件出错:", err.message);
+    return;
+  }
+  console.log("文件内容:", data);
+});
+```
+
+* **优点**：适用于**回调风格**的 API，可确保错误不会被忽略。
+* **缺点**：容易出现**回调地狱**（回调嵌套过深）。
+
+***
+
+#### **2.2 Promise 处理异步错误**
+
+使用 `Promise` 的 `.catch()` 方法捕获错误：
+
+```javascript
+const fs = require('fs').promises;
+
+fs.readFile('nonexistent.txt', 'utf8')
+  .then(data => console.log("文件内容:", data))
+  .catch(err => console.error("读取文件出错:", err.message));
+```
+
+***
+
+#### **2.3 async/await 结合 try...catch**
+
+在 `async/await` 中，可以使用 `try...catch` 捕获异步错误：
+
+```javascript
+const fs = require('fs').promises;
+
+async function readFileAsync() {
+  try {
+    let data = await fs.readFile('nonexistent.txt', 'utf8');
+    console.log("文件内容:", data);
+  } catch (err) {
+    console.error("读取文件出错:", err.message);
+  }
+}
+
+readFileAsync();
+```
+
+* **优点**：
+  * 代码结构更加清晰，避免回调地狱问题。
+  * 易于维护，类似于同步代码的错误处理方式。
+
+***
+
+### **3. 事件触发错误（EventEmitter）**
+
+Node.js 使用 `EventEmitter` 处理事件，有些错误会通过 `'error'` 事件触发。例如：
+
+```javascript
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
+
+emitter.on('error', (err) => {
+  console.error("捕获到事件错误:", err.message);
+});
+
+// 触发错误
+emitter.emit('error', new Error("Something went wrong"));
+```
+
+* **注意**：如果 `error` 事件没有监听器，Node.js 进程会崩溃。因此，建议始终**监听 `'error'` 事件**。
+
+***
+
+### **4. 全局错误处理**
+
+#### **4.1 捕获未处理的同步错误**
+
+```javascript
+process.on('uncaughtException', (err) => {
+  console.error("未捕获的异常:", err.message);
+  process.exit(1); // 退出进程，避免不稳定状态
+});
+```
+
+* **注意**：仅用于**日志记录**或**应急处理**，不推荐在生产环境下依赖它。
+
+#### **4.2 捕获未处理的 Promise 错误**
+
+```javascript
+process.on('unhandledRejection', (reason, promise) => {
+  console.error("未处理的 Promise 拒绝:", reason);
+});
+```
+
+* `unhandledRejection` 监听的是所有**未处理的 Promise 错误**，可以用于**调试和日志记录**。
+
+***
+
+### **总结**
+
+| **错误类型**        | **处理方式**                                                                                 |
+| --------------- | ---------------------------------------------------------------------------------------- |
+| **同步错误**        | 使用 `try...catch` 捕获                                                                      |
+| **回调模式**        | 通过 `if (err) {...}` 处理回调中的错误                                                             |
+| **Promise**     | 使用 `.catch()` 处理错误                                                                       |
+| **async/await** | 使用 `try...catch` 捕获异步错误                                                                  |
+| **事件错误**        | 监听 `'error'` 事件，如 `eventEmitter.on('error', handler)`                                    |
+| **全局错误**        | `process.on('uncaughtException', handler)` 和 `process.on('unhandledRejection', handler)` |
