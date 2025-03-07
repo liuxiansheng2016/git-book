@@ -6,20 +6,29 @@
 
 事件驱动：Node.js 使用事件驱动模型，当某个事件发生时，会触发相应的回调函数。
 
-事件循环的详细流程
+### 事件循环的详细流程
 
-1 初始化：
+初始化：
 
 Node.js 启动时，首先执行主模块中的同步代码。
 
-### 事件循环。
+**事件循环的 6 个阶段**
 
-1. Timers：执行 setTimeout 和 setInterval 设置的回调函数。
-2. Pending Callbacks：执行一些系统操作的回调函数，如 TCP 错误。
-3. Idle, Prepare：内部使用。这个阶段通常用于内部统计和性能分析。
-4. Poll：检索新的 I/O 事件；执行与 I/O 相关的回调。
-5. Check：执行 setImmediate 设置的回调函数。
-6. Close Callbacks：执行一些关闭回调，例如 socket.on('close', ...)。
+Node.js 的事件循环由 **libuv** 负责管理，主要分为以下 6 个阶段（按照执行顺序）：
+
+<table><thead><tr><th>阶段</th><th width="321">说明</th><th>主要执行任务</th></tr></thead><tbody><tr><td><strong>1. timers</strong></td><td>处理 <code>setTimeout</code> 和 <code>setInterval</code> 的回调</td><td>触发已到期的定时器</td></tr><tr><td><strong>2. I/O callbacks</strong></td><td>处理上一轮循环中延迟的 I/O 回调</td><td>读取文件、网络请求等</td></tr><tr><td><strong>3. idle, prepare</strong></td><td>内部使用，Node.js 内部调用</td><td>很少涉及</td></tr><tr><td><strong>4. poll</strong></td><td>处理新的 I/O 事件</td><td>主要的 I/O 处理阶段</td></tr><tr><td><strong>5. check</strong></td><td>处理 <code>setImmediate</code> 回调</td><td><code>setImmediate()</code> 回调会在这里执行</td></tr><tr><td><strong>6. close callbacks</strong></td><td>处理 <code>close</code> 事件</td><td>关闭文件描述符、socket 连接等</td></tr></tbody></table>
+
+***
+
+### **事件循环的执行流程**
+
+**同步代码 → 异步回调任务**
+
+1. **Node.js 先执行所有同步代码**
+2. **遇到异步任务（如 I/O 操作、`setTimeout`），将其交给 `libuv`**
+3. **`libuv` 监听 I/O 操作的完成情况**
+4. **当 I/O 任务完成，回调函数被推入事件循环的队列**
+5. **事件循环按顺序执行相应的回调**
 
 ### `setImmediate` 和 `setTimeout`
 

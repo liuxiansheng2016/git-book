@@ -49,7 +49,6 @@
   * [Express](node/express.md)
   * [通信](node/tong-xin.md)
   * [I/O](node/i-o.md)
-  * [Synchronous and Asynchronous](node/synchronous-and-asynchronous.md)
   * [Eventloop](node/eventloop.md)
   * [V8](node/v8.md)
   * [FS](node/fs.md)
