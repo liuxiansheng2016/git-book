@@ -1,6 +1,6 @@
 # React
 
-主要特性：
+### 主要特性：
 
 1. **组件化**：
    * React 基于组件构建，组件是独立的、可复用的 UI 模块。每个组件可以包含自己的状态和逻辑，并且可以组合成更复杂的 UI。
@@ -25,9 +25,18 @@
 
 
 
+### react 函数式编程
+
+#### **纯函数概念** 纯函数是函数式编程的核心概念之一，它具有两个重要特性：一是相同的输入总是返回相同的输出；二是不产生任何副作用，即不修改外部状态。在 React 中，函数式组件本质上就是纯函数。
+
+#### 不可变数据 函数式编程强调不可变数据，即数据一旦创建就不能被修改。在 React 中，使用不可变数据可以更容易地跟踪状态的变化，提高性能和可维护性。
+
+**高阶组件定义**\
+高阶组件是一个函数，它接收一个组件作为参数，并返回一个新的组件。这是函数式编程中高阶函数思想在 React 中的体现。
+
 ### 搭建步骤
-腾讯云 NPM 镜像：
-npm config set registry https://mirrors.cloud.tencent.com/npm/
+
+腾讯云 NPM 镜像： npm config set registry https://mirrors.cloud.tencent.com/npm/
 
 1 npm install -g create-react-app （npm uninstall -g create-react-app before install）
 
