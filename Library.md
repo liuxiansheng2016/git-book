@@ -707,3 +707,44 @@ window.electronPort.onMessage((message) => {
   * 是基于标准 Web MessageChannel API 的 Electron 版本，专门在主进程中使用。
   * 通过 `MessageChannelMain` 可以创建一对互联的 MessagePort 对象，然后将其中一个端口传递到渲染进程，实现专用的双向通信通道。
   * 适用于需要更细粒度、独立通道通信的场景，可以将特定的通信逻辑隔离开来，且更符合 Web 标准。
+
+### Lodash
+
+&#x20;是一个流行的 JavaScript 实用工具库，提供了模块化的、性能优越的函数来处理数组、对象、字符串等常见编程任务。它旨在提高开发效率，同时增强代码的可读性和可维护性。Lodash 可以在浏览器端和服务器端（Node.js）使用，并且与多数前端框架（如 Angular、React、Vue 等）兼容。
+
+#### 主要特性
+
+1. **一致性**：提供一致的接口，使得操作集合（数组/对象）更加简单。
+2. **模块化**：你可以只导入你需要的部分，从而减少打包后的文件大小。
+3. **跨环境支持**：无论是在现代浏览器还是老旧浏览器中都能正常工作，同时也支持 Node.js 环境。
+4. **性能优化**：针对各种数据类型和场景进行了性能优化。
+
+#### 常见用途
+
+* **集合操作**：例如 `_.map`, `_.filter`, `_.reduce` 等，用于数组或对象的操作。
+* **对象操作**：如 `_.get`, `_.set`, `_.has` 等，简化了对嵌套对象属性的访问。
+* **函数操作**：比如 `_.debounce`, `_.throttle` 用来控制函数调用频率；`_.once` 确保函数仅执行一次。
+* **实用工具**：包括创建浅拷贝(`_.clone`), 深拷贝(`_.cloneDeep`)，检查数据类型(`_.isNumber`, `_.isObject`, etc.)等。
+
+
+
+**示例：使用Lodash进行防抖操作**
+
+假设我们需要限制搜索框输入事件的频率：
+
+```
+import { Component, OnInit } from '@angular/core';
+import _ from 'lodash';
+
+@Component({
+  selector: 'app-search',
+  template: `<input type="text" placeholder="搜索..." (input)="onSearch($event)">`
+})
+export class SearchComponent implements OnInit {
+  ngOnInit(): void {}
+
+  onSearch = _.debounce((event) => {
+    console.log(`Searching for ${event.target.value}...`);
+  }, 300);
+}
+```
