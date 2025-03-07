@@ -45,3 +45,21 @@ ngOnInit() {
 ```javascript
 this.messageService.sendMsg('hello world');
 ```
+
+### `BehaviorSubject` 的特点：
+
+* **初始值**：当创建 `BehaviorSubject` 实例时，必须指定一个初始值。任何新订阅者都会立即收到这个初始值或最近一次发出的值。
+* **状态记忆**：即使没有新的值被发出，订阅者也会得到最后一次发出的值
+
+```
+const behaviorSubject = new Rx.BehaviorSubject(0); // 初始值为 0
+
+behaviorSubject.subscribe(val => console.log('Subscriber A:', val));
+
+behaviorSubject.next(1);
+behaviorSubject.next(2);
+
+behaviorSubject.subscribe(val => console.log('Subscriber B:', val)); // Subscriber B 接收 2
+
+behaviorSubject.next(3);
+```
