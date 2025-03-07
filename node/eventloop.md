@@ -30,10 +30,54 @@ Node.js 的事件循环由 **libuv** 负责管理，主要分为以下 6 个阶�
 4. **当 I/O 任务完成，回调函数被推入事件循环的队列**
 5. **事件循环按顺序执行相应的回调**
 
+<mark style="color:red;">**定时器阶段（timers phase）只在每一轮事件循环的开始时检查和执行已到期的定时器**</mark>。如果你在 I/O 回调内部调用了定时器（比如 setTimeout(callback, 0)），那么此时当前轮次的定时器阶段已经过去，<mark style="color:red;">新的定时器回调只能在下一轮事件循环的 timers 阶段中被执行</mark>。这是由事件循环的设计决定的。
+
+具体来说：
+
+* **事件循环阶段顺序：** Node.js 的事件循环由多个阶段构成，每个阶段都有特定的任务。定时器阶段位于整个事件循环的最前面，每一轮循环一开始就检查所有到期的定时器。
+* **I/O 回调执行时机：** 当进入 I/O 操作的 poll 阶段并执行相应的 I/O 回调时，定时器阶段已经结束。如果在 I/O 回调中安排了新的定时器，这些定时器会在当前轮次中等待，但不会被执行，而是等到下一轮事件循环的 timers 阶段。
+* **设计目的：** 这种设计确保了事件循环各阶段之间有明确的划分，避免在同一轮内反复切换，从而帮助维护代码执行的顺序和系统的整体响应性。
+
+这样，**即使设置了 0 毫秒延时，定时器也要等到下一个事件循环轮次才能执行**，这与 setImmediate() 在 I/O 回调中通常先于 setTimeout(callback, 0) 执行形成了对比。
+
 ### `setImmediate` 和 `setTimeout`
 
 * 在 **主线程** 中，`setImmediate` 和 `setTimeout(..., 0)` 的执行顺序不确定，取决于事件循环的调度。
-* 在 **I/O 回调** 中，`setImmediate` **总是先执行**，因为检查阶段（Check phase）紧跟在 I/O 之后，而定时器阶段（Timers phase）在后面。
+
+<pre><code>```javascript
+<strong>// 示例：在主模块中使用
+</strong>setImmediate(() => {
+    console.log("setImmediate callback");
+  });
+setTimeout(() => {
+    console.log("setTimeout callback");
+  }, 0);
+  
+    console.log("Main module end");
+  
+```
+</code></pre>
+
+输出
+
+```
+Main module end
+setTimeout callback
+setImmediate callback
+```
+
+* 在 I/O 回调中，`setImmediate` 通常会比 `setTimeout`（延迟设为 0）先执行。因为在 I/O 回调完成后，事件循环会先进入检查阶段执行 `setImmediate` 队列中的回调，然后再进入下一个定时器阶段执行 `setTimeout` 回调。
+
+### `process.nextTick()` 和 `setImmediate()`
+
+&#x20;都用于调度异步回调，但它们的执行时机和优先级有所不同：
+
+* **执行时机**
+  * **process.nextTick()** 会在当前操作完成后立即执行回调，也就是说，在当前事件循环阶段结束之前，它会清空 nextTick 队列。这使得它的回调能够在继续处理任何 I/O 事件或进入下一个事件循环之前运行。
+  * **setImmediate()** 则将回调调度到下一轮事件循环的 **check 阶段**。这意味着它会在当前 I/O 事件和 nextTick 队列执行完毕之后执行。
+* **优先级与风险**
+  * 由于 `process.nextTick()` 的回调在当前操作完成后立即执行，它的优先级更高。如果频繁或递归地使用 `process.nextTick()`，可能会阻塞事件循环，导致 I/O 事件无法及时处理。
+  * `setImmediate()` 的回调在下一轮事件循环执行，相对来说更“温和”，不会阻塞当前的 I/O 操作。
 
 ### 宏任务（Macrotask）
 
