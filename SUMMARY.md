@@ -31,6 +31,7 @@
   * [问题](readme/wen-ti.md)
   * [升级](readme/sheng-ji.md)
   * [流](angular/liu.md)
+  * [组件设计](angular/zu-jian-she-ji.md)
 * [React](react/README.md)
   * [Hooks](react/hooks/README.md)
     * [UseEffect](react/hooks/useeffect.md)
