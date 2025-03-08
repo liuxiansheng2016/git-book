@@ -232,7 +232,7 @@ Use fs.readdir() or fs.readdirSync() or fsPromises.readdir() to read the content
 * 第三方库：如 memfs、fs-extra 等扩展了文件系统功能，或提供了替代方案。
 * 云存储集成：使用特定云服务的 SDK 来与远程文件系统交互。
 
-#### **使用 memfs**
+### **使用 memfs**
 
 memfs 是一个内存中的虚拟文件系统，适用于测试环境或需要临时存储而不涉及磁盘 I/O 的场景。它完全兼容 Node.js 的 fs API，因此你可以无缝切换到 memfs 而无需修改现有代码。
 
@@ -246,3 +246,143 @@ fs.writeFileSync('/example.txt', 'Hello, world!');
 console.log(fs.readFileSync('/example.txt', 'utf8'));
 
 ```
+
+### **`util.promisify` 介绍**
+
+`util.promisify` 是 Node.js 内置的 `util` 模块提供的一个方法，它可以**将基于回调的函数转换为基于 Promise 的函数**，方便在 `async/await` 语法中使用。
+
+***
+
+#### **1. 为什么需要 `util.promisify`？**
+
+在 Node.js 早期，许多 API 使用**回调函数**进行异步操作，例如：
+
+```javascript
+const fs = require('fs');
+
+fs.readFile('example.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error('读取文件失败:', err);
+    return;
+  }
+  console.log('文件内容:', data);
+});
+```
+
+上面的 `fs.readFile` 需要传入一个**回调函数**来处理数据，这种方式可能导致“回调地狱”（Callback Hell）。
+
+`util.promisify` 可以让它变得更简洁，使其支持 `Promise` 语法。
+
+***
+
+#### **2. 使用 `util.promisify` 转换回调函数**
+
+```javascript
+const fs = require('fs');
+const util = require('util');
+
+// 使用 promisify 转换 fs.readFile
+const readFileAsync = util.promisify(fs.readFile);
+
+async function readFileExample() {
+  try {
+    const data = await readFileAsync('example.txt', 'utf8');
+    console.log('文件内容:', data);
+  } catch (err) {
+    console.error('读取文件失败:', err);
+  }
+}
+
+readFileExample();
+```
+
+✅ **转换后，我们可以使用 `async/await` 让代码更清晰！**
+
+***
+
+#### **3. `util.promisify` 的工作原理**
+
+`util.promisify` **会返回一个新函数**，并封装回调逻辑：
+
+* **如果原始函数执行成功，返回 `resolve(数据)`**
+* **如果原始函数出错，返回 `reject(错误)`**
+
+```javascript
+function originalFunction(param, callback) {
+  // 模拟异步操作
+  setTimeout(() => {
+    if (param === 'error') {
+      callback(new Error('发生错误'));
+    } else {
+      callback(null, `成功: ${param}`);
+    }
+  }, 1000);
+}
+
+// 转换成 Promise 版本
+const promiseFunction = util.promisify(originalFunction);
+
+promiseFunction('Hello')
+  .then((result) => console.log(result)) // 成功: Hello
+  .catch((err) => console.error(err));
+
+promiseFunction('error')
+  .then((result) => console.log(result))
+  .catch((err) => console.error('捕获到错误:', err.message)); // 捕获到错误: 发生错误
+```
+
+***
+
+#### **4. 适用场景**
+
+`util.promisify` 适用于**符合 Node.js 传统回调风格的异步函数**：
+
+```javascript
+function someAsyncTask(arg1, arg2, callback) {
+  // Node.js 传统回调格式 (error-first callback)
+  setTimeout(() => {
+    if (arg1 === 'error') {
+      callback(new Error('操作失败'));
+    } else {
+      callback(null, `结果: ${arg1} - ${arg2}`);
+    }
+  }, 1000);
+}
+```
+
+这种函数的最后一个参数必须是 `callback(error, result)` 格式，才能正确转换。
+
+***
+
+#### **5. `util.promisify` 与 `fs.promises`**
+
+Node.js 的 `fs` 模块本身已经提供了 `fs.promises` 版本，因此**对于 `fs` 相关 API，我们可以直接使用 `fs.promises`**：
+
+```javascript
+const fs = require('fs').promises;
+
+async function readFileExample() {
+  try {
+    const data = await fs.readFile('example.txt', 'utf8');
+    console.log('文件内容:', data);
+  } catch (err) {
+    console.error('读取文件失败:', err);
+  }
+}
+
+readFileExample();
+```
+
+✅ **直接使用 `fs.promises.readFile()`，无需 `util.promisify`！**
+
+***
+
+#### **6. 总结**
+
+| 方式                 | 适用场景           | 使用方式                                                 |
+| ------------------ | -------------- | ---------------------------------------------------- |
+| **回调函数**           | 传统 Node.js API | `fs.readFile('file.txt', callback)`                  |
+| **util.promisify** | 旧的回调风格 API     | `const readFileAsync = util.promisify(fs.readFile);` |
+| **fs.promises**    | `fs` 相关 API    | `await fs.readFile('file.txt')`                      |
+
+&#x20;**`util.promisify` 让回调函数支持 `Promise`，结合 `async/await` 让代码更加简洁和现代化！**

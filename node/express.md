@@ -163,3 +163,208 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../build/index.html'))
 })
 ```
+
+### **Express、Koa、NestJS 的主要区别及适用场景**
+
+| 特性        | Express                    | Koa                        | NestJS                         |
+| --------- | -------------------------- | -------------------------- | ------------------------------ |
+| **架构风格**  | 轻量级，基于回调和中间件               | 轻量级，基于 `async/await` 和洋葱模型 | OOP、DI、模块化架构                   |
+| **核心功能**  | 需要手动配置中间件（如 `body-parser`） | 内置 `koa-bodyparser`，更现代化   | 基于 `Express`/`Fastify`，支持模块化开发 |
+| **中间件处理** | 基于回调                       | 洋葱模型                       | 依赖管道 (Pipes) 和 Guards          |
+| **适用场景**  | 轻量级应用，灵活可扩展                | 适用于现代异步 Web 服务             | 适用于大型、可扩展的企业级应用                |
+
+***
+
+### &#x20;**使用 Express 创建 RESTful API**
+
+安装 Express：
+
+```sh
+npm init -y
+npm install express
+```
+
+创建 `server.js`：
+
+```javascript
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+app.use(express.json()); // 解析 JSON 请求体
+
+app.get('/api/hello', (req, res) => {
+  res.json({ message: 'Hello, Express!' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+```
+
+***
+
+### **在 Express 中实现中间件（Middleware）**
+
+Express 中间件是**一个处理请求的函数**，通常用于日志、认证、错误处理等：
+
+```javascript
+function logger(req, res, next) {
+  console.log(`${req.method} ${req.url}`);
+  next(); // 继续执行下一个中间件
+}
+
+app.use(logger);
+```
+
+***
+
+### **在 Express 中处理错误**
+
+Express 提供了**错误处理中间件**：
+
+```javascript
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: '服务器内部错误' });
+});
+```
+
+示例：
+
+```javascript
+app.get('/error', (req, res, next) => {
+  next(new Error('这是一个错误'));
+});
+```
+
+***
+
+### **在 Express 中进行路由管理**
+
+使用 `express.Router()` 进行模块化管理：
+
+```javascript
+const express = require('express');
+const router = express.Router();
+
+router.get('/users', (req, res) => {
+  res.json([{ id: 1, name: 'Alice' }]);
+});
+
+router.post('/users', (req, res) => {
+  res.status(201).json({ message: '用户已创建' });
+});
+
+module.exports = router;
+```
+
+然后在 `server.js` 中引入：
+
+```javascript
+const userRoutes = require('./routes/users');
+app.use('/api', userRoutes);
+```
+
+***
+
+### **使用 JWT 在 Express 中进行身份验证**
+
+安装 `jsonwebtoken`：
+
+```sh
+npm install jsonwebtoken
+```
+
+示例代码：
+
+```javascript
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'your_secret_key';
+
+// 生成 Token
+app.post('/login', (req, res) => {
+  const user = { id: 1, username: 'admin' };
+  const token = jwt.sign(user, SECRET_KEY, { expiresIn: '1h' });
+  res.json({ token });
+});
+
+// 认证中间件
+function authenticateToken(req, res, next) {
+  const token = req.headers['authorization'];
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+app.get('/protected', authenticateToken, (req, res) => {
+  res.json({ message: '这是受保护的资源' });
+});
+```
+
+***
+
+### **在 Express 中进行参数校验（常用库）**
+
+常见的参数校验库：
+
+* `express-validator`
+* `joi`
+
+**使用 `express-validator`**
+
+安装：
+
+```sh
+npm install express-validator
+```
+
+示例：
+
+```javascript
+const { body, validationResult } = require('express-validator');
+
+app.post('/register',
+  body('email').isEmail(),
+  body('password').isLength({ min: 6 }),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    res.json({ message: '注册成功' });
+  }
+);
+```
+
+***
+
+### **在 Express 中进行 CORS 处理**
+
+安装 `cors`：
+
+```sh
+npm install cors
+```
+
+启用：
+
+```javascript
+const cors = require('cors');
+app.use(cors()); // 允许所有跨域请求
+
+// 限制特定域名
+app.use(cors({
+  origin: 'https://example.com'
+}));
+```
+
+***
+
+#### **总结**
+
+Express 适合**小型应用**，可灵活扩展。它的中间件机制、路由管理、错误处理、JWT 认证、参数校验和 CORS 处理让开发更高效。对于更复杂的项目，NestJS 提供了更完善的架构。
