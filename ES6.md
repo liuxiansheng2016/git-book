@@ -585,6 +585,50 @@ JavaScript 在浏览器或 Node.js 环境中是单线程的，并且采用了事
 * 当一个函数被标记为 `async` 时，它会自动返回一个 `Promise`，并且可以在其内部使用 `await` 来暂停执行直到 `Promise` 被解决（即完成或拒绝）。
 * <mark style="color:red;">使用</mark> <mark style="color:red;"></mark><mark style="color:red;">`await`</mark> <mark style="color:red;"></mark><mark style="color:red;">暂停的是当前异步函数的执行流程，而不是整个主线程。</mark>这意味着其他代码（包括其他异步操作或者定时器等）仍然可以在后台继续运行
 
+`async/await` 是基于 **Promise** 的**语法糖**，它的本质是**对 Promise 进行封装**
+
+```
+function myAsync(generatorFunc) {
+  return function (...args) {
+    const gen = generatorFunc(...args);
+
+    return new Promise((resolve, reject) => {
+      function step(nextFunc, arg) {
+        let next;
+        try {
+          next = nextFunc(arg);
+        } catch (error) {
+          return reject(error);
+        }
+
+        if (next.done) {
+          return resolve(next.value);
+        }
+
+        Promise.resolve(next.value).then(
+          val => step(gen.next.bind(gen), val),
+          err => step(gen.throw.bind(gen), err)
+        );
+      }
+
+      step(gen.next.bind(gen));
+    });
+  };
+}
+
+// 使用 myAsync 运行 Generator 作为 async
+const fetchData = () => new Promise(resolve => setTimeout(() => resolve("数据加载完成"), 1000));
+
+const demo = myAsync(function* () {
+  console.log("开始请求...");
+  const data = yield fetchData();
+  console.log("获取到数据:", data);
+});
+
+demo();
+
+```
+
 ## Generator 函数
 
 Generator 函数是一个可以暂停执行和恢复执行的函数，使用 `function*` 语法声明，内部使用 `yield` 表达式来暂停函数的执行。
