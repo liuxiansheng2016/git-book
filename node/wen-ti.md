@@ -1038,4 +1038,345 @@ server.listen().then(({ url }) => console.log(`Server ready at ${url}`));
 | **性能监控**    | Clinic，PM2                       |
 | **GraphQL** | 代替 REST API                      |
 
-你在哪方面遇到了性能问题？我可以帮助你分析具体的优化点！ 🚀
+## 安全
+
+| **安全风险** | **解决方案** |
+| -------- | -------- |
+
+| **SQL 注入** | 使用参数化查询或 ORM |
+| ---------- | ------------ |
+
+| **XSS** | `helmet.js`，用户输入过滤 |
+| ------- | ------------------ |
+
+| **CSRF** | `csurf`，`SameSite` Cookie |
+| -------- | ------------------------- |
+
+| **DDoS 攻击** | `express-rate-limit`，Redis，WAF |
+| ----------- | ------------------------------ |
+
+| **密码存储** | `bcrypt.js` |
+| -------- | ----------- |
+
+| **API 密钥管理** | `.env` 文件，环境变量 |
+| ------------ | -------------- |
+
+| **依赖漏洞** | `npm audit`，`snyk` |
+| -------- | ------------------ |
+
+| **JWT 认证** | `jsonwebtoken` |
+| ---------- | -------------- |
+
+你的问题涉及到 **Node.js 在高并发、分布式、微服务、性能优化等多个方面的应用**，我会逐一解答这些关键问题，并提供示例代码。🚀
+
+***
+
+### **如何在 Node.js 中处理大文件上传？**
+
+#### **问题**
+
+直接读取大文件到内存可能导致内存溢出，因此要 **使用流（Stream）** 处理大文件。
+
+#### **解决方案**
+
+✅ **使用 `multer` 处理文件上传**
+
+```bash
+npm install multer
+```
+
+```javascript
+const express = require("express");
+const multer = require("multer");
+
+const upload = multer({ dest: "uploads/" });
+const app = express();
+
+app.post("/upload", upload.single("file"), (req, res) => {
+  res.send("File uploaded successfully");
+});
+
+app.listen(3000, () => console.log("Server started"));
+```
+
+✅ **使用 `stream` 处理大文件**
+
+```javascript
+const fs = require("fs");
+
+fs.createReadStream("largefile.txt")
+  .pipe(fs.createWriteStream("copy.txt"))
+  .on("finish", () => console.log("File copied"));
+```
+
+✅ **支持大文件分片上传（前端 + 后端）**
+
+1. **前端** 将文件分片上传
+2. **后端** 逐步接收合并文件片段
+
+***
+
+### **如何实现 API 限流（Rate Limiting）？**
+
+#### **问题**
+
+如果 API **没有速率限制**，可能导致 **DDoS 攻击** 或 **滥用 API 资源**。
+
+#### **解决方案**
+
+✅ **使用 `express-rate-limit`**
+
+```bash
+npm install express-rate-limit
+```
+
+```javascript
+const rateLimit = require("express-rate-limit");
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 分钟
+  max: 100, // 每个 IP 100 次请求
+});
+
+app.use(limiter);
+```
+
+✅ **使用 Redis 实现分布式限流**
+
+```javascript
+const Redis = require("ioredis");
+const redis = new Redis();
+
+async function rateLimiter(req, res, next) {
+  const key = `rate-limit:${req.ip}`;
+  const count = await redis.incr(key);
+  if (count === 1) await redis.expire(key, 60); // 60 秒窗口期
+  if (count > 10) return res.status(429).send("Too Many Requests");
+  next();
+}
+
+app.use(rateLimiter);
+```
+
+***
+
+### &#x20;**如何实现多线程任务调度？**
+
+#### **问题**
+
+Node.js **单线程**，但可以使用 **Worker Threads** 进行计算密集型任务。
+
+#### **解决方案**
+
+✅ **使用 `worker_threads`**
+
+```javascript
+const { Worker } = require("worker_threads");
+
+const worker = new Worker("./worker.js");
+worker.on("message", (msg) => console.log("Result:", msg));
+worker.postMessage({ task: "compute" });
+```
+
+✅ **Worker 线程计算任务**
+
+```javascript
+const { parentPort } = require("worker_threads");
+
+parentPort.on("message", (msg) => {
+  // 计算任务
+  parentPort.postMessage({ result: "done" });
+});
+```
+
+***
+
+### **如何在 Node.js 中实现 WebSocket 连接？**
+
+✅ **使用 `ws`**
+
+```bash
+npm install ws
+```
+
+```javascript
+const WebSocket = require("ws");
+const server = new WebSocket.Server({ port: 8080 });
+
+server.on("connection", (ws) => {
+  ws.on("message", (msg) => console.log(`Received: ${msg}`));
+  ws.send("Hello WebSocket!");
+});
+```
+
+✅ **使用 `socket.io`**
+
+```javascript
+const io = require("socket.io")(server);
+
+io.on("connection", (socket) => {
+  socket.on("message", (msg) => console.log(`Received: ${msg}`));
+  socket.emit("response", "Hello Client!");
+});
+});
+```
+
+***
+
+### **如何在 Node.js 中处理消息队列（RabbitMQ、Kafka）？**
+
+✅ **使用 `amqplib` 连接 RabbitMQ**
+
+```javascript
+const amqp = require("amqplib");
+
+async function sendMsg() {
+  const conn = await amqp.connect("amqp://localhost");
+  const channel = await conn.createChannel();
+  const queue = "tasks";
+  await channel.assertQueue(queue);
+  channel.sendToQueue(queue, Buffer.from("Hello, RabbitMQ!"));
+}
+sendMsg();
+```
+
+✅ **使用 `kafkajs` 连接 Kafka**
+
+```javascript
+const { Kafka } = require("kafkajs");
+
+const kafka = new Kafka({ clientId: "app", brokers: ["localhost:9092"] });
+const producer = kafka.producer();
+
+async function sendMsg() {
+  await producer.connect();
+  await producer.send({ topic: "topic1", messages: [{ value: "Hello Kafka" }] });
+}
+sendMsg();
+```
+
+***
+
+### **如何使用 Redis 进行分布式锁？**
+
+✅ **实现分布式锁**
+
+```javascript
+const Redis = require("ioredis");
+const redis = new Redis();
+
+async function acquireLock(key, ttl) {
+  const lock = await redis.set(key, "locked", "NX", "PX", ttl);
+  return lock === "OK";
+}
+```
+
+***
+
+### **如何在 Node.js 中进行单元测试和集成测试？**
+
+✅ **使用 Jest 进行单元测试**
+
+```bash
+npm install --save-dev jest
+```
+
+```javascript
+test("adds 1 + 2", () => {
+  expect(1 + 2).toBe(3);
+});
+```
+
+✅ **使用 Supertest 进行 API 测试**
+
+```javascript
+const request = require("supertest");
+
+test("GET /api", async () => {
+  const res = await request(app).get("/api");
+  expect(res.statusCode).toBe(200);
+});
+```
+
+***
+
+### **如何实现 OAuth2.0 登录？**
+
+✅ **使用 `passport.js`**
+
+```bash
+npm install passport passport-google-oauth20
+```
+
+```javascript
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: "GOOGLE_CLIENT_ID",
+      clientSecret: "GOOGLE_CLIENT_SECRET",
+      callbackURL: "/auth/google/callback",
+    },
+    (accessToken, refreshToken, profile, done) => {
+      done(null, profile);
+    }
+  )
+);
+```
+
+***
+
+### **如何在 Node.js 中构建微服务架构？**
+
+✅ **使用 NATS 消息总线**
+
+```javascript
+const nats = require("nats").connect("nats://localhost:4222");
+
+nats.subscribe("order.created", (msg) => console.log(`Received: ${msg}`));
+```
+
+✅ **使用 API Gateway（如 Express）**
+
+```javascript
+app.use("/orders", proxy({ target: "http://order-service" }));
+```
+
+***
+
+### **如何实现 SSR（服务端渲染）？**
+
+✅ **使用 Next.js**
+
+```javascript
+export async function getServerSideProps() {
+  return { props: { data: "SSR Example" } };
+}
+```
+
+✅ **使用 `express-handlebars`**
+
+```javascript
+const exphbs = require("express-handlebars");
+app.engine("handlebars", exphbs());
+app.set("view engine", "handlebars");
+```
+
+***
+
+### **总结**
+
+| **问题**          | **解决方案**                     |
+| --------------- | ---------------------------- |
+| **大文件上传**       | `multer` + 流                 |
+| **API 限流**      | `express-rate-limit` + Redis |
+| **多线程**         | `worker_threads`             |
+| **WebSocket**   | `ws` + `socket.io`           |
+| **消息队列**        | RabbitMQ、Kafka               |
+| **Redis 分布式锁**  | `ioredis`                    |
+| **单元测试**        | Jest + Supertest             |
+| **OAuth2.0 登录** | `passport.js`                |
+| **微服务**         | NATS、API Gateway             |
+| **SSR**         | Next.js、Express Handlebars   |

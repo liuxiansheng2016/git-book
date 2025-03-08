@@ -368,3 +368,22 @@ app.use(cors({
 #### **总结**
 
 Express 适合**小型应用**，可灵活扩展。它的中间件机制、路由管理、错误处理、JWT 认证、参数校验和 CORS 处理让开发更高效。对于更复杂的项目，NestJS 提供了更完善的架构。
+
+
+
+### **如何使用 Helmet.js 保护 Express/Koa 应用？**
+
+`helmet.js` 可提供一系列安全增强，如 XSS 保护、隐藏服务器信息等。
+
+#### **安装**
+
+```bash
+bash复制编辑npm install helmet
+```
+
+#### **在 Express 中使用**
+
+```javascript
+javascript复制编辑const helmet = require("helmet");
+app.use(helmet());
+```
