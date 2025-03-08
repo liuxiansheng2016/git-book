@@ -221,3 +221,133 @@ Node.js 提供了多种模块来实现网络通信，包括 HTTP、HTTPS、TCP �
 网络通信：使用 http, https, net, dgram 等模块实现基于 TCP 和 UDP 的网络通信。
 
 WebSocket 通信：使用 ws 库实现全双工的 WebSocket 通信。
+
+
+
+## **使用 WebSocket（socket.io）实现实时通信**
+
+WebSocket 允许**全双工通信**，适用于聊天应用、在线游戏、实时通知等场景。`socket.io` 是 WebSocket 的封装，支持**自动降级到 HTTP 长轮询**，并提供更友好的 API。
+
+***
+
+#### **1. 安装 socket.io**
+
+```sh
+npm install socket.io express
+```
+
+***
+
+#### **2. 在 Node.js（Express）中创建 WebSocket 服务器**
+
+```javascript
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const app = express();
+const server = http.createServer(app); // 创建 HTTP 服务器
+const io = new Server(server, { cors: { origin: '*' } }); // 允许跨域
+
+io.on('connection', (socket) => {
+  console.log(`用户连接：${socket.id}`);
+
+  // 监听消息
+  socket.on('chat message', (msg) => {
+    console.log(`消息: ${msg}`);
+    io.emit('chat message', msg); // 广播消息给所有客户端
+  });
+
+  // 用户断开连接
+  socket.on('disconnect', () => {
+    console.log(`用户断开连接：${socket.id}`);
+  });
+});
+
+server.listen(3000, () => {
+  console.log('服务器运行在 http://localhost:3000');
+});
+```
+
+***
+
+#### **3. 在客户端（HTML）中连接 WebSocket**
+
+```html
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket 聊天</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+  <input id="message" type="text" placeholder="输入消息">
+  <button onclick="sendMessage()">发送</button>
+  <ul id="messages"></ul>
+
+  <script>
+    const socket = io('http://localhost:3000'); // 连接 WebSocket 服务器
+
+    socket.on('chat message', (msg) => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      document.getElementById('messages').appendChild(li);
+    });
+
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      socket.emit('chat message', message); // 发送消息
+      document.getElementById('message').value = ''; // 清空输入框
+    }
+  </script>
+</body>
+</html>
+```
+
+***
+
+#### **4. 监听特定房间（分组）**
+
+如果要实现私聊或特定房间通信，可以使用 `socket.join(room)`：
+
+```javascript
+io.on('connection', (socket) => {
+  socket.on('join room', (room) => {
+    socket.join(room);
+    console.log(`${socket.id} 加入房间 ${room}`);
+  });
+
+  socket.on('message', ({ room, message }) => {
+    io.to(room).emit('message', message); // 仅发送给该房间的用户
+  });
+});
+```
+
+***
+
+#### **5. 服务器推送（如实时通知）**
+
+```javascript
+setInterval(() => {
+  io.emit('notification', { message: '服务器时间 ' + new Date().toLocaleTimeString() });
+}, 5000);
+```
+
+客户端监听：
+
+```javascript
+socket.on('notification', (data) => {
+  console.log(data.message);
+});
+```
+
+***
+
+#### **总结**
+
+* `socket.io` 封装了 WebSocket，支持自动降级（如 HTTP 轮询）。
+* `io.emit` 广播消息，`socket.emit` 发送给特定用户，`io.to(room).emit` 发送给特定房间。
+* 适用于**聊天、实时通知、多人协作、在线游戏**等应用。
+
+你需要 WebSocket 的更多高级功能，比如身份验证、断线重连吗？

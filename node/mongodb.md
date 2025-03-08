@@ -101,3 +101,244 @@ Model.findByIdAndRemove(id, \[options], \[callback]) // 根据 id 查找到并�
 Model.update(conditions, update, \[options], \[callback]) // 根据参数找到并更新
 
 Model.findByIdAndUpdate(id, \[update], \[options], \[callback]) // 根据 id 查找到并更新
+
+
+
+### **如何在 MongoDB 中使用索引优化查询？**
+
+MongoDB 通过索引（Indexes）来加速查询，避免全表扫描。常见索引优化技巧如下：
+
+***
+
+#### **1. 创建索引**
+
+默认情况下，MongoDB 仅在 `_id` 字段上有索引。如果查询涉及其他字段，应手动创建索引：
+
+```javascript
+db.users.createIndex({ age: 1 }) // 对 age 字段创建升序索引
+db.users.createIndex({ name: 1, age: -1 }) // 复合索引（name 升序，age 降序）
+```
+
+***
+
+#### **2. 使用 `explain()` 分析查询**
+
+使用 `explain("executionStats")` 观察查询是否使用了索引：
+
+```javascript
+db.users.find({ age: 30 }).explain("executionStats")
+```
+
+**关键字段分析：**
+
+* `IXSCAN`（索引扫描）：查询使用了索引，性能较高。
+* `COLLSCAN`（全表扫描）：查询未命中索引，需优化。
+
+***
+
+#### **3. 复合索引（Compound Index）**
+
+如果查询同时涉及多个字段，创建**复合索引**比多个单列索引更高效：
+
+```javascript
+db.users.createIndex({ name: 1, age: -1 })
+```
+
+**优化查询**
+
+```javascript
+db.users.find({ name: "Alice", age: { $gt: 20 } }) // 直接利用索引
+db.users.find({ age: { $gt: 20 } }) // 可能无法完全利用索引
+```
+
+**索引匹配规则**
+
+* 只有**查询条件的最左前缀**才能使用索引。例如：
+  * `find({ name: "Alice", age: 30 })` ✅
+  * `find({ age: 30 })` ❌（未匹配最左前缀 `name`）
+
+***
+
+#### **4. 唯一索引（Unique Index）**
+
+防止重复插入：
+
+```javascript
+db.users.createIndex({ email: 1 }, { unique: true })
+```
+
+***
+
+#### **5. TTL 索引（Time-To-Live Index）**
+
+自动删除过期数据（适用于日志、缓存）：
+
+```javascript
+db.sessions.createIndex({ createdAt: 1 }, { expireAfterSeconds: 3600 }) // 1 小时后删除
+```
+
+***
+
+#### **6. 局部索引（Partial Index）**
+
+只索引符合特定条件的文档，减少索引大小：
+
+```javascript
+db.users.createIndex({ status: 1 }, { partialFilterExpression: { status: { $eq: "active" } } })
+```
+
+***
+
+#### **7. 哈希索引**
+
+适用于**等值查询**（但不支持范围查询）：
+
+```javascript
+db.users.createIndex({ email: "hashed" })
+```
+
+***
+
+### **在高并发场景下，如何提高数据库的读写性能？**
+
+高并发下，MongoDB 可能会面临**读写瓶颈**，以下优化策略有助于提高性能：
+
+#### **1. 读优化**
+
+**（1）主从复制（Replication）**
+
+* **作用**：MongoDB **默认主从复制**，可以通过**从节点分担读压力**。
+* **实现**：
+
+```javascript
+rs.initiate() // 初始化复制集
+rs.add("mongodb-node2:27017") // 添加从节点
+rs.status() // 查看状态
+```
+
+* **读写分离**：
+
+```javascript
+db.getMongo().setReadPref("secondary") // 从节点读
+```
+
+***
+
+**（2）使用缓存（Redis + MongoDB）**
+
+在高频查询场景，使用 **Redis 缓存**热点数据：
+
+```javascript
+const redis = require("redis");
+const client = redis.createClient();
+
+async function getUser(userId) {
+  const cacheKey = `user:${userId}`;
+  
+  // 先查 Redis 缓存
+  const cachedData = await client.get(cacheKey);
+  if (cachedData) return JSON.parse(cachedData);
+
+  // 缓存未命中，查询 MongoDB
+  const user = await db.users.findOne({ _id: userId });
+
+  // 写入 Redis 缓存
+  if (user) await client.set(cacheKey, JSON.stringify(user), "EX", 3600); // 1 小时过期
+
+  return user;
+}
+```
+
+***
+
+**（3）分片（Sharding）**
+
+适用于**海量数据场景**，将数据分布到多个 MongoDB 服务器上：
+
+```javascript
+sh.enableSharding("myDatabase") // 启用分片
+sh.shardCollection("myDatabase.users", { _id: "hashed" }) // 基于 `_id` 哈希分片
+```
+
+***
+
+#### **2. 写优化**
+
+**（1）批量插入（Bulk Insert）**
+
+避免循环单条插入：
+
+```javascript
+db.users.insertMany([{ name: "Alice" }, { name: "Bob" }])
+```
+
+***
+
+**（2）写操作优化**
+
+* **禁用 `fsync` 以提高写入性能**（适用于临时数据）：
+
+```javascript
+db.getSiblingDB("admin").runCommand({ setParameter: 1, journalCommitInterval: 5000 })
+```
+
+* **使用 `WriteConcern` 控制写入确认级别**：
+
+```javascript
+db.users.insertOne({ name: "Alice" }, { writeConcern: { w: 1, j: false } })
+```
+
+* `w: 1`：写入到**主节点**即返回
+* `j: false`：不写入日志，提高吞吐量
+
+***
+
+**（3）异步写入（如队列 + MongoDB）**
+
+* 生产环境可使用 **RabbitMQ / Kafka** 缓冲写入，避免高并发直接写入 MongoDB：
+
+```javascript
+const amqp = require("amqplib");
+async function publishMessage(queue, msg) {
+  const conn = await amqp.connect("amqp://localhost");
+  const channel = await conn.createChannel();
+  await channel.assertQueue(queue);
+  channel.sendToQueue(queue, Buffer.from(msg));
+}
+```
+
+* 消费队列：
+
+```javascript
+const { MongoClient } = require("mongodb");
+async function consumeMessages(queue) {
+  const client = new MongoClient("mongodb://localhost:27017");
+  await client.connect();
+  const db = client.db("myDatabase");
+
+  // 监听队列，批量写入 MongoDB
+  channel.consume(queue, async (msg) => {
+    const data = JSON.parse(msg.content.toString());
+    await db.collection("users").insertOne(data);
+    channel.ack(msg);
+  });
+}
+```
+
+***
+
+#### **总结**
+
+| **优化方向** | **优化策略**                              |
+| -------- | ------------------------------------- |
+| **读优化**  | 索引优化、主从复制、读写分离、Redis 缓存、分片            |
+| **写优化**  | 批量插入、异步写入、降低写入一致性（WriteConcern）、队列写入  |
+| **通用优化** | 限制查询返回字段（`projection`）、使用 TTL 索引、适当分片 |
+
+**适用场景**
+
+* **高并发读**：缓存 + 读写分离
+* **高并发写**：异步写入（队列）+ 分片
+* **实时数据**：索引 + 批量处理
+
+如果你的 MongoDB 处理**上千万级数据量**，可以考虑进一步优化分片策略，或者考虑 **MongoDB Atlas + Auto-scaling**。你是想优化某个具体场景吗？
