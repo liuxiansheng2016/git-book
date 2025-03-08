@@ -1366,7 +1366,7 @@ app.set("view engine", "handlebars");
 
 ***
 
-### **总结**
+
 
 | **问题**          | **解决方案**                     |
 | --------------- | ---------------------------- |
@@ -1380,3 +1380,158 @@ app.set("view engine", "handlebars");
 | **OAuth2.0 登录** | `passport.js`                |
 | **微服务**         | NATS、API Gateway             |
 | **SSR**         | Next.js、Express Handlebars   |
+
+***
+
+### &#x20;**`ws` 和 `socket.io`**&#x20;
+
+| **特性**        | **ws**                | **socket.io**                           |
+| ------------- | --------------------- | --------------------------------------- |
+| **传输协议**      | 仅支持 WebSocket         | WebSocket + HTTP 长轮询                    |
+| **自动重连**      | ❌ 需要手动实现              | ✅ 内置支持                                  |
+| **广播消息**      | ❌ 需要手动实现              | ✅ 内置支持（`socket.broadcast`）              |
+| **房间（Rooms）** | ❌ 不支持                 | ✅ 内置支持（`socket.join(room)`）             |
+| **支持事件**      | ❌ 仅 `message` 事件      | ✅ 自定义事件（`socket.on("event", callback)`） |
+| **兼容性**       | 仅支持现代浏览器              | 兼容旧浏览器（支持 WebSocket 不可用时的降级）            |
+| **适用场景**      | **轻量级、高性能** WebSocket | **功能丰富、适用于多人实时通信**                      |
+
+***
+
+#### **2. 使用 `ws` 实现 WebSocket**
+
+**安装 `ws`**
+
+```bash
+npm install ws
+```
+
+**创建 WebSocket 服务器**
+
+```javascript
+const WebSocket = require("ws");
+
+const server = new WebSocket.Server({ port: 8080 });
+
+server.on("connection", (ws) => {
+  console.log("Client connected");
+
+  ws.on("message", (message) => {
+    console.log(`Received: ${message}`);
+    ws.send(`Echo: ${message}`);
+  });
+
+  ws.on("close", () => console.log("Client disconnected"));
+});
+```
+
+**客户端连接 WebSocket**
+
+```javascript
+const ws = new WebSocket("ws://localhost:8080");
+
+ws.onopen = () => ws.send("Hello Server!");
+ws.onmessage = (event) => console.log("Message from server:", event.data);
+```
+
+✅ **`ws` 适用于**：
+
+* 轻量级应用
+* 需要高性能、低延迟的 WebSocket 连接
+* 不需要额外功能（如广播、房间、自动重连）
+
+***
+
+#### **3. 使用 `socket.io` 实现 WebSocket**
+
+**安装 `socket.io`**
+
+```bash
+npm install socket.io
+```
+
+**创建 `socket.io` 服务器**
+
+```javascript
+const io = require("socket.io")(3000);
+
+io.on("connection", (socket) => {
+  console.log("Client connected");
+
+  socket.on("message", (msg) => {
+    console.log("Received:", msg);
+    socket.emit("response", `Echo: ${msg}`);
+  });
+
+  socket.on("disconnect", () => console.log("Client disconnected"));
+});
+```
+
+**客户端连接 `socket.io`**
+
+```javascript
+const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+  console.log("Connected to server");
+  socket.emit("message", "Hello Server!");
+});
+
+socket.on("response", (data) => console.log("Message from server:", data));
+```
+
+✅ **`socket.io` 适用于**：
+
+* 需要 **自动重连**，防止连接丢失
+* **多人聊天室**，需要 **广播和房间**
+* 需要 **HTTP 轮询** 作为 WebSocket 兼容方案
+* 适用于 **游戏、聊天、协作应用**
+
+***
+
+#### **4. `ws` vs `socket.io` 代码对比**
+
+#### **纯 WebSocket（ws）**
+
+```javascript
+ws.on("message", (msg) => {
+  ws.send(`Echo: ${msg}`);
+});
+```
+
+#### **socket.io 事件**
+
+```javascript
+socket.on("chat", (msg) => {
+  io.emit("chat", msg); // 广播消息
+});
+```
+
+***
+
+#### **5. 选择哪一个？**
+
+✅ **用 `ws`**
+
+* 只需要 **WebSocket**，不需要其他功能
+* 需要 **高性能**（`ws` 速度更快）
+* 服务器与客户端 **都支持 WebSocket**
+
+✅ **用 `socket.io`**
+
+* 需要 **自动重连**
+* 需要 **事件机制**（`on("chat", handler)`）
+* 需要 **房间（Rooms）** 和 **广播（Broadcast）**
+* 需要 **兼容 HTTP 轮询**
+
+***
+
+#### **6. 总结**
+
+| **对比项**           | **ws** | **socket.io** |
+| ----------------- | ------ | ------------- |
+| **轻量级**           | ✅      | ❌             |
+| **仅支持 WebSocket** | ✅      | ❌（可回退到 HTTP）  |
+| **自动重连**          | ❌      | ✅             |
+| **房间（Rooms）**     | ❌      | ✅             |
+| **适用于游戏、多人协作**    | ❌      | ✅             |
+
