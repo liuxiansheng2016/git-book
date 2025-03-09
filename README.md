@@ -183,6 +183,8 @@ console.log(Example.prototype.__proto__ === Object.prototype); // true
 <mark style="color:red;">**constructor**</mark> <mark style="color:red;">属性的含义就是指向该对象的构造函数</mark>，所有函数（此时看成对象了）最终的构造函数都指向Function。
 
 ```
+function Foo (){...}
+f1 = new Foo();
 f1.constructor === Foo
 ```
 
