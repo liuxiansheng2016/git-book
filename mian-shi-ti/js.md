@@ -1521,7 +1521,7 @@ function myNew(Fn,...args){
    var obj = {};
    var result = Fn.apply(obj, args);
    obj.__proto__ = Fn.prototype;
-   return (result === 'object' && result !== null) ? result : obj;
+   return result instanceof Object ? result : obj;
 
 }
 
@@ -1556,15 +1556,18 @@ function myCreate(proto) {
   return new F();  // 通过 new 关键字创建新对象
 }
 
-function myCreate(proto) {
-  if (typeof proto !== "object" || proto === null) {
-    throw new TypeError("Prototype must be a non-null object");
+const person = {
+  greet: function() {
+    console.log("Hello, I am " + this.name);
   }
-  
-  function F() {}  // 创建一个空的构造函数
-  F.prototype = proto; // 让它的 prototype 指向传入的 proto
-  return new F();  // 通过 new 关键字创建新对象
-}
+};
+
+const obj = myCreate(person);
+obj.name = "Alice";
+obj.greet(); // Hello, I am Alice
+
+console.log(obj.__proto__ === person); // true
+
 
 ```
 

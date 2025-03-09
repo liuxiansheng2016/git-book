@@ -1160,12 +1160,13 @@ javascript深色版本(function() {    let localVariable = 'I am scoped locally'
 多次绑定 bind 是无效的
 
 ```
-Function.prototype.bind = function (context){
-    var self = this;
-    return function() {
-        self.apply(context, arguments);
-    }
-}
+Function.prototype.myBind = function (context, ...args) {
+  const fn = this;
+  return function (...innerArgs) {
+    return fn.apply(context, args.concat(innerArgs));
+  };
+};
+
 ```
 
 ### WEB本地存储
