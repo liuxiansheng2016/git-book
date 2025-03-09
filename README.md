@@ -159,11 +159,32 @@ console.log("主线程任务完成");
 
 ### 原型prototype
 
-<mark style="color:red;">每个类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
+<mark style="color:red;">每个函数类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
 
 prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
 
 _**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象</mark>，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
+
+| `prototype` | **只有函数才有**，用于存放该构造函数的共享方法，实例会继承它 |
+| ----------- | -------------------------------- |
+
+| `__proto__` | **所有对象都有**，指向它的原型对象 |
+| ----------- | ------------------- |
+
+```
+function Example() {}
+const obj = new Example();
+
+console.log(Example.prototype); 
+// { constructor: Example }
+
+console.log(obj.__proto__); 
+// { constructor: Example } (等于 Example.prototype)
+
+console.log(obj.prototype); 
+// undefined (实例没有 prototype)
+
+```
 
 <pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
 </strong><strong>f1 = new Foo();
