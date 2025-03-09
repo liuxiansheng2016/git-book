@@ -1,4 +1,4 @@
-# JS
+# JavaScript
 
 ### 事件流
 
@@ -1516,14 +1516,26 @@ New操作符创建一个空对象，用this指代该对象。同时继承该函�
 （3）让函数的 this 指向这个对象，执行构造函数的代码（为这个新对象添加属性）
 
 （4）判断函数的返回值类型，如果是值类型，返回创建的对象。如果是引用类型，就返回这个引用类型的对象。用的对象中。
-function myNew(fn, ...args) {
-    // 创建一个空对象，并将其原型设置为构造函数的 prototype 对象
-    const obj = {};
-    const result = fn.apply(obj,args);
-    obj.__proto__ = fn.prototype;
-    // 如果构造函数返回的是一个对象，则返回该对象；否则返回新创建的对象
-    return (result !== null && typeof result === 'object') ? result : obj;
+
+function myNew(Fn,...args){
+   var obj = {};
+   var result = Fn.apply(obj, args);
+   obj.__proto__ = Fn.prototype;
+   return (result === 'object' && result !== null) ? result : obj;
+
 }
+
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+const p1 = myNew(Person, "Alice", 25);
+console.log(p1.name); // Alice
+console.log(p1.age);  // 25
+console.log(p1 instanceof Person); // true
+
+
 
 构造函数：如果构造函数没有显式返回任何对象，则默认返回新创建的对象。如果显式返回了一个对象，则返回该对象；但如果返回的是一个原始类型（如字符串、数字等），则忽略返回值，依旧返回新创建的对象。
 function SpecialThing() {
@@ -1531,16 +1543,29 @@ function SpecialThing() {
     return { special: 'value' }; // 返回自定义对象
 }
 const obj = new SpecialThing(); // obj 是 { special: 'value' }
+```
 
-Object.create()
-Object.create = function (o) {
+```
+function myCreate(proto) {
+  if (typeof proto !== "object" || proto === null) {
+    throw new TypeError("Prototype must be a non-null object");
+  }
+  
+  function F() {}  // 创建一个空的构造函数
+  F.prototype = proto; // 让它的 prototype 指向传入的 proto
+  return new F();  // 通过 new 关键字创建新对象
+}
 
-   var F = function () {};
+function myCreate(proto) {
+  if (typeof proto !== "object" || proto === null) {
+    throw new TypeError("Prototype must be a non-null object");
+  }
+  
+  function F() {}  // 创建一个空的构造函数
+  F.prototype = proto; // 让它的 prototype 指向传入的 proto
+  return new F();  // 通过 new 关键字创建新对象
+}
 
-   F.prototype = o;
-   return new F();
-
-};
 ```
 
 155\. 前端资源加载失败优化
