@@ -28,7 +28,7 @@ loadChildren: () => import('./product/product.module').then(m => m.ProductModule
 
 **RouterModule.forRoot()**:
 
-* 用于应用的主模块（通常是 `AppModule`），它初始化顶级路由配置，并且会创建一个可以监听 URL 变化并导航到不同视图的路由器服务实例。
+* <mark style="color:red;">用于应用的主模块（通常是</mark> <mark style="color:red;"></mark><mark style="color:red;">`AppModule`</mark><mark style="color:red;">），它初始化顶级路由配置</mark>，并且会创建一个可以监听 URL 变化并导航到不同视图的路由器服务实例。
 * 通常在应用的根模块中调用一次，用来定义应用的基础路由。
 * **RouterModule.forChild()**：用于在特性模块中配置子路由。它不会创建新的路由服务实例，而是将子路由添加到现有的路由配置中。通常在特性模块的 `imports` 数组中调用。
 
@@ -277,6 +277,22 @@ export class AuthGuard implements CanActivate {
 ```
 
 * **CanActivateChild**：用于控制是否可以激活某个子路由。
+
+```
+const routes: Routes = [
+  {
+    path: 'parent',
+    component: ParentComponent,
+    canActivateChild: [ChildGuard], // 使用 CanActivateChild 守卫
+    children: [
+      { path: 'child1', component: ChildComponent1 },
+      { path: 'child2', component: ChildComponent2 }
+    ]
+  }
+];
+
+```
+
 * **CanDeactivate**：用于控制是否可以离开某个路由。
 * **Resolve**：用于在路由激活前预获取数据。
 * **CanLoad**：用于控制是否可以懒加载某个模块

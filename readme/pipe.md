@@ -24,7 +24,7 @@
 #### 1. 什么是 async 管道（Pipe）？它的作用是什么？
 
 \
-`async` 管道是 Angular 内置的一个管道，用于处理异步数据。它可以自动订阅 `Observable` 或 `Promise` 对象，并在数据可用时自动更新视图，同时在组件销毁时自动取消订阅，避免内存泄漏。
+`async` 管道是 Angular 内置的一个管道，用于处理异步数据。它可以自动订阅 `Observable` 或 `Promise` 对象，并在数据可用时自动更新视图<mark style="color:red;">，同时在组件销毁时自动取消订阅</mark>，避免内存泄漏。
 
 **作用**
 

@@ -1,4 +1,4 @@
-# 动态表单
+# 表单
 
 ### **模板驱动表单**
 
@@ -20,6 +20,8 @@
 
 1. FormGroup：表示一组控件（FormControl），可以是简单的输入字段，也可以是其他 FormGroup 或 FormArray。
 
+<mark style="color:red;">可以在创建</mark> <mark style="color:red;"></mark><mark style="color:red;">`FormGroup`</mark> <mark style="color:red;"></mark><mark style="color:red;">实例时，通过第二个参数为其添加验证器</mark>。常用的内置验证器有 `Validators.required`、`Validators.minLength`、`Validators.maxLength` 等。
+
 ```javascript
 const form = new FormGroup({
     password: new FormControl('', Validators.minLength(2)),
@@ -31,6 +33,38 @@ const form = new FormGroup({
       ? null : {'mismatch': true};
   }
 ```
+
+````
+```typescript
+ passwordForm = new FormGroup({
+    password: new FormControl('', {
+      validators: [Validators.required, Validators.minLength(6)]
+    }),
+    confirmPassword: new FormControl('', Validators.required)
+  }, {
+    validators: [this.matchPasswordsValidator()]
+  });
+
+  matchPasswordsValidator(): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const password = group.get('password')?.value;
+      const confirmPassword = group.get('confirmPassword')?.value;
+      if (password!== confirmPassword) {
+        return { passwordsDoNotMatch: true };
+      }
+      return null;
+    };
+  }
+  
+    onSubmit() {
+    if (this.passwordForm.valid) {
+      console.log('Form submitted successfully:', this.passwordForm.value);
+    } else {
+      console.log('Form is invalid');
+    }
+  }
+```
+````
 
 2. FormControl：表示单个表单控件，例如文本框、复选框等。你可以为每个 FormControl 添加验证器（Validators）。
 3. &#x20;FormArray：表示一个动态数组，其中可以包含多个 FormControl 或 FormGroup。这对于实现动态添加或移除表单字段非常有用。
