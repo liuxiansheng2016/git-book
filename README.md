@@ -168,6 +168,14 @@ _**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，�
 <pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
 </strong><strong>f1 = new Foo();
 </strong>即f1.__proto__ === Foo.prototype。
+
+
+function Example() {}
+const e = new Example();
+
+console.log(e.__proto__ === Example.prototype); // true
+console.log(Example.prototype.__proto__ === Object.prototype); // true
+
 </code></pre>
 
 **prototype** 属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法，即f1._proto_ === Foo.prototype。
@@ -186,10 +194,25 @@ constructor：此属性只有原型对象才有，它默认指回prototype属性
 
 基本原理就是对象的\_\_proto\_\_，当一个对象调用某个成员（属性，方法）的时候，首先先查找当前对象实例，没有再查找当前的原型对象，如果还没有，在继续向上层查找，会一直查找到Object类型，如果还没有，直接报错
 
-### JavaScript 中设置对象原型的两种不同方法：
+#### JavaScript 中设置对象原型的不同方法：
 
 * **构造函数方式**：当你通过构造函数创建对象时，该对象的原型是构造函数的 `prototype` 属性。这是 JavaScript 实现基于类的继承模型的基础。
 * **`Object.create` 方式**：当你使用 `Object.create` 创建对象时，你可以直接指定新对象的原型。这种方法提供了一种更为灵活的方式来设置对象的原型链，而不需要依赖于构造函数。
+
+| `Object.create(proto)` | ✅ 推荐 | 创建对象并指定原型 |
+| ---------------------- | ---- | --------- |
+
+| `__proto__` | ❌ 不推荐 | 直接修改原型，影响性能 |
+| ----------- | ----- | ----------- |
+
+| `Object.setPrototypeOf()` | ⚠️ 慎用 | 需要动态修改原型时 |
+| ------------------------- | ----- | --------- |
+
+| `class extends` | ✅ 推荐 | 面向对象编程 |
+| --------------- | ---- | ------ |
+
+| `prototype` | ✅ 推荐 | 传统构造函数方法 |
+| ----------- | ---- | -------- |
 
 ```
 function Obj() {
@@ -225,6 +248,122 @@ console.log(Object.getPrototypeOf(obj) === Object.prototype); // 输出 true
 
 console.log(obj.__proto__ === Object.prototype); // 输出 true
 ```
+
+### 继承
+
+通过子类的原型prototype对象实例化来实现
+
+```
+function Parent() {
+    this.name = 'Parent';
+}
+
+Parent.prototype.sayHello = function() {
+    console.log('Hello');
+};
+
+function Child() {
+    this.name = 'Child';
+}
+
+Child.prototype = new Parent();
+
+var child = new Child();
+child.sayHello(); // Hello
+```
+
+缺点是：子类之间相互影响。所有子对象共享同一个原型对象，对原型对象的修改会影响到所有子对象
+
+#### 构造函数式继承
+
+构造函数继承是通过在子构造函数中调用父构造函数来实现继承。在构造函数继承中，通过在子构造函数中使用\*\*call()或apply()\*\*方法，将父构造函数的上下文设置为子对象的上下文，从而实现继承。
+
+```
+function Parent(name) {
+  this.name = name;
+}
+
+Parent.prototype.sayName = function() {
+  console.log(this.name);
+};
+
+function Child(name) {
+  Parent.call(this, name); // 调用父类构造函数
+}
+
+let child1 = new Child('Alice');
+let child2 = new Child('Bob');
+
+child1.sayName(); // 输出: Alice
+child2.sayName(); // 输出: Bob
+```
+
+使通过this创建的属性和方法在子类中复制一份，因为是单独复制的，所以各个实例化的子类互不影响。<mark style="color:red;">Parent.call(this ,name),所以父类的原型方法自然不会被子类继承</mark>，而如果要想被子类继承就必须要放在构造函数中。
+
+#### 组合式继承
+
+但是父类的构造函数会被创建两次（一次是在设置原型时，一次是在创建子对象时）
+
+```
+function Parent(name) {
+    this.name = name;
+    this.colors = ['red', 'blue', 'green'];
+}
+
+Parent.prototype.sayName = function() {
+    console.log(this.name);
+};
+
+function Child(name, age) {
+    Parent.call(this, name); // 第二次调用Parent构造函数
+    this.age = age;
+}
+
+// 直接将Parent.prototype赋值给Child.prototype，这会导致Parent构造函数被第二次调用
+Child.prototype = new Parent(); 
+
+Child.prototype.constructor = Child; 
+Child.prototype.sayAge = function() {
+    console.log(this.age);
+};
+```
+
+#### 寄生组合继承
+
+```
+function inheritPrototype(subType, superType) {
+  let prototype = Object.create(superType.prototype); // 创建父类原型的副本
+  prototype.constructor = subType; // 修复构造函数引用
+  subType.prototype = prototype; // 将子类原型指向这个副本
+}
+
+function SuperType(name) {
+  this.name = name;
+}
+
+SuperType.prototype.sayName = function() {
+  console.log(this.name);
+};
+
+function SubType(name, age) {
+  SuperType.call(this, name); // 继承父类的实例属性
+  this.age = age;
+}
+
+inheritPrototype(SubType, SuperType); // 继承父类的原型方法
+
+SubType.prototype.sayAge = function() {
+  console.log(this.age);
+};
+
+let instance = new SubType('Alice', 25);
+instance.sayName(); // 输出: Alice
+instance.sayAge(); // 输出: 25
+```
+
+#### ES6中的继承 extends
+
+在 ES2015 中有了 class 语法糖，有了 extends、super、static 这样的关键字，更像强类型语言中的“类”了。
 
 #### In 和 hasOwnProperty
 
@@ -1484,121 +1623,7 @@ ES6模块不是对象，而是通过export命令显式指定输出的内容，�
 
 **CMD (Common Module Definition)** 浏览器端的实现之一是Sea.js，其设计目标类似于Require.js，但在模块定义和加载机制上有自己的特点，比如使用sea.use()来加载模块。
 
-### 继承
 
-通过子类的原型prototype对象实例化来实现
-
-```
-function Parent() {
-    this.name = 'Parent';
-}
-
-Parent.prototype.sayHello = function() {
-    console.log('Hello');
-};
-
-function Child() {
-    this.name = 'Child';
-}
-
-Child.prototype = new Parent();
-
-var child = new Child();
-child.sayHello(); // Hello
-```
-
-缺点是：子类之间相互影响。所有子对象共享同一个原型对象，对原型对象的修改会影响到所有子对象
-
-#### 构造函数式继承
-
-构造函数继承是通过在子构造函数中调用父构造函数来实现继承。在构造函数继承中，通过在子构造函数中使用\*\*call()或apply()\*\*方法，将父构造函数的上下文设置为子对象的上下文，从而实现继承。
-
-```
-function Parent(name) {
-  this.name = name;
-}
-
-Parent.prototype.sayName = function() {
-  console.log(this.name);
-};
-
-function Child(name) {
-  Parent.call(this, name); // 调用父类构造函数
-}
-
-let child1 = new Child('Alice');
-let child2 = new Child('Bob');
-
-child1.sayName(); // 输出: Alice
-child2.sayName(); // 输出: Bob
-```
-
-使通过this创建的属性和方法在子类中复制一份，因为是单独复制的，所以各个实例化的子类互不影响。<mark style="color:red;">Parent.call(this ,name),所以父类的原型方法自然不会被子类继承</mark>，而如果要想被子类继承就必须要放在构造函数中。
-
-#### 组合式继承
-
-但是父类的构造函数会被创建两次（一次是在设置原型时，一次是在创建子对象时）
-
-```
-function Parent(name) {
-    this.name = name;
-    this.colors = ['red', 'blue', 'green'];
-}
-
-Parent.prototype.sayName = function() {
-    console.log(this.name);
-};
-
-function Child(name, age) {
-    Parent.call(this, name); // 第二次调用Parent构造函数
-    this.age = age;
-}
-
-// 直接将Parent.prototype赋值给Child.prototype，这会导致Parent构造函数被第二次调用
-Child.prototype = new Parent(); 
-
-Child.prototype.constructor = Child; 
-Child.prototype.sayAge = function() {
-    console.log(this.age);
-};
-```
-
-#### 寄生组合继承
-
-```
-function inheritPrototype(subType, superType) {
-  let prototype = Object.create(superType.prototype); // 创建父类原型的副本
-  prototype.constructor = subType; // 修复构造函数引用
-  subType.prototype = prototype; // 将子类原型指向这个副本
-}
-
-function SuperType(name) {
-  this.name = name;
-}
-
-SuperType.prototype.sayName = function() {
-  console.log(this.name);
-};
-
-function SubType(name, age) {
-  SuperType.call(this, name); // 继承父类的实例属性
-  this.age = age;
-}
-
-inheritPrototype(SubType, SuperType); // 继承父类的原型方法
-
-SubType.prototype.sayAge = function() {
-  console.log(this.age);
-};
-
-let instance = new SubType('Alice', 25);
-instance.sayName(); // 输出: Alice
-instance.sayAge(); // 输出: 25
-```
-
-#### ES6中的继承 extends
-
-在 ES2015 中有了 class 语法糖，有了 extends、super、static 这样的关键字，更像强类型语言中的“类”了。
 
 ### Ajax
 
