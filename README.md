@@ -163,24 +163,6 @@ console.log("主线程任务完成");
 
 prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
 
-```
-function Example() {}
-console.log(Example.prototype); 
-// { constructor: Example }
-```
-
-默认情况下，函数 Example 的 prototype 是一个对象，包含 constructor 属性，指向 Example 本身。
-
-```
-const obj = new Example();
-那么它的原型链如下：
-obj → Example.prototype → Object.prototype → null
-```
-
-* `obj.__proto__ === Example.prototype` → 说明 `obj` 继承自 `Example.prototype`。
-* `Example.prototype.__proto__ === Object.prototype` → 说明 `Example.prototype` 继承自 `Object.prototype`。
-* `Object.prototype.__proto__ === null` → 说明 `Object.prototype` 没有更高层的原型，它是**原型链的终点**
-
 _**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象</mark>，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
 
 <pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
@@ -213,6 +195,29 @@ constructor：此属性只有原型对象才有，它默认指回prototype属性
 #### **原型链**：
 
 基本原理就是对象的\_\_proto\_\_，当一个对象调用某个成员（属性，方法）的时候，首先先查找当前对象实例，没有再查找当前的原型对象，如果还没有，在继续向上层查找，会一直查找到Object类型，如果还没有，直接报错
+
+```
+function Example() {}
+//默认情况下，函数 Example 的 prototype 是一个对象，包含 constructor 属性，指向 Example 本身。
+console.log(Example.prototype);  // { constructor: Example }
+const obj = new Example();
+那么它的原型链如下：
+obj → Example.prototype → Object.prototype → null
+
+```
+
+* `obj.__proto__ === Example.prototype` → 说明 `obj` 继承自 `Example.prototype`。
+* `Example.prototype.__proto__ === Object.prototype` → 说明 `Example.prototype` 继承自 `Object.prototype`。
+* `Object.prototype.__proto__ === null` → 说明 `Object.prototype` 没有更高层的原型，它是**原型链的终点**
+
+```
+console.log(Example.__proto__ === Function.prototype); // true
+console.log(Function.prototype.__proto__ === Object.prototype); // true
+console.log(Object.prototype.__proto__ === null); // true
+
+Example 的原型链如下：
+Example → Function.prototype → Object.prototype → null
+```
 
 #### JavaScript 中设置对象原型的不同方法：
 
