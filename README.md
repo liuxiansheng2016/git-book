@@ -186,6 +186,46 @@ constructor：此属性只有原型对象才有，它默认指回prototype属性
 
 基本原理就是对象的\_\_proto\_\_，当一个对象调用某个成员（属性，方法）的时候，首先先查找当前对象实例，没有再查找当前的原型对象，如果还没有，在继续向上层查找，会一直查找到Object类型，如果还没有，直接报错
 
+### JavaScript 中设置对象原型的两种不同方法：
+
+* **构造函数方式**：当你通过构造函数创建对象时，该对象的原型是构造函数的 `prototype` 属性。这是 JavaScript 实现基于类的继承模型的基础。
+* **`Object.create` 方式**：当你使用 `Object.create` 创建对象时，你可以直接指定新对象的原型。这种方法提供了一种更为灵活的方式来设置对象的原型链，而不需要依赖于构造函数。
+
+```
+function Obj() {
+    this.name = 'zhangsan';
+}
+let objInstance = new Obj();
+let prototype = Object.getPrototypeOf(objInstance);
+
+console.log(prototype === Obj.prototype); // 输出 true
+```
+
+```
+// 创建一个新的对象，其原型为一个自定义对象
+const proto = {year: 2025};
+const obj = Object.create(proto);
+
+// 获取 obj 的原型
+const objProto = Object.getPrototypeOf(obj);
+console.log(objProto === proto); // 输出 true
+```
+
+```html
+console.log(Object.getPrototypeOf([]) === Array.prototype); // 输出 true
+console.log(Object.getPrototypeOf({}) === Object.prototype); // 输出 true
+console.log(Object.getPrototypeOf(() => {}) === Function.prototype); // 输出 true
+```
+
+#### `Object.getPrototypeOf()` 和 `__proto__` 都可以用来访问对象的原型
+
+```
+const obj = {};
+console.log(Object.getPrototypeOf(obj) === Object.prototype); // 输出 true
+
+console.log(obj.__proto__ === Object.prototype); // 输出 true
+```
+
 #### In 和 hasOwnProperty
 
 in语法：检测某个对象中（包括原型对象）是否拥有某个成员 '属性或者方法名称'in 对象

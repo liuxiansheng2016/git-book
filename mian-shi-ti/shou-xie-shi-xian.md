@@ -47,5 +47,44 @@ console.log(obj.__proto__ === person); // true
 ### bind
 
 ```
-function myind(obj){
+Function.prototype.myind(obj,...args){
+  var self = this;
+  return function(...innerArgs){
+    //在这里，直接使用 'this' 将不会指向原来的函数，而是取决于这个匿名函数是如何被调用的。
+    return self.apply(obj, args.concat(innerArgs)) 
+  }
+}
+
+
+const obj = { num: 40 };
+function add(a, b) {
+    return this.num + a + b;
+}
+const boundAdd = add.mybind(obj, 1);
+var res = boundAdd(2);
+
+console.log(res)
+
+```
+
+call
+
+```
+Function.prototype.myCall = function (context, ...args) {
+  context = context || window; // 若 context 为空，则默认为全局对象
+  const fnKey = Symbol(); // 生成唯一键，避免属性覆盖
+  context[fnKey] = this; // 将当前函数赋值到 context 的属性中
+  const result = context[fnKey](...args); // 执行函数
+  delete context[fnKey]; // 清理属性
+  return result;
+};
+
+const obj = { num: 40 };
+function add(a, b) {
+    return this.num + a + b;
+}
+const res = add.myCall(obj, 1,2);
+
+
+console.log(res)
 ```
