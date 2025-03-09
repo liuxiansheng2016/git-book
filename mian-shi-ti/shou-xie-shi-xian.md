@@ -67,7 +67,7 @@ console.log(res)
 
 ```
 
-call
+### call
 
 ```
 Function.prototype.myCall = function (context, ...args) {
@@ -87,4 +87,18 @@ const res = add.myCall(obj, 1,2);
 
 
 console.log(res)
+```
+
+### instanceof
+
+```
+function myInstanceOf(obj, constructor) {
+  let prototype = Object.getPrototypeOf(obj);
+  while (prototype) {
+    if (prototype === constructor.prototype) return true;
+    prototype = Object.getPrototypeOf(prototype);
+  }
+  return false;
+}
+
 ```
