@@ -163,6 +163,24 @@ console.log("主线程任务完成");
 
 prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
 
+```
+function Example() {}
+console.log(Example.prototype); 
+// { constructor: Example }
+```
+
+默认情况下，函数 Example 的 prototype 是一个对象，包含 constructor 属性，指向 Example 本身。
+
+```
+const obj = new Example();
+那么它的原型链如下：
+obj → Example.prototype → Object.prototype → null
+```
+
+* `obj.__proto__ === Example.prototype` → 说明 `obj` 继承自 `Example.prototype`。
+* `Example.prototype.__proto__ === Object.prototype` → 说明 `Example.prototype` 继承自 `Object.prototype`。
+* `Object.prototype.__proto__ === null` → 说明 `Object.prototype` 没有更高层的原型，它是**原型链的终点**
+
 _**proto**_ <mark style="color:red;">任何对象实例都拥有这个属性，这个属性指向这个对象的类的原型对象</mark>，不建议在程序中直接使用\_\_proro\_\_这个属性引用，很多浏览器不允许直接调用。
 
 <pre class="language-javascript" data-overflow="wrap"><code class="lang-javascript"><strong>function Foo (){...}
