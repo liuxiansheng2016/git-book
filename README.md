@@ -159,7 +159,10 @@ console.log("主线程任务完成");
 
 ### 原型prototype
 
-<mark style="color:red;">每个函数类型（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
+<mark style="color:red;">在JavaScript中，每个对象都有一个与之关联的原型对象</mark>，通过这个原型对象可以实现属性和方法的继承
+
+* 对象（如 `obj` 或 `personInstance`）有 `__proto__` 属性，指向它们的原型对象。`__proto__` 是 `[[Prototype]]` 的一种访问方式。
+* <mark style="color:red;">每个函数</mark><mark style="color:red;">对象</mark><mark style="color:red;">（例如Date,Error,Array,Number......包括自定义类型例如Person）都有一个属性，这个属性的名字叫做prototype，这个prototype指向一个对象，这个对象就是这个类的原型对象</mark>，里面默认有两个属性，constructor，_proto_，如果把属性或者方法定义到类的原型对象中，不管创建多少个对象，这些属性和方法仅存在一次，比较节省内存，一般来说，只 会把方法定义到原型对象中。不放属性，因为属性值一样，无法实现面向对象。
 
 prototype属性的作用就是让该函数所实例化的对象们都可以找到公用的属性和方法
 
