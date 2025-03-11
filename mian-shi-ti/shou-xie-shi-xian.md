@@ -186,8 +186,6 @@ console.log(uniqueArray); // 输出 [1, 2, 3, 4, 5]
 
 ### **实现promise all**
 
-Copy
-
 ```
 function promiseAll(promises) {
     return new Promise((resolve, reject) => {
@@ -227,4 +225,81 @@ promiseAll([p1, p2, p3]).then(values => {
 }).catch(error => {
     console.error(error);
 });
+```
+
+### 输入一个promise和一个时间
+
+在规定的时间内如果promise的状态为非pending，则返回状态，如果为pending则返回一个新的promise，内容为new Error()
+
+```
+function timeoutPromise(promise, timeout) {
+    // 创建一个在指定时间后拒绝的 Promise
+    const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+            reject(new Error('Timeout'));
+        }, timeout);
+    });
+
+    // 使用 Promise.race 来竞争原 Promise 和超时 Promise
+    return Promise.race([promise, timeoutPromise]);
+}
+```
+
+### 每几秒打印
+
+```
+setInterval
+
+function print(){
+       console.log(111);
+       setTimeOut(print, 5000)
+}
+Print()
+
+function delay(ms) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            console.log("delay");
+            resolve();
+        },ms)
+    })
+}
+async function excute(){
+    while (true) {
+        await delay(2000);
+    }
+}
+excute();
+```
+
+虚拟dom  转成真实dom
+
+```
+function createDOMFromVirtualDOM(virtualDOM) {
+    // 创建一个新的 DOM 元素
+    const domElement = document.createElement(virtualDOM.type);
+
+    // 设置属性
+    if (virtualDOM.props) {
+        Object.keys(virtualDOM.props).forEach(key => {
+            if (key === 'children') {
+                // 递归处理子节点
+                virtualDOM.props.children.forEach(child => {
+                    if (typeof child === 'string') {
+                        // 文本节点
+                        domElement.appendChild(document.createTextNode(child));
+                    } else {
+                        // 子虚拟 DOM 节点
+                        domElement.appendChild(createDOMFromVirtualDOM(child));
+                    }
+                });
+            } else {
+                // 其他属性
+                domElement.setAttribute(key, virtualDOM.props[key]);
+            }
+        });
+    }
+
+    return domElement;
+}
 ```
