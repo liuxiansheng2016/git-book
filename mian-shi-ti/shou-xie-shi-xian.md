@@ -102,3 +102,44 @@ function myInstanceOf(obj, constructor) {
 }
 
 ```
+
+### 节流
+
+````
+```html
+function throttle(fn, delay) {
+   let canRun = true;
+   return function () {
+     if (!canRun) return;
+     canRun = false;
+
+     setTimeout(() => {
+       fn.apply(this, arguments);
+       canRun = true;
+     }, delay);
+   }
+
+}
+
+function handleScroll() {
+  console.log('scrolling');
+}
+
+window.addEventListener('scroll',throttle(handleScroll,1000));
+```
+````
+
+### 防抖
+
+```html
+function  debounce(fn, time) {
+    let timer;
+    return function() {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          fn.apply(this, arguments);
+        }, time);
+    }
+}
+```
+

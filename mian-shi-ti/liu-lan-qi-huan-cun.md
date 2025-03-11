@@ -41,6 +41,14 @@ Cache-Control: max-age=600
 1. no-cache 表示虽然资源可以被缓存，但在每次使用前都需要与服务器进行验证，确保资源是最新的。
 2. no-store 则指示浏览器完全不要存储任何关于该响应的信息，适用于敏感数据或者需要每次都获取最新版本的情况。
 
+### **Cache-Control 优先于 Expires**：
+
+当同时存在 `Cache-Control` 和 `Expires` 头部时，`Cache-Control` 的优先级更高。具体来说，如果 `Cache-Control` 响应头中设置了 `max-age` 或 `s-maxage` 指令，则 `Expires` 头会被忽略 1。
+
+这是因为 `Expires` 是 HTTP/1.0 引入的一个头部字段，它提供了一个 GMT 格式的绝对过期时间。然而，由于客户端和服务器时间可能不同步，这可能导致缓存管理上的问题。为了解决这个问题，HTTP/1.1 引入了 `Cache-Control` 头部，它使用相对时间（以秒为单位）来定义资源的有效期，从而避免了时间同步的问题
+
+此外，`Cache-Control` 提供了更多的缓存控制选项，例如 `no-cache`, `no-store`, `must-revalidate` 等，使得缓存策略更加灵活和精确
+
 ## 协商缓存
 
 协商缓存：当缓存过期或未设置强缓存指令时，浏览器会向服务器发送条件请求（通常包含 If-None-Match 或 If-Modified-Since 头），以确认资源是否发生了变化。如果资源没有变化，服务器返回 304 Not Modified 响应，浏览器继续使用缓存；否则，返回新的资源。
