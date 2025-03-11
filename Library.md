@@ -126,6 +126,47 @@ myDiagram.model = new go.TreeModel([
 * **分辨率依赖**：Canvas 图形在放大时可能会失真，不适合高分辨率屏幕和打印。
 * **绘图上下文**：Canvas 提供了一个 2D 或 3D 绘图上下文，所有绘图操作都通过这个上下文进行。
 
+### **如何优化 Canvas 绘制性能，避免卡顿？**
+
+优化 `Canvas` 绘制可以提高 FPS，减少卡顿，以下是关键优化点：
+
+**✅ 1. 选择合适的 `context`**
+
+* **`2d` 适用于简单图形**
+* **`webgl` 适用于 3D 或高性能绘图**
+* **`OffscreenCanvas` 可以在 Worker 线程渲染**
+
+**✅ 2. 降低重绘次数**
+
+* **避免不必要的 `clearRect()`**，仅更新需要的部分。
+* **使用 `requestAnimationFrame()`** 控制绘制节奏，而非 `setInterval()`。
+
+**✅ 3. 使用 `OffscreenCanvas` 进行后台渲染**
+
+```javascript
+javascript复制编辑const offscreenCanvas = new OffscreenCanvas(800, 600);
+const ctx = offscreenCanvas.getContext('2d');
+
+// 在后台绘制
+ctx.fillStyle = 'blue';
+ctx.fillRect(0, 0, 100, 100);
+
+// 传递给主 Canvas
+const mainCanvas = document.getElementById('canvas');
+const mainCtx = mainCanvas.getContext('2d');
+mainCtx.drawImage(offscreenCanvas, 0, 0);
+```
+
+**✅ 4. 批量绘制**
+
+* **合并 `fillRect()` 或 `drawImage()` 调用**
+* **使用 `canvas.getImageData()` 处理多个像素**
+
+**✅ 5. 避免频繁创建对象**
+
+* 复用 `Path2D`
+* 预渲染静态元素到缓存 `Canvas`
+
 #### Echarts 和 D3.js 对比
 
 * **Echarts**
