@@ -143,3 +143,88 @@ function  debounce(fn, time) {
 }
 ```
 
+### 深拷贝
+
+```
+// 在 Object 类的原型中添加一个深克隆方法
+Object.prototype.clone = function () {
+    // 根据情况创建一个数组或者普通 object 对象
+    let obj = this instanceof Array ? [] : {};
+    // 遍历当前对象的成员，赋给新对象
+    for (let prop in this) {
+        // 如果当前成员是对象类型
+        if (typeof this[prop] === 'object' && this[prop]!== null) {
+            obj[prop] = this[prop].clone();
+        } else {
+            obj[prop] = this[prop];
+        }
+    }
+    return obj;
+};
+
+// 使用自定义深克隆方法
+let obj1 = { a: 1, b: { c: 2 } };
+let obj2 = obj1.clone();
+
+// 验证深克隆，修改 obj2 中 b 属性的 c 值
+obj2.b.c = 3;
+console.log(obj1.b.c); // 输出 2，说明修改 obj2 不影响 obj1
+```
+
+### 去重
+
+```
+[...new Set(array)];
+Array.from(new Set(array));
+const array = [1, 2, 2, 3, 4, 4, 5];
+
+const uniqueArray = array.filter((value, index, self) => {
+  return self.indexof(value) == index;
+});
+console.log(uniqueArray); // 输出 [1, 2, 3, 4, 5]
+```
+
+### **实现promise all**
+
+Copy
+
+```
+function promiseAll(promises) {
+    return new Promise((resolve, reject) => {
+        if (!Array.isArray(promises)) {
+            return reject(new TypeError('Argument is not an array'));
+        }
+
+        let resolvedCounter = 0;
+        const result = new Array(promises.length);
+        for (let i = 0; i < promises.length; i++) {
+            Promise.resolve(promises[i])
+                .then(value => {
+                    resolvedCounter++;
+                    // 按照原始顺序保存结果
+                    result[i] = value;
+                    if (resolvedCounter === promises.length) {
+                        resolve(result);
+                    }
+                })
+                .catch(error => {
+                    // 如果任意一个 Promise 被拒绝，则整个 Promise.all 被拒绝
+                    reject(error);
+                });
+        }
+    });
+}
+
+// 测试代码
+const p1 = Promise.resolve(3);
+const p2 = 42;
+const p3 = new Promise((resolve, reject) => {
+    setTimeout(resolve, 100, 'foo');
+});
+
+promiseAll([p1, p2, p3]).then(values => {
+    console.log(values); // [3, 42, "foo"]
+}).catch(error => {
+    console.error(error);
+});
+```
