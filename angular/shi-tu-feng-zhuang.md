@@ -21,3 +21,16 @@ _**1.2 None（无）**_
 在这种模式下，组件的样式将完全封装在 Shadow DOM 中，确保组件的样式不会影响其他组件，也不会被其他组件的样式所影响。这种模式需要浏览器支持 Shadow DOM。\
 \
 ::host 用于选择组件的宿主元素，即组件的最外层标签。
+
+```
+@Component({
+  selector: 'app-my-component',
+  template: `<p>这是一个没有封装模式的组件。</p>`,
+  styles: [`p { color: blue; }`],
+  encapsulation: ViewEncapsulation.None
+})
+export class MyComponentWithoutEncapsulation {}
+```
+
+\
+\
