@@ -4,7 +4,7 @@ description: 它将每个源值投影到一个新的 Observable，并将这些�
 
 # mergeMap
 
-假设你有一个用户 ID 列表，你需要根据这些 ID 获取用户的详细信息。你可以使用 flatMap 来实现这一点：
+假设你有一个用户 ID 列表，你需要根据这些 ID 获取用户的详细信息。你可以使用 mergeMap来实现这一点：
 
 ```javascript
 ngOnInit() {
