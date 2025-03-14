@@ -21,12 +21,24 @@ Node.js 启动时，首先执行主模块中的同步代码。
    1. `process.nextTick()` 会在**当前执行栈清空后**，立即执行，而不会等待进入事件循环的下一个阶段。
 3. **执行所有的微任务队列（Promise 回调等）**
 4. **事件循环进入各个阶段，按顺序执行宏任务**
-   * **Timers（定时器阶段）：执行 `setTimeout()` 和 `setInterval()`**
-   * **I/O 处理阶段**（例如读取文件的回调）
-   * **Idle, Prepare**（内部使用，忽略）
-   * **Poll（轮询阶段）：执行 I/O 相关的回调**
-   * **Check（检查阶段）：执行 `setImmediate()` 回调**
-   * **Close Callbacks（关闭回调）：执行 `socket.on('close')` 等回调**
+   1. **Timers（定时器阶段）**：
+      * 执行 `setTimeout()` 和 `setInterval()` 设定的 **回调函数**。
+      * 但并不保证回调会 **准时** 执行，而是**最早**在设定的时间后执行（受 CPU 任务、I/O 操作影响）。
+   2. **Pending Callbacks（待处理回调阶段）**：
+      * 处理上一轮循环中延迟执行的 I/O 回调（如 TCP 错误）。
+   3. **Idle, Prepare（空闲阶段）**：
+      * 仅供内部使用，一般不涉及开发者的代码。
+   4. **Poll（轮询阶段）**：
+      * 处理 **I/O 事件**（如读取文件、网络请求等）。
+      * 如果 **无 I/O 任务**，事件循环会：
+        * 如果有 `setImmediate()` 任务，跳到 `check` 阶段执行。
+        * 如果 **没有** `setImmediate()` 任务，则 **阻塞** 在 `poll` 阶段，直到有新的事件到达（如 I/O 事件）。
+   5. **Check（setImmediate 阶段）**：
+      * 执行 `setImmediate()` 设定的 **回调函数**。
+      * `setImmediate()` **总是在 poll 阶段执行完后** 立即执行。
+   6. **Close Callbacks（关闭回调阶段）**：
+      * 执行 `close` 事件的回调函数（如 `socket.on('close', callback)`）。
+      * 例如：当 `socket` 连接被关闭时触发 `close` 事件。
 5. **循环进入下一个迭代，继续执行 `nextTick()` → 微任务 → 宏任务**
 
 **事件循环的 6 个阶段**
