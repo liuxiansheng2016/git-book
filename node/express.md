@@ -139,6 +139,104 @@ app.use(
 )
 ```
 
+<mark style="color:red;">req.session 当前用户的 Session 对象</mark>
+
+### session 的存储方式
+
+#### **默认存储方式：内存（MemoryStore）**
+
+**默认情况下**，`express-session` 使用 `MemoryStore` 存储数据：
+
+```javascript
+javascript复制编辑app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
+```
+
+🔹 **数据存储在服务器的内存（RAM）中**，适用于 **开发环境**，但 **生产环境不推荐**，因为：
+
+* **重启服务器会丢失所有 session 数据**。
+* **占用内存，用户多时会影响性能**。
+
+***
+
+#### **生产环境推荐的 Session 存储方式**
+
+Redis 是高效的 **内存数据库**，适合存储 Session 数据。
+
+```javascript
+javascript复制编辑const session = require('express-session');
+const RedisStore = require('connect-redis').default;
+const { createClient } = require('redis');
+
+const redisClient = createClient({ legacyMode: true });
+redisClient.connect().catch(console.error);
+
+app.use(session({
+    store: new RedisStore({ client: redisClient }),
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+```
+
+📌 **优点：**
+
+* **高性能，持久化存储，不会因服务器重启丢失**。
+* **支持分布式存储**，适合多个服务器共享 Session。
+
+***
+
+#### **✅使用数据库（MySQL、MongoDB）存储**
+
+**🔹MongoDB 存储 Session**
+
+```javascript
+javascript复制编辑const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
+app.use(session({
+    store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/session_db' }),
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+```
+
+#### **✅ 使用文件存储**
+
+可以将 Session 存储在本地文件中：
+
+```javascript
+javascript复制编辑const session = require('express-session');
+const FileStore = require('session-file-store')(session);
+
+app.use(session({
+    store: new FileStore(),
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false
+}));
+```
+
+📌 **适用于：**
+
+* **小型应用或临时存储 Session**，但不适合分布式系统。
+
+#### **如何查看 Session 存储数据？**
+
+不同的存储方式，数据会存储在不同位置：
+
+| **存储方式**             | **数据存放位置**       | **查看方式**                           |
+| -------------------- | ---------------- | ---------------------------------- |
+| **MemoryStore** (默认) | 服务器内存            | 不能直接查看                             |
+| **Redis**            | Redis 内存数据库      | `redis-cli` -> `keys *` 查看 session |
+| **MySQL**            | `session_db` 数据表 | `SELECT * FROM sessions;`          |
+| **MongoDB**          | `session_db` 集合  | `db.sessions.find().pretty();`     |
+| **文件存储**             | 本地 `tmp` 目录      | 打开 `.json` 文件                      |
+
 ### express.static
 
 是 Express.js 提供的一个内置中间件函数，用于提供静态文件（如 HTML 文件、图像、CSS 文件和 JavaScript 文件）。它使得你可以轻松地将某个目录下的文件作为静态资源提供给客户端。
@@ -717,7 +815,7 @@ app.listen(port, () => {
 编辑 `/etc/nginx/sites-available/default`：
 
 ```nginx
-nginx复制编辑upstream node_app {
+upstream node_app {
     server 127.0.0.1:3001;
     server 127.0.0.1:3002;
     server 127.0.0.1:3003;
