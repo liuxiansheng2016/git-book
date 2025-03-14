@@ -214,7 +214,7 @@ Express 的中间件主要分为以下几类：
 4. **内置中间件**（如 `express.json()`、`express.static()`）
 5. **第三方中间件**（如 `cors`、`morgan`）
 
-Express 中间件是**一个处理请求的函数**，通常用于日志、认证、错误处理等：
+Express 中间件是一个函数，它可以访问请求对象（`req`）、响应对象（`res`）以及应用程序请求 - 响应循环中的下一个中间件函数（通常用 `next` 表示）。中间件函数可以执行各种任务，如记录日志、解析请求体、进行身份验证、修改响应头等。
 
 ```javascript
 function logger(req, res, next) {
@@ -287,6 +287,32 @@ module.exports = router;
 ```javascript
 const userRoutes = require('./routes/users');
 app.use('/api', userRoutes);
+```
+
+**内置中间件**
+
+**`express.static`**：用于提供静态文件服务，比如 HTML、CSS、JavaScript、图片等。可以将指定目录下的文件直接暴露给客户端访问。
+
+```javascript
+const express = require('express');
+const app = express();
+// 将 'public' 目录作为静态文件目录
+app.use(express.static('public'));
+
+```
+
+**`express.json`**：用于解析 JSON 格式的请求体，将请求体中的 JSON 数据转换为 JavaScript 对象，并挂载到 `req.body` 上。
+
+```javascript
+app.use(express.json());
+```
+
+**`express.urlencoded`**：用于解析表单数据，将表单提交的数据转换为 JavaScript 对象，并挂载到 `req.body` 上。
+
+
+
+```javascript
+app.use(express.urlencoded({ extended: true }));
 ```
 
 ***
