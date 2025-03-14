@@ -252,7 +252,7 @@ export class ExampleService {
 #### **1. 基于事件触发**
 
 ```html
-html复制编辑<button (click)="loadContent = true">加载内容</button>
+<button (click)="loadContent = true">加载内容</button>
 
 <ng-container *defer (on viewport) when="loadContent">
   <p>✨ 这段内容只有在点击按钮后才会加载！</p>
@@ -269,7 +269,7 @@ html复制编辑<button (click)="loadContent = true">加载内容</button>
 #### **✅ 2. `viewport` 触发（懒加载）**
 
 ```html
-html复制编辑<ng-container *defer (on viewport)">
+<ng-container *defer (on viewport)">
   <p>📌 这段内容只有当进入视口（用户滚动到这里）时才会加载！</p>
 </ng-container>
 ```
@@ -283,7 +283,7 @@ html复制编辑<ng-container *defer (on viewport)">
 #### **✅ 3. 设置 `timeout`（定时加载）**
 
 ```html
-html复制编辑<ng-container *defer (on timer(3000))">
+<ng-container *defer (on timer(3000))">
   <p>⏳ 3 秒后，这段内容才会显示！</p>
 </ng-container>
 ```
@@ -297,7 +297,7 @@ html复制编辑<ng-container *defer (on timer(3000))">
 #### **✅ 4. `placeholder`（占位内容）**
 
 ```html
-html复制编辑<ng-container *defer (on viewport)>
+ht<ng-container *defer (on viewport)>
   <p>📌 当内容加载完成后，这里会显示实际内容！</p>
   
   <template defer:placeholder>
