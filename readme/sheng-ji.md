@@ -237,114 +237,9 @@ export class ExampleService {
 
 
 
-
-
-### **`*defer`**&#x20;
-
-| 特性       | 传统方式                          | `*defer` 方式              |
-| -------- | ----------------------------- | ------------------------ |
-| **懒加载**  | `ngIf + IntersectionObserver` | ✅ `*defer (on viewport)` |
-| **事件触发** | `ngIf + 事件绑定`                 | ✅ `*defer (on event)`    |
-| **定时加载** | `setTimeout + ngIf`           | ✅ `*defer (on timer(x))` |
-| **占位符**  | `ngIf + loading`              | ✅ `defer:placeholder`    |
-| **错误处理** | 额外的 `ngIf` 逻辑                 | ✅ `defer:error`          |
-
-#### **1. 基于事件触发**
-
-```html
-<button (click)="loadContent = true">加载内容</button>
-
-<ng-container *defer (on viewport) when="loadContent">
-  <p>✨ 这段内容只有在点击按钮后才会加载！</p>
-</ng-container>
-```
-
-📌 **效果**：
-
-* `when="loadContent"` 让 `*defer` 在 `loadContent` 变为 `true` 时才渲染。
-* **初始状态不会渲染内容**，只有用户点击按钮后才会加载。
-
-***
-
-#### **✅ 2. `viewport` 触发（懒加载）**
-
-```html
-<ng-container *defer (on viewport)">
-  <p>📌 这段内容只有当进入视口（用户滚动到这里）时才会加载！</p>
-</ng-container>
-```
-
-📌 **效果**：
-
-* **当用户滚动到该元素时才渲染**，实现懒加载（类似 `IntersectionObserver`）。
-
-***
-
-#### **✅ 3. 设置 `timeout`（定时加载）**
-
-```html
-<ng-container *defer (on timer(3000))">
-  <p>⏳ 3 秒后，这段内容才会显示！</p>
-</ng-container>
-```
-
-📌 **效果**：
-
-* 页面加载 **3 秒后** 才渲染内容。
-
-***
-
-#### **✅ 4. `placeholder`（占位内容）**
-
-```html
-ht<ng-container *defer (on viewport)>
-  <p>📌 当内容加载完成后，这里会显示实际内容！</p>
-  
-  <template defer:placeholder>
-    <p>⏳ 正在加载，请稍候...</p>
-  </template>
-</ng-container>
-```
-
-📌 **效果**：
-
-* 在内容渲染前，会先显示 **"正在加载..."**，加载完成后才替换成最终内容。
-
-***
-
-#### **✅ 5. `error`（错误处理）**
-
-```html
-html复制编辑<ng-container *defer (on timer(2000)) when="data">
-  <p>✅ 数据加载成功：{{ data }}</p>
-
-  <template defer:error>
-    <p>❌ 数据加载失败，请重试！</p>
-  </template>
-</ng-container>
-```
-
-📌 **效果**：
-
-* 如果 `data` 变量没有正确加载，会显示 `"数据加载失败"`。
-
-### `*defer` 和 `@defer`&#x20;
+### &#x20;`@defer`&#x20;
 
 在 Angular 中都用于**延迟渲染内容**，但它们的应用场景和使用方式有所不同。
-
-
-
-| 特性        | `*defer`（Angular 17+）          | `@defer`（Angular 18+，实验性）                    |
-| --------- | ------------------------------ | -------------------------------------------- |
-| **用法**    | 结构性指令 (`*`)                    | Angular 模板块 (`@`)                            |
-| **支持触发器** | ✅ `viewport`、`timer`、`click` 等 | ✅ `on idle`、`on viewport`、`on interaction` 等 |
-| **适用于**   | HTML 模板                        | 组件模板（`@defer` 块）                             |
-| **占位符**   | ✅ `defer:placeholder`          | ✅ `placeholder {}`                           |
-| **错误处理**  | ✅ `defer:error`                | ✅ `error {}`                                 |
-| **异步数据**  | 需要手动管理                         | ✅ `@defer (prefetch: true)` 可提前预取数据          |
-| **优化方式**  | 主要用于 UI 渲染优化                   | 结合 `@block` 和 `@loading`，支持更强的优化             |
-
-***
 
 #### **📌 `*defer` 示例**
 
@@ -394,83 +289,113 @@ html复制编辑<ng-container *defer (on timer(2000)) when="data">
 * `on idle` 只有在 **浏览器空闲** 时才加载，提高性能。
 * **占位符**、**加载状态**、**错误处理** 用更直观的 `@` 语法。
 
-#### **🎯 何时使用**
-
-* **`*defer` 适用于 UI 片段的懒加载**，比如部分内容、简单逻辑控制。
-* **`@defer` 适用于完整组件的懒加载**，可以和 `@loading`、`@error` 结合，适合更复杂的优化。
-
-&#x20;**Angular 18+ 推荐使用 `@defer` 来优化组件渲染，而 `*defer` 更适用于局部 UI 内容的控制！**&#x20;
 
 
+### `@if`&#x20;
 
-在 **Angular 17+** 引入的新模板控制流语法中，
-
-### `*if` 取代了 `*ngIf`，
-
-并且支持更清晰的 **`then...else`** 语法。
-
-`*if="isLoggedIn; then loggedIn else loggedOut"` 的作用是：
-
-* **如果 `isLoggedIn` 为 `true`，则渲染 `loggedIn` 模板**。
-* **如果 `isLoggedIn` 为 `false`，则渲染 `loggedOut` 模板**。
+是 **Angular 18+** 引入的新语法，用于替代 `*ngIf`，提供更 **简洁**、**可读性更高** 的条件渲染方式。
 
 ***
 
-#### **✅ 1. 基本用法**
+
 
 ```html
-<ng-template #loggedIn>
-  <p>✅ 欢迎回来，用户已登录！</p>
-</ng-template>
-
-<ng-template #loggedOut>
-  <p>🔒 请先登录！</p>
-</ng-template>
-
-<div *if="isLoggedIn; then loggedIn else loggedOut"></div>
+@if (condition) {
+  <p>条件为 true，显示这个内容！</p>
+} @else {
+  <p>条件为 false，显示这个内容！</p>
+}
 ```
 
-📌 **解析**：
+```typescript
+typescript复制代码import { Component } from '@angular/core';
 
-* **如果 `isLoggedIn === true`**，`<ng-template #loggedIn>` 的内容会被渲染。
-* **如果 `isLoggedIn === false`**，`<ng-template #loggedOut>` 的内容会被渲染。
+@Component({
+  selector: 'app-root',
+  template: `
+    <button (click)="isLoggedIn = !isLoggedIn">切换状态</button>
+
+    @if (isLoggedIn) {
+      <p>🎉 欢迎回来，用户已登录！</p>
+    } @else {
+      <p>🔑 请先登录！</p>
+    }
+  `,
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  isLoggedIn = false;
+}
+```
+
+**📌 解释**
+
+* `@if (isLoggedIn)`：如果 `isLoggedIn` 为 `true`，显示 "🎉 欢迎回来"。
+* `@else`：如果 `isLoggedIn` 为 `false`，显示 "🔑 请先登录"。
+* **点击按钮** 切换 `isLoggedIn` 的值。
 
 ***
 
-#### **✅ 2. 结合 `loading` 状态**
 
-可以扩展 `loading` 逻辑，**在加载过程中先显示 "加载中..."**：
 
 ```html
-<ng-template #loggedIn>
-  <p>✅ 欢迎回来，用户已登录！</p>
-</ng-template>
-
-<ng-template #loggedOut>
-  <p>🔒 请先登录！</p>
-</ng-template>
-
-<ng-template #loading>
-  <p>⏳ 正在检查登录状态...</p>
-</ng-template>
-
-<div *if="isLoading; then loading else (isLoggedIn ? loggedIn : loggedOut)"></div>
+html复制代码@if (status === 'success') {
+  <p>✅ 操作成功！</p>
+} @else if (status === 'loading') {
+  <p>⏳ 加载中...</p>
+} @else {
+  <p>❌ 发生错误！</p>
+}
 ```
 
-📌 **逻辑**：
+```typescript
+typescript复制代码import { Component } from '@angular/core';
 
-* `isLoading === true` 时，显示 `"⏳ 正在检查登录状态..."`。
-* 加载完成后，`isLoggedIn === true` 显示 `"✅ 欢迎回来"`，否则显示 `"🔒 请先登录"`。
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  status: 'success' | 'loading' | 'error' = 'loading';
+}
+```
 
-***
+Angular 18 还支持 `@for`，可以和 `@if` 结合：
 
-#### **`*if` vs `*ngIf`**
+```html
+html复制代码<ul>
+  @for (item of items; track item) {
+    @if (item.visible) {
+      <li>{{ item.name }}</li>
+    }
+  }
+</ul>
+```
 
-| 语法       | `*if`（Angular 17+）   | `*ngIf`（传统写法）           |
-| -------- | -------------------- | ----------------------- |
-| **可读性**  | ✅ 更清晰直观              | ❌ 需要多个 `*ngIf` 嵌套       |
-| **模板结构** | ✅ `then` & `else` 语法 | ❌ `<ng-template>` 可能较复杂 |
-| **灵活性**  | ✅ 支持 `loading` 等状态   | ❌ 需要手动嵌套 `ngIf`         |
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  items = [
+    { name: '苹果', visible: true },
+    { name: '香蕉', visible: false },
+    { name: '橙子', visible: true }
+  ];
+}
+```
+
+**📌 解释**
+
+* 只显示 `visible: true` 的项目（`苹果` 和 `橙子`）。
+* `@for` 进行循环，`@if` 过滤数据。
+
+
 
 ### Angular Signals&#x20;
 
