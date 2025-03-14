@@ -52,7 +52,6 @@
   * [Eventloop](node/eventloop.md)
   * [V8](node/v8.md)
   * [FS](node/fs.md)
-  * [Script](node/script.md)
   * [HTTP](node/http.md)
   * [mongoDB](node/mongodb.md)
   * [Template engine](node/template-engine.md)
