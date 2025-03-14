@@ -599,3 +599,157 @@ app.listen(3000, () => {
 
 | `req.baseUrl` | 获取路由的基础路径 |
 | ------------- | --------- |
+
+### 如何优化 Express.js 应用的性能？
+
+| **优化策略** | **作用** |
+| -------- | ------ |
+
+| **Gzip 压缩（compression）** | 减少响应体大小，提高加载速度 |
+| ------------------------ | -------------- |
+
+| **使用 `cluster` 多进程** | 提高服务器并发能力 |
+| -------------------- | --------- |
+
+| **静态资源缓存** | 通过 `cache-control` 减少 HTTP 请求 |
+| ---------- | ----------------------------- |
+
+| **Redis 缓存 API 响应** | 降低数据库负载，加速请求 |
+| ------------------- | ------------ |
+
+| **安全性（helmet）** | 防止 XSS、CSRF 攻击 |
+| --------------- | -------------- |
+
+| **使用 `morgan` 记录日志** | 监控慢查询、异常请求 |
+| -------------------- | ---------- |
+
+| **数据库查询优化** | 使用索引、分页，减少数据查询时间 |
+| ----------- | ---------------- |
+
+| **代码优化（async/await）** | 避免同步阻塞，提高服务器响应能力 |
+| --------------------- | ---------------- |
+
+
+
+**1. 路由优化**
+
+* **路由模块化**：将不同功能的路由拆分成独立的模块，提高代码的可维护性和可扩展性。例如使用 `express.Router()` 创建子路由模块。
+* **路由顺序**：将常用的路由放在前面，减少不必要的匹配。
+
+**2. 中间件优化**
+
+* **减少中间件使用**：避免使用不必要的中间件，每个中间件都会增加请求处理的时间。
+* **异步中间件**：使用异步中间件时，确保正确处理错误和调用 `next()`。
+
+**3. 数据库优化**
+
+* **连接池**：使用数据库连接池，减少数据库连接的开销，如在使用 MySQL 时使用 `mysql2` 的连接池。
+* **查询优化**：优化数据库查询语句，避免全表扫描，使用索引提高查询效率。
+
+**4. 静态文件优化**
+
+* **使用缓存**：设置静态文件的缓存头，减少客户端对静态文件的重复请求。
+
+```javascript
+app.use(express.static('public', { maxAge: 3600000 }));
+```
+
+**5. 性能监控和分析**
+
+* **使用工具**：如 `New Relic`、`AppDynamics` 等工具监控应用性能，找出性能瓶颈。
+
+### 如何在 Express.js 中实现缓存？
+
+#### **1. 内存缓存** 可以使用 `node - cache` 库实现简单的内存缓存。
+
+```javascript
+const express = require('express');
+const NodeCache = require('node - cache');
+const app = express();
+const myCache = new NodeCache();
+
+app.get('/data', (req, res) => {
+    const cachedData = myCache.get('data');
+    if (cachedData) {
+        return res.json(cachedData);
+    }
+    // 模拟从数据库或其他数据源获取数据
+    const data = { message: 'This is some data' };
+    myCache.set('data', data, 60); // 缓存 60 秒
+    res.json(data);
+});
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+```
+
+**2. 分布式缓存**\
+可以使用 Redis 作为分布式缓存。
+
+```javascript
+const express = require('express');
+const Redis = require('ioredis');
+const app = express();
+const redis = new Redis();
+
+app.get('/data', async (req, res) => {
+    const cachedData = await redis.get('data');
+    if (cachedData) {
+        return res.json(JSON.parse(cachedData));
+    }
+    const data = { message: 'This is some data' };
+    await redis.set('data', JSON.stringify(data), 'EX', 60); // 缓存 60 秒
+    res.json(data);
+});
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+```
+
+### **Express.js 如何与 Nginx 进行负载均衡？**
+
+#### &#x20;**修改 Nginx 配置**
+
+编辑 `/etc/nginx/sites-available/default`：
+
+```nginx
+nginx复制编辑upstream node_app {
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002;
+    server 127.0.0.1:3003;
+}
+
+server {
+    listen 80;
+    server_name example.com;
+
+    location / {
+        proxy_pass http://node_app;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+#### &#x20;**启动多个 Express 实例**
+
+```sh
+pm2 start server.js --name "app1" -- --port 3001
+pm2 start server.js --name "app2" -- --port 3002
+pm2 start server.js --name "app3" -- --port 3003
+```
+
+重启 Nginx：
+
+```sh
+sudo systemctl restart nginx
+```
+
+✅ ：Nginx 作为 **负载均衡器**，将请求分配给多个 Express 实例，提高并发能力。
