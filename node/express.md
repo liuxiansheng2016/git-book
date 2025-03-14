@@ -216,6 +216,10 @@ Express 的中间件主要分为以下几类：
 
 Express 中间件是一个函数，它可以访问请求对象（`req`）、响应对象（`res`）以及应用程序请求 - 响应循环中的下一个中间件函数（通常用 `next` 表示）。中间件函数可以执行各种任务，如记录日志、解析请求体、进行身份验证、修改响应头等。
 
+* 自定义中间件需要 `next();`，否则请求不会继续执行。
+* 在路由处理函数 (`app.get()`、`app.post()`等) 里，不需要 `next();`，因为 `res.send()` 会终止请求。
+* 如果一个中间件已经返回了响应 (`res.send()`)，就不应该再调用 `next();`，否则会报错
+
 ```javascript
 function logger(req, res, next) {
   console.log(`${req.method} ${req.url}`);
@@ -309,11 +313,53 @@ app.use(express.json());
 
 **`express.urlencoded`**：用于解析表单数据，将表单提交的数据转换为 JavaScript 对象，并挂载到 `req.body` 上。
 
-
-
 ```javascript
 app.use(express.urlencoded({ extended: true }));
 ```
+
+### next () 在 Express.js 中的作用是什么？
+
+在 Express.js 中，<mark style="color:red;">`next()`</mark> <mark style="color:red;"></mark><mark style="color:red;">是一个函数，用于将控制权传递给当前中间件之后的下一个中间件或路由处理函数。在中间件函数中，如果需要继续执行后续的中间件或路由处理逻辑</mark>，就需要调用 `next()` 函数。如果不调用 `next()`，请求 - 响应循环将被中断，后续的中间件和路由处理函数将不会被执行。
+
+```
+const express = require('express');
+const app = express();
+
+const firstMiddleware = (req, res, next) => {
+    console.log('First middleware');
+    next(); // 传递控制权给下一个中间件或路由处理函数
+};
+
+const secondMiddleware = (req, res, next) => {
+    console.log('Second middleware');
+    next();
+};
+
+app.use(firstMiddleware);
+app.use(secondMiddleware);
+
+app.get('/', (req, res) => {
+    res.send('Home page');
+});
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
+
+输出
+Server is running on port 3000
+First middleware
+Second middleware
+First middleware
+Second middleware
+```
+
+你看到的输出是因为浏览器在访问根路径 `/` 时，通常会发出两个请求：<mark style="color:red;">一个是针对页面本身的请求，另一个是针对浏览器的图标（favicon.ico）的请求。</mark>
+
+**修改代码后，没有重新启动服务器**（没有 `Ctrl + C` 重新运行 `node app.js`），那么终端输出的可能是 **上次运行的日志**
+
+
 
 ***
 
