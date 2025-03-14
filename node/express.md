@@ -851,3 +851,141 @@ sudo systemctl restart nginx
 ```
 
 ✅ ：Nginx 作为 **负载均衡器**，将请求分配给多个 Express 实例，提高并发能力。
+
+
+
+### **Express.js 如何处理日志？**
+
+在 Express.js 应用中，日志处理可以分为以下几种方式：
+
+1. **使用 `console.log()` 进行简单日志输出**（开发环境）
+2. **使用 `morgan` 记录 HTTP 请求日志**（推荐）
+3. **使用 `winston` 进行更高级的日志管理**（适用于生产环境）
+4. **将日志存储到文件或远程日志服务**（如 ELK、Datadog）
+
+***
+
+### **如何使用 `morgan` 记录请求日志？**
+
+`morgan` 是一个 Express.js 的 HTTP 请求日志中间件，可以方便地记录 API 请求的日志信息，包括：
+
+* 请求方法（GET, POST, etc.）
+* 请求路径
+* 状态码
+* 响应时间
+* 用户代理信息等
+
+#### **1️⃣ 安装 `morgan`**
+
+```sh
+npm install morgan
+```
+
+#### **2️⃣ 在 Express.js 中使用 `morgan`**
+
+```javascript
+const express = require('express');
+const morgan = require('morgan');
+
+const app = express();
+
+// 使用 morgan 记录所有请求日志
+app.use(morgan('combined'));
+
+app.get('/', (req, res) => {
+    res.send('Hello, Express with Morgan!');
+});
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
+```
+
+🔹 **访问 `http://localhost:3000/` 时，日志输出示例**：
+
+```
+::1 - - [10/Mar/2025:10:00:00 +0000] "GET / HTTP/1.1" 200 23 "-" "Mozilla/5.0"
+```
+
+***
+
+#### &#x20;**`morgan` 的不同日志格式**
+
+`morgan` 允许使用多种格式：
+
+| **格式**     | **说明**                               |
+| ---------- | ------------------------------------ |
+| `combined` | 详细日志，包括 IP、时间、方法、URL、状态码、用户代理（适用于生产） |
+| `common`   | 类似 `combined`，但不包含 `user-agent`      |
+| `dev`      | **开发模式**，带颜色，输出方法、状态码、响应时间           |
+| `short`    | 精简格式，适合日志文件                          |
+| `tiny`     | 最小格式，仅记录方法、URL、状态码、响应时间              |
+
+```javascript
+app.use(morgan('dev')); // 适合开发环境
+```
+
+***
+
+#### **记录日志到文件**
+
+可以使用 `fs.createWriteStream` 将日志写入文件：
+
+```javascript
+const fs = require('fs');
+const path = require('path');
+
+const logStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+
+// 将日志写入文件
+app.use(morgan('combined', { stream: logStream }));
+```
+
+📌 **日志将被追加到 `access.log` 文件中**。
+
+***
+
+#### **自定义日志格式**
+
+可以使用 `morgan.format()` 定义自己的日志格式：
+
+```javascript
+morgan.format('myFormat', ':method :url :status :response-time ms - :res[content-length]');
+app.use(morgan('myFormat'));
+```
+
+🔹 **示例输出：**
+
+```
+GET /users 200 5ms - 124b
+```
+
+#### **结合 `winston` 进行高级日志管理**
+
+`winston` 可以结合 `morgan` 进行 **日志级别管理**，并支持 **存入数据库或远程日志服务**：
+
+```javascript
+const winston = require('winston');
+const morgan = require('morgan');
+
+// 创建 winston 记录器
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
+
+// 使用 morgan 并结合 winston
+app.use(morgan('combined', { stream: { write: (message) => logger.info(message) } }));
+```
+
+📌 **`error.log` 仅记录 `error` 级别的日志，而 `combined.log` 记录所有日志**。
+
+1. **开发环境** → 使用 `morgan('dev')` 直接在控制台查看日志。
+2. **生产环境** → 使用 `morgan('combined')` 记录详细日志，并存入文件。
+3. **高级日志管理** → 结合 `winston` 进行日志级别管理，并存入数据库或远程服务。
+4. **日志存储** → 使用 `fs.createWriteStream` 将日志写入 `access.log`。
