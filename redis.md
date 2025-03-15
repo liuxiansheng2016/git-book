@@ -100,3 +100,61 @@ async function isAllowed(userId) {
     }
 })();
 ```
+
+### **如何使用 Redis 进行分布式锁**
+
+使用Redis实现分布式锁是一种常见的解决方案，用于确保在分布式系统中多个节点对共享资源的互斥访问。Redis提供了多种方式来实现分布式锁，其中最常见的是使用`SET`命令配合一些选项来保证操作的原子性。下面介绍一种基于Redlock算法的简单分布式锁实现方法。
+
+#### 实现步骤
+
+1. **获取锁**：尝试设置一个特定的键值对到Redis中，并设置过期时间。如果键已经存在，则表示其他客户端已经持有了锁。
+2. **释放锁**：删除对应的键值对以释放锁。为了防止误删别的客户端持有的锁，通常会存储锁持有者的唯一标识符（如UUID），并在删除前检查该标识符是否匹配。
+
+```
+const Redis = require('ioredis');
+const redis = new Redis(); // 默认连接到localhost:6379
+
+async function acquireLock(lockKey, ttl) {
+    const clientId = Math.random().toString(36).slice(2); // 生成随机client id
+    const result = await redis.set(lockKey, clientId, 'EX', ttl, 'NX'); // 设置键值对，仅当key不存在时设置成功
+    if (result === 'OK') {
+        console.log(`Lock acquired by ${clientId}`);
+        return clientId;
+    } else {
+        console.log('Failed to acquire lock');
+        return null;
+    }
+}
+
+async function releaseLock(lockKey, clientId) {
+    // 使用Lua脚本来保证判断和删除操作的原子性
+    const luaScript = `
+        if redis.call("GET", KEYS[1]) == ARGV[1] then
+            return redis.call("DEL", KEYS[1])
+        else
+            return 0
+        end
+    `;
+    const result = await redis.eval(luaScript, 1, lockKey, clientId);
+    if (result === 1) {
+        console.log(`Lock released by ${clientId}`);
+    } else {
+        console.log('Failed to release lock or lock not held by this client');
+    }
+}
+
+// 测试代码
+(async () => {
+    const lockKey = "myDistributedLock";
+    const ttl = 10; // 锁的有效期为10秒
+
+    const clientId = await acquireLock(lockKey, ttl);
+    if (clientId) {
+        // 执行需要加锁保护的操作
+        console.log("Performing operation under lock...");
+        
+        // 操作完成后释放锁
+        await releaseLock(lockKey, clientId);
+    }
+})();
+```
