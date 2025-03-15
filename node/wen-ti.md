@@ -1025,7 +1025,7 @@ server.listen().then(({ url }) => console.log(`Server ready at ${url}`));
 
 ***
 
-### **总结**
+## **优化总结**
 
 | **优化方向**    | **方法**                           |
 | ----------- | -------------------------------- |
@@ -1038,7 +1038,7 @@ server.listen().then(({ url }) => console.log(`Server ready at ${url}`));
 | **性能监控**    | Clinic，PM2                       |
 | **GraphQL** | 代替 REST API                      |
 
-## 安全
+## 安全总结
 
 | **安全风险** | **解决方案** |
 | -------- | -------- |
