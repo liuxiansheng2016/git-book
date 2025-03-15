@@ -94,7 +94,6 @@
   * [Pipe](rxjs/pipe.md)
   * [Of 和 from](rxjs/of.md)
   * [Map相关](rxjs/mergemap.md)
-  * [switchMap](rxjs/switchmap.md)
   * [mergeAll](rxjs/mergeall.md)
   * [concatWith和concatAll](rxjs/concatwith-he-concatall.md)
   * [Tap](rxjs/tap.md)
