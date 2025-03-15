@@ -16,15 +16,13 @@ Redis（Remote Dictionary Server）是一个开源的、基于内存的数据结
 
 **安装 Redis**
 
-Copy
-
 ```
 npm install redis
 ```
 
 **使用示例**
 
-Copy
+
 
 ```
 const redis = require("redis");
@@ -45,4 +43,60 @@ async function getUser(id) {
 
   return user;
 }
+```
+
+### 使用Redis实现分布式限流
+
+是一个常见的场景，尤其是在需要控制对某些资源（如API）的访问速率时。下面介绍一种基于令牌桶算法或漏桶算法的概念来实现限流的方法，这里我们以令牌桶算法为例进行说明。
+
+#### 实现思路
+
+令牌桶算法的基本思想是系统会以一个恒定的速率往桶里放入令牌，而用户每次请求都需要从桶中获取一个令牌才能被处理。如果桶中没有足够的令牌，则拒绝该请求或者让请求等待。通过这种方式可以有效地限制请求的速率。
+
+在Redis中，可以通过以下步骤实现：
+
+1. **存储令牌数**：使用一个Redis键来表示当前桶中的令牌数。
+2. **更新令牌数**：根据设定的速率周期性地增加令牌数，但不能超过桶的最大容量。
+3. **消耗令牌**：当有请求到达时，尝试减少令牌数。如果当前令牌数不足以满足请求，则拒绝该请求。
+
+```
+const Redis = require('ioredis');
+const redis = new Redis(); // 默认连接到localhost:6379
+
+// 限流配置
+const LIMIT = 10; // 每秒允许的最大请求数
+const TIME_WINDOW = 1; // 时间窗口为1秒
+
+async function isAllowed(userId) {
+    const key = `rate_limit:${userId}`;
+    const now = Date.now();
+    
+    // 获取当前令牌数和上次填充时间戳
+    const tokenData = await redis.hmget(key, 'tokens', 'lastRefillTimestamp');
+    let tokens = parseInt(tokenData[0], 10) || LIMIT;
+    let lastRefillTimestamp = parseInt(tokenData[1], 10) || now;
+
+    // 计算需要填充的令牌数量
+    const refillCount = Math.floor((now - lastRefillTimestamp) / (TIME_WINDOW * 1000) * LIMIT);
+    tokens = Math.min(LIMIT, tokens + refillCount);
+
+    if (tokens > 0) {
+        // 如果还有令牌，则减少一个令牌并更新数据
+        await redis.hmset(key, 'tokens', tokens - 1, 'lastRefillTimestamp', now);
+        return true;
+    } else {
+        // 没有足够令牌
+        return false;
+    }
+}
+
+// 测试代码
+(async () => {
+    const userId = "user123";
+    if (await isAllowed(userId)) {
+        console.log("Request allowed.");
+    } else {
+        console.log("Rate limit exceeded.");
+    }
+})();
 ```
