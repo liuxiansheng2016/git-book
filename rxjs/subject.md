@@ -24,6 +24,7 @@ export class MessageService {
 
   public getMsg() {
     return this.msg;
+    //  return this.msg.asObservable(); // 返回可订阅的 Observable
   }
 }
 
@@ -45,6 +46,15 @@ ngOnInit() {
 ```javascript
 this.messageService.sendMsg('hello world');
 ```
+
+#### `asObservable()`&#x20;
+
+是 `Subject` 类的一个方法，它的主要作用是将 `Subject` 转换为一个普通的 `Observable` 对象
+
+* `getMessage()` 返回的是 `Subject`，而不是 `Observable`。
+* 任何订阅它的组件都可以 **直接调用 `.next(value)` 发送消息**，这可能会导致：
+  * 某些组件 **误修改数据流**，造成数据混乱。
+  * 违背**单一数据流**的原则（不希望消费者也能充当生产者）。
 
 ## `BehaviorSubject` 的特点：
 
@@ -123,21 +133,19 @@ subject.next(2);
 
 ### **2. 值的发出方式**
 
-* **Observable**：值的发出逻辑通常在其构造函数的订阅函数中定义，并且由 `Observable` 内部的逻辑控制值的产生和发出。例如，使用 `new Observable()` 创建的 `Observable`，在订阅函数中定义了如何发出值。
+* 普通 `Observable` **不能** 直接通过 `.next(value)` 手动推送数据，<mark style="color:red;">数据流是在创建</mark> <mark style="color:red;"></mark><mark style="color:red;">`Observable`</mark> <mark style="color:red;"></mark><mark style="color:red;">时</mark><mark style="color:red;">**定义**</mark><mark style="color:red;">的，所有数据的推送逻辑必须写在</mark> <mark style="color:red;"></mark><mark style="color:red;">`Observable`</mark> <mark style="color:red;"></mark><mark style="color:red;">内部。</mark>不能在外部调用 `next(value)` 推送新数据。
 
 ```javascript
-const { Observable } = require('rxjs');
+import { Observable } from 'rxjs';
 
-const customObservable = new Observable((observer) => {
-    let count = 0;
-    const intervalId = setInterval(() => {
-        observer.next(count++);
-    }, 1000);
-
-    return () => {
-        clearInterval(intervalId);
-    };
+const observable = new Observable(observer => {
+  observer.next('数据1');
+  observer.next('数据2');
+  observer.complete(); // 结束数据流
 });
+
+// 订阅
+observable.subscribe(value => console.log(value));
 ```
 
 * **Subject**：可以手动控制值的发出，通过调用 `next()`、`error()` 和 `complete()` 方法来分别发出值、抛出错误和发送完成信号。如前面 `Subject` 示例中，通过 `subject.next()` 手动发出值。
