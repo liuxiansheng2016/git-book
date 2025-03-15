@@ -4,6 +4,9 @@ description: pipe 方法是一个函数，它接受一系列的操作符作为�
 
 # Pipe
 
+* `pipe()` 组合多个操作符。
+* **使用 `pipe()` 好处：** 遵循函数式编程、易于组合、不修改原始 Observabl
+
 ```javascript
 import { ajax } from 'rxjs/ajax';
 import { delay, filter } from 'rxjs/operators';

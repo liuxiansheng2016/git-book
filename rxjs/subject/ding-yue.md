@@ -2,13 +2,13 @@
 description: 什么是订阅？订阅是表示可支配资源的对象，通常是 Observable 的执行
 ---
 
-# 订阅
+# 取消订阅
 
 
 
-<figure><img src="../.gitbook/assets/image (1).png" alt="" width="501"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (1).png" alt="" width="501"><figcaption></figcaption></figure>
 
-<figure><img src="../.gitbook/assets/image (2).png" alt="" width="450"><figcaption></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2).png" alt="" width="450"><figcaption></figcaption></figure>
 
 ### 取消订阅
 
