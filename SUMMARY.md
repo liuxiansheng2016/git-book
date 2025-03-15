@@ -106,7 +106,7 @@
   * [timer](rxjs/timer.md)
   * [Interval](rxjs/interval.md)
   * [debounce](rxjs/debounce.md)
-  * [将Observable转换成Promise](rxjs/jiang-observable-zhuan-huan-cheng-promise.md)
+  * [Observable和promise](rxjs/jiang-observable-zhuan-huan-cheng-promise.md)
   * [shareReplay](rxjs/sharereplay.md)
   * [debounceTime/throttleTime](rxjs/debouncetime-throttletime.md)
 * [Http](Http.md)
