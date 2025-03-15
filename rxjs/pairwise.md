@@ -10,6 +10,10 @@ const source = of(1, 2, 3, 4, 5).pipe(pairwise());
 
 source.subscribe(pair => console.log(pair));
 
+[1, 2]
+[2, 3]
+[3, 4]
+[4, 5]
 ```
 
 假设你有一个数字序列，你想计算每对相邻值之间的差值：

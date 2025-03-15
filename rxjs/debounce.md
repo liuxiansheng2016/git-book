@@ -1,8 +1,6 @@
----
-description: 只有在另一个 Observable 确定的特定时间跨度过去且没有另一个源发射时，才从源 Observable 发出通知。
----
+# debounce() 和 debounceTime()
 
-# debounce
+### **`debounce`**
 
 ```javascript
 // RxJS v6+
@@ -22,3 +20,12 @@ const debouncedExample = example.pipe(debounce(() => timer(1000)));
 const subscribe = debouncedExample.subscribe(val => console.log(val));
 
 ```
+
+### **`debounce()` 和 `debounceTime()` 的区别**
+
+这两个 RxJS 操作符都用于**防抖（Debounce）**，即**抑制短时间内频繁触发的事件**，仅在**事件间隔达到一定时间后**才执行最新的事件。
+
+| 操作符                           | 作用                            |
+| ----------------------------- | ----------------------------- |
+| `debounceTime(time)`          | 在**指定的时间间隔**内如果没有新的值，则发出最新的值。 |
+| `debounce(() => timer(time))` | **基于回调函数**，可以动态控制**防抖时间**。    |
