@@ -14,7 +14,7 @@ Bable转码let 给var加\_
 * 对AST进行处理，这个阶段可以对Es6进行相应转换，即转成es5代码
 * 根据处理后的AST再生成代码字符串
 
-#### **聚合运算符**
+#### **运算符**
 
 \*\*??\*\*是聚合运算符，如果左值为 null 或 undefined，就返回右值。默认返回左值。
 
@@ -23,10 +23,25 @@ Bable转码let 给var加\_
 </strong>// expected output: "default"
 </code></pre>
 
-```
-const test1 = 0 ?? 2;
-console.log(test1);
+<pre><code><strong>const test1 = 0 ?? 2;
+</strong>console.log(test1);
 // expected output: 0
+</code></pre>
+
+`||` 运算符用于逻辑或操作，它会对左侧操作数进行布尔转换，如果转换结果为 `false`（即 `false`、`0`、`''`、`null`、`undefined`、`NaN`），则返回右侧操作数；否则返回左侧操作数。
+
+```
+const value1 = null;
+const value2 = 'default value';
+
+const result1 = value1 || value2;
+console.log(result1); // 输出: 'default value'
+
+const value3 = 0;
+const value4 = 'another default';
+
+const result2 = value3 || value4;
+console.log(result2); // 输出: 'another default'
 ```
 
 let 和 const
