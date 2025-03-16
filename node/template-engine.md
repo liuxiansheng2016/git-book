@@ -2,6 +2,8 @@
 
 结合 Node.js 的 Express 框架与模板引擎（如 Nunjucks、EJS 或 Pug），你可以轻松地创建一个简单的 SSR 应用程序
 
+`res.render()` 是 Express 框架中用于 **渲染 HTML 模板** 并返回给客户端的方法。
+
 ## **EJS**
 
 npm install express ejs

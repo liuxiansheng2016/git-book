@@ -45,13 +45,30 @@ Node.js 启动时，首先执行主模块中的同步代码。
 
 Node.js 的事件循环由 **libuv** 负责管理，主要分为以下 6 个阶段（按照执行顺序）：
 
-<table><thead><tr><th>阶段</th><th width="321">说明</th><th>主要执行任务</th></tr></thead><tbody><tr><td><strong>1. timers</strong></td><td>处理 <code>setTimeout</code> 和 <code>setInterval</code> 的回调</td><td>触发已到期的定时器</td></tr><tr><td><strong>2. I/O callbacks</strong></td><td>处理上一轮循环中延迟的 I/O 回调</td><td>读取文件、网络请求等</td></tr><tr><td><strong>3. idle, prepare</strong></td><td>内部使用，Node.js 内部调用</td><td>很少涉及</td></tr><tr><td><strong>4. poll</strong></td><td>处理新的 I/O 事件</td><td>主要的 I/O 处理阶段</td></tr><tr><td><strong>5. check</strong></td><td>处理 <code>setImmediate</code> 回调</td><td><code>setImmediate()</code> 回调会在这里执行</td></tr><tr><td><strong>6. close callbacks</strong></td><td>处理 <code>close</code> 事件</td><td>关闭文件描述符、socket 连接等</td></tr></tbody></table>
+| **阶段** | **执行的任务** |
+| ------ | --------- |
 
-***
+| **1️⃣ Timers** | 执行 `setTimeout()` 和 `setInterval()` |
+| -------------- | ----------------------------------- |
+
+| **2️⃣ Pending Callbacks** | 执行 I/O 相关的回调（如 TCP 连接错误） |
+| ------------------------- | ------------------------ |
+
+| **3️⃣ Idle, Prepare** | 内部使用，通常不影响开发 |
+| --------------------- | ------------ |
+
+| **4️⃣ Poll（轮询）** | 处理 **I/O 任务**（如文件读写、网络请求） |
+| ---------------- | ------------------------- |
+
+| **5️⃣ Check** | 执行 `setImmediate()` |
+| ------------- | ------------------- |
+
+| **6️⃣ Close Callbacks** | 处理 `close` 事件，如 `socket.on('close', ...)` |
+| ----------------------- | ----------------------------------------- |
 
 ### **事件循环的执行流程**
 
-**同步代码 → 异步回调任务**
+**同步代码 →&#x20;**<mark style="color:red;">**异步回调任务**</mark>
 
 1. **Node.js 先执行所有同步代码**
 2. **遇到异步任务（如 I/O 操作、`setTimeout`），将其交给 `libuv`**
