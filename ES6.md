@@ -14,6 +14,21 @@ Bable转码let 给var加\_
 * 对AST进行处理，这个阶段可以对Es6进行相应转换，即转成es5代码
 * 根据处理后的AST再生成代码字符串
 
+#### **聚合运算符**
+
+\*\*??\*\*是聚合运算符，如果左值为 null 或 undefined，就返回右值。默认返回左值。
+
+<pre><code>const test= null ?? 'default';
+<strong>console.log(test);
+</strong>// expected output: "default"
+</code></pre>
+
+```
+const test1 = 0 ?? 2;
+console.log(test1);
+// expected output: 0
+```
+
 let 和 const
 
 **`let`**：具有块级作用域，存在暂时性死区，不允许在同一作用域内重复声明变量
