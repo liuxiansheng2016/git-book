@@ -1494,6 +1494,74 @@ app.use(cors({
 | 避免 `OPTIONS` 预检请求 | 确保 `Content-Type` 简单，避免不必要的请求头                                          |
 | 后端不支持 CORS        | 代理服务器（Vue/React 配置 `proxy`）                                             |
 
+````
+```html
+<body>
+    <button id="fetchDataButton">Fetch Data</button>
+    <script>
+        document.getElementById('fetchDataButton').addEventListener('click', function () {
+            // 生成唯一的回调函数名
+            const callbackName = `jsonpCallback_${Date.now()}`;
+
+            // 创建 script 标签
+            const script = document.createElement('script');
+
+            // 定义回调函数
+            window[callbackName] = function (data) {
+                console.log('Received data:', data);
+                // 移除 script 标签
+                document.body.removeChild(script);
+                // 删除回调函数
+                delete window[callbackName];
+            };
+
+            // 构造请求 URL，包含回调函数名作为参数
+            const url = `http://localhost:3000/api/data?callback=${callbackName}`;
+
+            // 设置 script 标签的 src 属性
+            script.src = url;
+
+            // 将 script 标签添加到文档中
+            document.body.appendChild(script);
+        });
+    </script>
+</body>
+```
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/api/data', (req, res) => {
+    // 获取回调函数名
+    const callback = req.query.callback;
+
+    // 模拟要返回的 JSON 数据
+    const data = {
+        message: 'This is some sample data',
+        status: 'success'
+    };
+
+    // 将 JSON 数据转换为字符串
+    const jsonData = JSON.stringify(data);
+
+    // 包装 JSON 数据到回调函数调用中
+    const response = `${callback}(${jsonData})`;
+
+    // 设置响应的 Content-Type
+    res.setHeader('Content-Type', 'application/javascript');
+
+    // 返回响应数据
+    res.send(response);
+});
+
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+```
+
+````
+
 #### nodejs中间层代理
 
 利用http.request方法来转发请求
