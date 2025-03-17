@@ -303,3 +303,105 @@ function createDOMFromVirtualDOM(virtualDOM) {
     return domElement;
 }
 ```
+
+### 排序
+
+```
+```
+
+### eventbus
+
+// eventBus.js
+
+<pre><code><strong>```javascript
+</strong>// eventBus.js
+class EventBus {
+    constructor() {
+      this.events = {};
+    }
+  
+    on(eventName, callback) {
+      if (!this.events[eventName]) {
+        this.events[eventName] = [];
+      }
+      this.events[eventName].push(callback);
+    }
+  
+    off(eventName, callback) {
+      if (this.events[eventName]) {
+        this.events[eventName] = this.events[eventName].filter(
+          (cb) => cb !== callback
+        );
+      }
+    }
+  
+    emit(eventName, data) {
+      if (this.events[eventName]) {
+        this.events[eventName].forEach((callback) => callback(data));
+      }
+    }
+  }
+  
+  const eventBus = new EventBus();
+  export default eventBus;
+```
+}  
+```
+</code></pre>
+
+//Subscriber.js
+
+````
+```javascript
+import React, { useEffect, useState } from 'react';
+import eventBus from './eventBus';
+
+const Subscriber = () => {
+    const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        const handler = (data) => {
+            setMessage(data.message);
+        };
+        
+        eventBus.on('customEvent', handler); // 订阅事件
+
+        return () => {
+            eventBus.off('customEvent', handler); // 组件卸载时取消订阅
+        };
+    }, []);
+
+    return (
+        <div>
+            Received Message: {message}
+        </div>
+    );
+};
+
+export default Subscriber;
+```
+````
+
+// Publisher.js
+
+````
+```javascript
+import React from 'react';
+import eventBus from './eventBus';
+
+const Publisher = () => {
+    const handleClick = () => {
+        console.log('Publishing an event');
+        eventBus.emit('customEvent', { message: 'Hello from Publisher!' });
+    };
+
+    return (
+        <div>
+            <button onClick={handleClick}>Trigger Event</button>
+        </div>
+    );
+};
+
+export default Publisher;
+```
+````
