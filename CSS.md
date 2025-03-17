@@ -59,12 +59,19 @@ BFC（**块级格式化上下文**，Block Formatting Context）是 **CSS 中的
 ✅ 防止元素被浮动元素覆盖\
 ✅ 阻止元素与浮动元素重叠
 
-#### 1. 解决外边距塌陷（Margin Collapse）问题
+### 外边距塌陷（Margin Collapse）问题
 
 #### **场景1： 父子元素外边距塌陷**
 
 * parent 触发 **BFC**
 * **BFC 内部的 margin 不会与外部的 margin 合并**
+
+解决方法：&#x20;
+
+* 父元素Overflow: hidden.
+* 父元素Border.
+* 父元素position设置absolute或者fixed，或者float浮动，脱离文档输出流.
+* 父元素Display: inline-block display:flex.
 
 ```html
 <style>
@@ -89,37 +96,83 @@ BFC（**块级格式化上下文**，Block Formatting Context）是 **CSS 中的
     <div class="parent">
       <div class="child">子元素</div>
     </div>
+ </body>
 ```
 
-**场景1： d兄弟元素外边距塌陷兄弟元素外边距塌陷兄弟元素外边距塌陷兄弟元素外边距塌陷**兄弟元素外边距塌陷兄弟元素外边距塌陷**外边距塌陷**
+**场景2：**&#x5144;弟元素外边距塌陷
 
-\
+解决：&#x20;
+
+```
+.container {
+    display: flex;
+    flex-direction: column;
+}
+```
+
+```html
+  <style>
+      .box1 {
+        margin-bottom: 50px;
+        height: 100px;
+        background-color: lightgreen;
+      }
+
+      .box2 {
+        margin-top: 30px;
+        height: 100px;
+        background-color: lightyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box1">Box 1</div>
+      <div class="box2">Box 2</div>
+    </div>
+  </body>
+```
+
+### 浮动元素会导致父元素高度塌陷
 
 
 
-
-
-
-#### 垂直margin失效问题的解决办法
-
-1. 父元素Overflow: hidden.
-2. 父元素Border.
-3. 父元素position设置absolute或者fixed，或者float浮动，脱离文档输出流.
-4. 父元素Display: inline-block display:flex.
-
-#### 浮动元素会导致父元素高度塌陷，解决的方法
+````
+```html
+ <style>
+    .container {
+    }
+    .float-box {
+      float: left;
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      background: lightblue;
+    }
+   
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="float-box">浮动元素</div>
+  </div>
+</body>
+```
+````
 
 **浮动元素中** 父元素的高度默认是以子元素高度撑开的，但子元素浮动后，便脱离了文档流，因此无法撑起父元素，从而导致父元素高度丢失。
 
-1\.         父容器设置固定高度
+1. 父容器设置固定高度
+2. 清除浮动
+   1. 最后一个浮动子元素的后面，加上一个任意块级元素应用clear清除浮动样式
+   2. 用伪元素动态的在父元素的最后输出一个空内容，在空内容上应用清除浮动样式
+3. BFC
+   1. 父元素应用overflow:hidden样式，在IE6下需要用zoom:1样式做兼容
+   2. display: flex/position: absolute;
 
-2\.         最后一个浮动子元素的后面，加上一个任意块级元素应用clear清除浮动样式
 
-3\.         父元素应用overflow:hidden样式，在IE6下需要用zoom:1样式做兼容
 
-4\.         用伪元素动态的在父元素的最后输出一个空内容，在空内容上应用清除浮动样式
-
-#### 选择器的分类
+### 选择器的分类
 
 1. **元素选择器**，标签名称作为选择器 例如 p h1 table
 2. **类选择器**，用法选择定义类名，然后在元素中用class属性应用
