@@ -1,5 +1,38 @@
 # 手写实现
 
+### 模拟let
+
+```
+(function() {
+    var c = 3;
+    console.log(c); // 1
+})();
+
+console.log(c); // c is not defined
+```
+
+### 模拟const
+
+```
+function _const(key, value) {
+    window[key] = value;
+    Object.defineProperty(window, key, {
+        enumerable: false,
+        configurable: false,
+        get: function() {
+            return value;
+        },
+        set: function(newValue) {
+            if (newValue !== value) {
+                throw TypeError("这是只读变量，不可修改");
+            } else {
+                return value;
+            }
+        },
+    });
+}
+```
+
 ### new
 
 ```
