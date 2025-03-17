@@ -39,20 +39,66 @@ id选择器>类选择器>元素选择器 行内样式>内嵌样式>外联样式
 
 **JavaScript 执行阻塞：** 由于CSS和脚本都会阻塞HTML的解析，因此也会间接阻塞JavaScript的执行。当浏览器遇到 `<script>` 标签时，它会暂停HTML解析并执行JavaScript代码，如果在此之前有未加载完毕的CSS文件，HTML解析会被阻塞，进而导致JavaScript代码的执行也被阻塞。
 
-#### BFC(块级格式化上下文)
+### BFC(块级格式化上下文)
 
-**什么是BFC** Block Formatting Context，解释为块级格式化上下文。一旦HTML元素触发BFC，则满足下列的任意一个或多个条件即可：
+BFC（**块级格式化上下文**，Block Formatting Context）是 **CSS 中的一个布局机制**
+
+<mark style="color:red;">**BFC 是一个独立的布局区域，内部的元素不会影响外部元素的布局**</mark><mark style="color:red;">。</mark>
+
+#### 触发BFC条件：
 
 1. 设置了`display:none`, `display:flex`, `display:inline-flex`.
 2. position的值不是static或者relative（position:absolute或者position:fixed）.
 3. display的值是inline-block、table-cell、flex、table-caption除了inline-flex.
 4. overflow的值是visible以外（overflow:hidden、overflow:scroll）.
 
-**BFC 特性**
+#### **BFC 的作用**
 
-* 用于决定盒子布局以及浮动互相影响范围的一个区域。
-* BFC 是一个独立的渲染单元，容器里面的元素不会影响到外面的元素。
-* 使用BFC属性的元素可以包含浮动元素，会自动包围浮动，可以阻止元素被浮动元素覆盖。
+✅ 解决外边距塌陷（Margin Collapse）问题\
+✅ 清除浮动（Clearfix）\
+✅ 防止元素被浮动元素覆盖\
+✅ 阻止元素与浮动元素重叠
+
+#### 1. 解决外边距塌陷（Margin Collapse）问题
+
+#### **场景1： 父子元素外边距塌陷**
+
+* parent 触发 **BFC**
+* **BFC 内部的 margin 不会与外部的 margin 合并**
+
+```html
+<style>
+      .parent {
+        background-color: lightblue;
+        margin-top: 50px; /* 父元素外边距 */
+        width: 400px;
+        height: 200px;
+        //overflow: hidden;
+      }
+
+      .child {
+        margin-top: 30px; /* 子元素外边距 */
+        height: 100px;
+        background-color: lightcoral;
+        width: 400px;
+        height: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="parent">
+      <div class="child">子元素</div>
+    </div>
+```
+
+**场景1： d兄弟元素外边距塌陷兄弟元素外边距塌陷兄弟元素外边距塌陷兄弟元素外边距塌陷**兄弟元素外边距塌陷兄弟元素外边距塌陷**外边距塌陷**
+
+\
+
+
+
+
+
 
 #### 垂直margin失效问题的解决办法
 
