@@ -128,7 +128,7 @@ Js 解释器
 
 ### 同步任务 和异步任务
 
-<figure><img src=".gitbook/assets/image (10).png" alt=""><figcaption><p><br></p></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (10).png" alt=""><figcaption><p><br></p></figcaption></figure>
 
 1. 在执行过程中，同步和异步任务分别进入不同的执行场所，同步的是进入主线程，异步的进入Event Table并注册函数
 2. 指定的事情完成时，Event Tabel 会将这个函数移入Event Quene
