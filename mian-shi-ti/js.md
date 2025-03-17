@@ -1037,7 +1037,37 @@ Object.defineProperty 是 ES5 中引入的一个方法，用于定义或修改�
 
 103\. 空间复杂度和时间复杂度
 
-104\. \[] ==\[] 为 false；\[] == !\[] 为 true
+### `[0] == true`&#x20;
+
+JavaScript 在进行 `i`<mark style="color:red;">`f(condition)`</mark> <mark style="color:red;"></mark><mark style="color:red;">判断时会将</mark> <mark style="color:red;"></mark><mark style="color:red;">`condition`</mark> <mark style="color:red;"></mark><mark style="color:red;">转换成布尔值然后做判断。</mark><mark style="color:red;">`[0]`</mark> <mark style="color:red;"></mark><mark style="color:red;">是一个非空数组，转换成布尔值是</mark> <mark style="color:red;"></mark><mark style="color:red;">`true`</mark>。但在进行 `==` 比较时，如果类型不同，JavaScript 会尝试将两边转换为相同的类型，通常是数字。具体步骤如下：
+
+```javascript
+[0] == true;
+// 步骤分解：
+// 1. 把 `true` 转化为 `number`，`true` 变成 `1`
+[0] == 1;
+// 2. 数组 `[0]` 是对象，先尝试 `.valueOf()`，结果还是 `[0]`
+// 3. 再尝试 `.toString()`，结果是 `"0"`，类型是 `string`
+"0" == 1;
+// 4. 把 `"0"` 字符串转化为 `number`，`"0"` 变成 `0`
+0 == 1; // 结果是 `false`
+```
+
+### `== 和 ===`
+
+<mark style="color:red;">`==`</mark> <mark style="color:red;"></mark><mark style="color:red;">和</mark> <mark style="color:red;"></mark><mark style="color:red;">`===`</mark> <mark style="color:red;"></mark><mark style="color:red;">的主要区别在于是否进行类型转换</mark>
+
+* **`==`（相等运算符）**：在进行比较时会进行类型转换，它会尝试将两个比较的值转换为相同的类型，然后再进行比较。
+* **`===`（严格相等运算符）**：在进行比较时不会进行类型转换，也称为严格相等。只有当两个值的类型和值都完全相同时，才会返回 `true`。
+
+```
+console.log(null == undefined); 
+// 输出: true，在使用 == 时，null 和 undefined 被视为相等
+console.log(null === undefined); 
+// 输出: false，因为使用 === 时，不会进行类型转换，null 和 undefined 类型不同
+```
+
+### \[] ==\[] 为 false；\[] == !\[] 为 true
 
 {% code overflow="wrap" %}
 ```
@@ -1606,6 +1636,19 @@ window.addEventListener('error', function(event) {
 ### 在 Map 中和 For 循环中调用异步函数的区别
 
 * **Map 中的异步调用**：由于 `map()` 方法中的异步调用可以并发执行，所以它们的结果顺序可能与它们在数组中的顺序不同。
+
+```
+const arr = [1, 2, 3];
+
+const result = arr.map(async (num) => {
+  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${num}`);
+  return res.json();
+});
+
+console.log(result); // ❌ [Promise, Promise, Promise]
+问题： map() 直接返回 Promise 数组，无法直接获取异步结果。
+```
+
 * **For 循环中的异步调用**：使用 `for` 循环配合 `await` 关键字可以确保每个异步操作按顺序执行。当前一个异步操作完成后才会开始下一个操作，保证了顺序性。
 
 ### 遍历机制
@@ -1621,44 +1664,22 @@ window.addEventListener('error', function(event) {
 ### 异步支持
 
 * **`forEach` 和 `map`**：作为同步函数，不支持 `await` 语句；尝试在其中使用 `break` 或 `continue` 会导致错误。
+  *   **`forEach()` 和 `map()` 不是循环结构**
+
+      * `forEach()` 和 `map()` **是回调函数的执行方式**，并不是像 `for` 一样的循环体，不能使用 `break` 和 `continue`。
+
+      #### **`forEach()` 不能中途退出**
+
+      * `forEach()` 没有返回值，不能中途跳出，**必须执行所有元素的回调**。
+      * 但可以使用 `return` 退出当前回调，**只是跳过当前元素，不会跳出整个遍历**。
+
+      #### **`map()` 需要返回值**
+
+      * `map()` 的回调函数需要返回一个值用于创建新数组。
+      * `continue` 需要在 **循环体中使用**，而 `map()` **不是循环结构**，会导致 `SyntaxError`。
 * **`for` 循环、`for...in`, `for...of`**：支持 `await`，允许在循环体内等待异步操作完成。`for` 和 `for...of` 可以使用 `break` 和 `continue` 控制流，而 `for...in` 对 `continue` 和 `break` 的支持较弱，可能会被忽略。
 
-### `[0] == true`&#x20;
 
-JavaScript 在进行 `i`<mark style="color:red;">`f(condition)`</mark> <mark style="color:red;"></mark><mark style="color:red;">判断时会将</mark> <mark style="color:red;"></mark><mark style="color:red;">`condition`</mark> <mark style="color:red;"></mark><mark style="color:red;">转换成布尔值然后做判断。</mark><mark style="color:red;">`[0]`</mark> <mark style="color:red;"></mark><mark style="color:red;">是一个非空数组，转换成布尔值是</mark> <mark style="color:red;"></mark><mark style="color:red;">`true`</mark>。但在进行 `==` 比较时，如果类型不同，JavaScript 会尝试将两边转换为相同的类型，通常是数字。具体步骤如下：
-
-```javascript
-[0] == true;
-// 步骤分解：
-// 1. 把 `true` 转化为 `number`，`true` 变成 `1`
-[0] == 1;
-// 2. 数组 `[0]` 是对象，先尝试 `.valueOf()`，结果还是 `[0]`
-// 3. 再尝试 `.toString()`，结果是 `"0"`，类型是 `string`
-"0" == 1;
-// 4. 把 `"0"` 字符串转化为 `number`，`"0"` 变成 `0`
-0 == 1; // 结果是 `false`
-```
-
-### `[] == ![]` 结果是什么
-
-* 左边 `[] == 0`
-* 右边 `![] == false`
-* `False == 0`
-* 所以 `0 == 0` 为 `true`
-
-### `== 和 ===`
-
-<mark style="color:red;">`==`</mark> <mark style="color:red;"></mark><mark style="color:red;">和</mark> <mark style="color:red;"></mark><mark style="color:red;">`===`</mark> <mark style="color:red;"></mark><mark style="color:red;">的主要区别在于是否进行类型转换</mark>
-
-* **`==`（相等运算符）**：在进行比较时会进行类型转换，它会尝试将两个比较的值转换为相同的类型，然后再进行比较。
-* **`===`（严格相等运算符）**：在进行比较时不会进行类型转换，也称为严格相等。只有当两个值的类型和值都完全相同时，才会返回 `true`。
-
-```
-console.log(null == undefined); 
-// 输出: true，在使用 == 时，null 和 undefined 被视为相等
-console.log(null === undefined); 
-// 输出: false，因为使用 === 时，不会进行类型转换，null 和 undefined 类型不同
-```
 
 ### WebWorker多线程
 
