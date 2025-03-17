@@ -438,3 +438,103 @@ const Publisher = () => {
 export default Publisher;
 ```
 ````
+
+### 实现动态表单
+
+```
+// Some codeimport React from 'react';
+import DynamicMergeTable from './DynamicMergeTable';
+
+const columns = [
+  { Header: '姓名', accessor: 'name' },
+  { Header: '年龄', accessor: 'age' },
+  { Header: '城市', accessor: 'city' },
+];
+
+const data = [
+  { name: 'Alice', age: 25, city: 'New York' },
+  { name: 'Alice', age: 26, city: 'Los Angeles' },
+  { name: 'Bob', age: 30, city: 'Chicago' },
+  { name: 'Charlie', age: 22, city: 'San Francisco' },
+  { name: 'Charlie', age: 22, city: 'San Francisco' },
+  { name: 'Charlie', age: 23, city: 'San Francisco' },
+  { name: 'David', age: 35, city: 'Boston' },
+];
+
+const App = () => (
+  <div>
+    <h1>动态合并表格示例</h1>
+    {/* 同时在 mergeColumns 中传入 'name' 和 'city' */}
+    <DynamicMergeTable columns={columns} data={data} mergeColumns={['name', 'city']} />
+  </div>
+);
+
+export default App;
+
+import React from 'react';
+
+const DynamicMergeTable = ({ columns, data, mergeColumns = [] }) => {
+  // mergeColumns: 数组，指定哪些列需要进行动态合并（例如 ['name']）
+
+  // 预处理：为需要合并的列计算每个单元格的 rowSpan
+  const rowSpanMatrix = data.map(() => {
+    const obj = {};
+    mergeColumns.forEach(col => obj[col] = 0);
+    return obj;
+  });
+
+  mergeColumns.forEach(col => {
+    let i = 0;
+    while (i < data.length) {
+      let count = 1;
+      // 当当前行与下一行该列的值相同时，增加计数
+      while (i + count < data.length && data[i][col] === data[i + count][col]) {
+        count++;
+      }
+      // 在第一行设置 rowSpan
+      rowSpanMatrix[i][col] = count;
+      // 后续合并的行设置为 0（表示不再渲染该单元格）
+      for (let j = i + 1; j < i + count; j++) {
+        rowSpanMatrix[j][col] = 0;
+      }
+      i += count;
+    }
+  });
+
+  return (
+    <table border="1" cellPadding="5" style={{ borderCollapse: 'collapse' }}>
+      <thead>
+        <tr>
+          {columns.map(col => (
+            <th key={col.accessor}>{col.Header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row, rowIndex) => (
+          <tr key={rowIndex}>
+            {columns.map(col => {
+              // 如果该列需要合并
+              if (mergeColumns.includes(col.accessor)) {
+                const span = rowSpanMatrix[rowIndex][col.accessor];
+                // 当 rowSpan 为 0 时，说明该单元格已被上面的单元格合并，不再渲染
+                if (span === 0) return null;
+                return (
+                  <td key={col.accessor} rowSpan={span}>
+                    {row[col.accessor]}
+                  </td>
+                );
+              }
+              // 非合并列直接渲染
+              return <td key={col.accessor}>{row[col.accessor]}</td>;
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
+export default DynamicMergeTable;
+
+```
