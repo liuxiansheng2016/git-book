@@ -654,6 +654,73 @@ console.log(go()); // 3
 * 构造函数调用function：this永远代表当前创建的对象
 * 对象实例方法调用function：this永远代表当前的对象
 
+### New 和 Object.create
+
+New操作符
+
+&#x20;New操作符创建一个空对象，用this指代该对象。同时继承该函数的原型。属性和方法被加到this&#x20;
+
+1）首先创建了一个新的空对象&#x20;
+
+2）设置原型，将对象的原型设置为函数的 prototype 对象。&#x20;
+
+3）让函数的 this 指向这个对象，执行构造函数的代码（为这个新对象添加属性）&#x20;
+
+4）判断函数的返回值类型，如果是值类型，返回创建的对象。如果是引用类型，就返回这个引用类型的对象。用的对象中。
+
+```
+function myNew(Fn,...args){
+   var obj = {};
+   var result = Fn.apply(obj, args);
+   obj.__proto__ = Fn.prototype;
+   return result instanceof Object ? result : obj;
+
+}
+
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+const p1 = myNew(Person, "Alice", 25);
+console.log(p1.name); // Alice
+console.log(p1.age);  // 25
+console.log(p1 instanceof Person); // true
+
+
+
+构造函数：如果构造函数没有显式返回任何对象，则默认返回新创建的对象。如果显式返回了一个对象，则返回该对象；但如果返回的是一个原始类型（如字符串、数字等），则忽略返回值，依旧返回新创建的对象。
+function SpecialThing() {
+    this.value = 42;
+    return { special: 'value' }; // 返回自定义对象
+}
+const obj = new SpecialThing(); // obj 是 { special: 'value' }
+```
+
+```
+function myCreate(proto) {
+  if (typeof proto !== "object" || proto === null) {
+    throw new TypeError("Prototype must be a non-null object");
+  }
+  
+  function F() {}  // 创建一个空的构造函数
+  F.prototype = proto; // 让它的 prototype 指向传入的 proto
+  return new F();  // 通过 new 关键字创建新对象
+}
+
+const person = {
+  greet: function() {
+    console.log("Hello, I am " + this.name);
+  }
+};
+
+const obj = myCreate(person);
+obj.name = "Alice";
+obj.greet(); // Hello, I am Alice
+
+console.log(obj.__proto__ === person); // true
+```
+
 ### 执行上下文
 
 执行上下文： 是评估和执行js代码环境的抽象概念,每当js代码在运行的时候，它都在执行上下文中运行。
