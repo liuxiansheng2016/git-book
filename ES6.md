@@ -200,6 +200,8 @@ arrowFunc(1, 2, 3); // 输出: [1, 2, 3]
 
 泛型允许函数或组件支持多种数据类型，同时保持类型安全。
 
+<mark style="color:red;">使用类型参数，而不是具体的类型。</mark>
+
 ```typescript
 // 不使用泛型
 function identity(arg: number): number {
