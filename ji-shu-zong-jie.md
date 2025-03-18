@@ -11,7 +11,7 @@
   * MongoDB 处理 NoSQL 数据存储
   * MySQL 处理关系型数据
 * **CI/CD 流程：**
-  * 使用 TeamCity 或 GitHub Actions 进行代码构建、测试与发布
+  * 使用 TeamCity /GitHub Actions/Jenkins 进行代码构建
   * Webpack 和 Gulp 进行前端打包构建
 * **版本控制管理：**
   * Git 和 Perforce (P4) 进行代码管理
@@ -24,6 +24,13 @@
   * 使用 Karma 配合 Angular 进行组件与服务的单元测试
 * **Web 服务器部署：**
   * IIS 和 Azure 进行项目托管和上线
-* **安全与第三方集成：**
-  * reCAPTCHA 提供安全验证
-  * 通过 Analytics、Adobe、Datadog 进行数据分析与监控
+*   **安全与第三方集成：**
+
+    * reCAPTCHA 提供安全验证
+    * 通过 Analytics、Adobe、Datadog 进行数据分析与监控\
+
+
+
+
+    其他：rxjs响应式编程  Electron桌面端 next服务端渲染
+
