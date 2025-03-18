@@ -1,13 +1,9 @@
----
-hidden: true
----
-
 # 技术总结
 
 * **前端开发：**
-  * 使用 Angular、React 和其他框架进行 UI 交互和数据展示
+  * 使用 Angular、React&#x20;
   * 结合 ag-Grid、D3.js、ECharts 等进行数据可视化
-  * 使用 TypeScript 和 ECMAScript 编写业务逻辑
+  * 使用 TypeScript 和 ECMAScript&#x20;
 * **后端服务：**
   * 通过 Node.js 或 C# 提供 REST API 和服务
   * Express + 模板引擎支持服务端渲染
