@@ -34,6 +34,7 @@ React 依赖于 Hooks 的调用顺序来正确地关联状态和副作用。这<
 
 1. 只能在 React 的函数组件中调用 Hook。不要在其他 JavaScript 函数中调用。（还有一个地方可以调用 Hook —— 就是自定义的 Hook 中）
 2. 不要在循环，条件或嵌套函数中调用 Hook，必须始终在 React 函数的顶层使用 Hook
+   1. <mark style="color:red;">React 的 Hook 状态管理基于</mark><mark style="color:red;">**链表或数组的索引顺序**</mark><mark style="color:red;">。每次渲染时，React 会维护一个“Hook 链表”或“Hook 数组”，按顺序存储所有 Hook 的状态。如果调用顺序不一致，索引就会错位，导致状态无法正确关联。</mark>
 
 ## 常见hooks
 

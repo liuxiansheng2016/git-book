@@ -205,7 +205,8 @@ if (module.hot) {
   * 利用动态导入（`import()`）和 `optimization.splitChunks` 自动提取公共代码，降低初始加载体积。
   * 对多页面应用配置多个入口点，实现并行构建。
 * **DllPlugin 预编译**
-  * 使用 DllPlugin 和 DllReferencePlugin 对第三方依赖进行预编译，使得这些依赖在后续构建时无需重新编译。
+  *
+* 使用 DllPlugin 和 DllReferencePlugin 对第三方依赖进行预编译，使得这些依赖在后续构建时无需重新编译。
 * **合理区分开发和生产模式**
   * 开发模式（`mode: 'development'`）：关闭不必要的压缩与优化，加快构建和热更新。
   * 生产模式（`mode: 'production'`）：启用 Tree-shaking、压缩等优化，以减小最终产物体积。
