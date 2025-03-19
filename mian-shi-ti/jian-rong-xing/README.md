@@ -1,5 +1,11 @@
 # 兼容性
 
+* **html 设置正确的 doctype**: 建议使用 `<!DOCTYPE html>` 来确保文档以标准模式渲染，从而避免浏览器的兼容性问题。
+* **语义化标签**: 使用语义化标签（如 `<header>`, `<footer>`, `<article>`, `<section>`）不仅有助于SEO，还可以提高代码的可读性和可维护性。
+* **css reset 基础样式**: CSS reset 可以消除浏览器默认样式的差异，使不同浏览器中的页面表现更加一致。常见的 CSS reset 库包括 Normalize.css 和 Eric Meyer's Reset CSS。
+* **css 样式前缀**: 为了兼容不同浏览器，可以使用工具（如 Autoprefixer）自动添加浏览器前缀（如 `-webkit-`, `-moz-`, `-ms-`, `-o-`）。
+* **js polyfill**: Polyfill 是一种 JavaScript 插件，用于在旧浏览器中实现现代 JavaScript 特性。可以手动实现特性，也可以使用 `core-js`, `babel-polyfill` 等工具。
+
 ## **CSS 样式显示不一致**
 
 * **使用 CSS 重置样式**：引入通用的 CSS 重置样式，如 `normalize.css`，消除不同浏览器的默认样式差异，确保元素在不同浏览器中有一致的基础样式。
