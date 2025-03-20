@@ -379,7 +379,17 @@ export class HeroComponent {
 ### **InjectionToken**
 
 * 用途：用于创建标识符，以便在依赖注入系统中注入非类类型的值。
-* 注入非类类型的值：通过 `@Inject` 装饰器和 `InjectionToken` 来实现。
+* 注入非类类型的值：
+  * 通过 `@Inject` 装饰器和 `InjectionToken` 来实现。
+  *   在 `providers` 里提供具体的实现：
+
+      ```typescript
+      providers: [
+        { provide: API_URL, useValue: 'https://api.example.com' }
+      ]
+      ```
+
+
 
 ### `@Inject` 装饰器 使用场景
 
