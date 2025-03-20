@@ -603,7 +603,41 @@ promiseAll([p1, p2, p3]).then(values => {
 });
 ```
 
-‌
+### ‌ **Promise 实例方法 vs. Promise 对象方法**
+
+
+
+* **Promise 实例方法**： 由 `Promise` 的实例调用，例如 `then()`, `catch()`, `finally()`。
+* **Promise 对象方法**： 直接由 `Promise` 构造函数调用，例如 `Promise.resolve()`, `Promise.reject()`, `Promise.all()`。
+
+#### **Promise 实例方法**
+
+| 方法        | 作用          | 参数                          | 返回值        |
+| --------- | ----------- | --------------------------- | ---------- |
+| `then`    | 处理成功/失败     | `onFulfilled`, `onRejected` | 新的 Promise |
+| `catch`   | 仅处理失败       | `onRejected`                | 新的 Promise |
+| `finally` | 不论成功或失败都会执行 | `onFinally`                 | 原 Promise  |
+
+***
+
+&#x20;**Promise 对象方法**
+
+| 方法                   | 作用                 | 参数         | 返回值       |
+| -------------------- | ------------------ | ---------- | --------- |
+| `Promise.resolve`    | 返回成功的 Promise      | `value`    | `Promise` |
+| `Promise.reject`     | 返回失败的 Promise      | `reason`   | `Promise` |
+| `Promise.all`        | 全部成功才返回成功          | `iterable` | `Promise` |
+| `Promise.allSettled` | 所有 Promise 完成后返回结果 | `iterable` | `Promise` |
+| `Promise.race`       | 第一个完成的 Promise 结果  | `iterable` | `Promise` |
+| `Promise.any`        | 第一个成功的 Promise 结果  | `iterable` | `Promise` |
+
+***
+
+
+
+***
+
+🎉 **现在你掌握了 `Promise` 的全部实例方法与对象方法！** 😎
 
 ## Async 和 await
 
