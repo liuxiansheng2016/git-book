@@ -60,3 +60,19 @@ body {
 ```
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 ```
+
+### 屏幕**适配**
+
+\
+对于高清屏幕（如 Retina 屏幕），为了使页面元素显示得更加清晰，可以根据设备的像素比进行缩放设置。例如：\
+收起html
+
+```
+<script>
+    const scale = 1 / window.devicePixelRatio;
+    document.write('<meta name="viewport" content="width=device-width, initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no">');
+</script>
+```
+
+\
+通过 JavaScript 获取设备的像素比，然后<mark style="color:red;">动态设置</mark> <mark style="color:red;"></mark><mark style="color:red;">`viewport`</mark> <mark style="color:red;"></mark><mark style="color:red;">的缩放比例</mark>，确保页面元素在高清屏幕上以合适的大小显示。

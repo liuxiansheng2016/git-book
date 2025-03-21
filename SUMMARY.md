@@ -82,7 +82,7 @@
       * [渐进增强和 优雅降级](mian-shi-ti/jian-rong-xing/css/jian-jin-zeng-qiang-he-you-ya-jiang-ji.md)
     * [HTML](mian-shi-ti/jian-rong-xing/html.md)
     * [JS](mian-shi-ti/jian-rong-xing/js/README.md)
-      * [js plyfill](mian-shi-ti/jian-rong-xing/js/js-plyfill.md)
+      * [js plyfill](mian-shi-ti/jian-rong-xing/js-plyfill.md)
     * [桌面端和移动端兼容性](mian-shi-ti/jian-rong-xing/zhuo-mian-duan-he-yi-dong-duan-jian-rong-xing.md)
   * [常见的数据一致性](mian-shi-ti/chang-jian-de-shu-ju-yi-zhi-xing.md)
   * [datadog](mian-shi-ti/datadog.md)
