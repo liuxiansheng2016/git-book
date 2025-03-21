@@ -399,135 +399,289 @@ export class AppComponent {
 
 ### Angular Signals&#x20;
 
-是 Angular 团队在框架中引入的一种新的响应式编程概念
+**Angular Signals** 是 Angular v16 引入的新特性，用于管理 **状态和数据流**，旨在提供更高效的变更检测机制，与 **Zone.js** 相比，`Signals` 的数据变更机制更加 **精准**，避免了不必要的组件重渲染
 
-#### 创建和使用 Signals
-
-要创建一个 Signal，你可以使用 `signal` 函数，并为其提供一个初始值：
-
-```
-count = signal(0);
-```
-
-为了响应 Signal 的变化，你可以使用 `effect` 函数注册一个副作用函数，每当 Signal 的值发生变化时，这个副作用函数就会被重新执行
-
-#### 修改 Signals
-
-Signals 提供了多种方法来修改其值，包括直接设置新值的 `set()` 方法、基于当前值计算新值的 `update()` 方法以及用于修改复杂数据结构的 `mutate()` 方法
-
-#### **主要 API**
-
-| API        | 作用                        | 示例                                           |
-| ---------- | ------------------------- | -------------------------------------------- |
-| `signal`   | 创建一个可响应的信号（类似 `useState`） | `count = signal(0);`                         |
-| `computed` | 创建一个计算信号，依赖其他信号           | `doubleCount = computed(() => count() * 2);` |
-| `effect`   | 监听信号变化并执行副作用              | `effect(() => console.log(count()));`        |
-
-#### **✅ 1. 创建 `signal`**
-
-`signal` 是最基础的 API，用于创建一个可响应的状态变量。
-
-```typescript
-typescript复制编辑import { signal } from '@angular/core';
-
-export class CounterComponent {
-  count = signal(0); // 创建信号
-
-  increment() {
-    this.count.update(value => value + 1); // 更新信号
-  }
-}
-```
-
-📌 **特点**
-
-* `signal(0)` 创建一个信号，初始值为 `0`。
-* 访问值时，使用 `count()` **（调用函数方式）**。
-* `this.count.update(value => value + 1)` 更新信号值。
+* **高效变更检测**：跳过不必要的检测，只更新真正变化的部分。
+* **易于追踪依赖**：明确声明组件依赖的信号，自动追踪变化。
+* **提高性能**：精确触发组件更新，减少不必要的 DOM 变更。
 
 ***
 
-#### **✅ 2. `computed` 计算派生值**
+#### **Signal（信号）**
 
-`computed` 用于创建**派生信号**，会自动跟踪依赖的信号值。
+* **基本的数据容器**，用于存储和管理状态变化。
+* 通过 `set()` 和 `update()` 更新状态。
+* 访问状态时，通过调用 `signal()` 直接读取数据。
 
 ```typescript
-typescript复制编辑import { computed, signal } from '@angular/core';
+import { signal } from '@angular/core';
 
-export class CounterComponent {
-  count = signal(1);
-  doubleCount = computed(() => this.count() * 2); // 计算信号
+const count = signal(0);
+console.log(count()); // 0
 
-  increment() {
-    this.count.set(this.count() + 1);
-  }
-}
+// 更新 signal
+count.set(10);
+console.log(count()); // 10
+
+// 使用 update 更新当前状态
+count.update(value => value + 1);
+console.log(count()); // 11
 ```
-
-📌 **特点**
-
-* `computed` 会**自动更新**，无需手动订阅。
-* 当 `count()` 变化时，`doubleCount()` **自动更新**。
 
 ***
 
-#### **✅ 3. `effect` 监听信号变化**
+#### &#x20;**Computed（计算属性）**
 
-`effect` 用于执行**副作用**（例如 API 调用、日志记录）。
+* **基于其他 Signal 的派生状态**，会自动追踪依赖变化。
+* 只有在依赖的 Signal 发生变化时，Computed 才会重新计算。
 
 ```typescript
-typescript复制编辑import { effect, signal } from '@angular/core';
+import { signal, computed } from '@angular/core';
 
-export class CounterComponent {
-  count = signal(0);
+const length = signal(5);
+const width = signal(10);
 
-  constructor() {
-    effect(() => {
-      console.log('Count changed:', this.count());
-    });
-  }
+// 计算面积
+const area = computed(() => length() * width());
 
-  increment() {
-    this.count.update(c => c + 1);
-  }
-}
+console.log(area()); // 50
+
+// 更新 length
+length.set(7);
+console.log(area()); // 70
 ```
-
-📌 **特点**
-
-* `effect` **自动监听** `count` 变化，无需手动订阅。
-* 当 `count()` 变化时，会触发 `console.log`。
 
 ***
 
-#### **📌 在组件中使用 Signals**
+#### **Effect（副作用）**
+
+* **监听信号的变化，并执行副作用操作**。
+* 当依赖的 Signal 发生变化时，`Effect` 会自动触发回调。
 
 ```typescript
-typescript复制编辑import { Component, signal } from '@angular/core';
+import { signal, effect } from '@angular/core';
+
+const message = signal('Hello');
+
+// 监听变化
+effect(() => {
+  console.log(`Message changed: ${message()}`);
+});
+
+message.set('Hi there!'); // Console: Message changed: Hi there!
+```
+
+#### &#x20;**使用 Signal 绑定到 Angular 组件**
+
+**在组件中创建 Signal**
+
+```typescript
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-counter',
   template: `
-    <p>计数：{{ count() }}</p>
-    <button (click)="increment()">增加</button>
-  `
+    <div>
+      <p>Counter: {{ count() }}</p>
+      <button (click)="increment()">Increment</button>
+      <button (click)="reset()">Reset</button>
+    </div>
+  `,
 })
 export class CounterComponent {
   count = signal(0);
 
   increment() {
-    this.count.set(this.count() + 1);
+    this.count.update(value => value + 1);
+  }
+
+  reset() {
+    this.count.set(0);
   }
 }
 ```
 
-📌 **模板中直接使用 `count()`**，不需要 `async pipe`。
+***
 
-#### **`Signals` vs `RxJS`**
+**✅ (2) 使用 Computed 和 Effect**
 
-| 特性       | Signals API  | RxJS                               |
-| -------- | ------------ | ---------------------------------- |
-| **状态管理** | ✅ 内置状态管理     | ❌ 需要 `BehaviorSubject`             |
-| **变更检测** | ✅ 仅影响相关组件    | ❌ 可能触发整个组件树                        |
-| **订阅管理** | ✅ **无需手动订阅** | ❌ 需要 `subscribe` 并手动 `unsubscribe` |
-| **复杂度**  | ✅ **简单**     | ❌ 复杂，适用于大规模数据流                     |
+```typescript
+import { Component, signal, computed, effect } from '@angular/core';
+
+@Component({
+  selector: 'app-cart',
+  template: `
+    <div>
+      <p>Price: {{ price() }}</p>
+      <p>Quantity: {{ quantity() }}</p>
+      <p>Total: {{ total() }}</p>
+      <button (click)="increaseQuantity()">Add One</button>
+    </div>
+  `,
+})
+export class CartComponent {
+  price = signal(50);
+  quantity = signal(1);
+
+  // 计算总价
+  total = computed(() => this.price() * this.quantity());
+
+  constructor() {
+    // 监听 total 的变化
+    effect(() => {
+      console.log(`Total updated: ${this.total()}`);
+    });
+  }
+
+  increaseQuantity() {
+    this.quantity.update(q => q + 1);
+  }
+}
+```
+
+***
+
+#### 📌 **1. 在 `@Input()` 中使用 Signal**
+
+* 可以将 `@Input` 与 `Signal` 结合使用。
+
+```typescript
+import { Component, Input, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-product',
+  template: `
+    <p>{{ productName() }}</p>
+  `,
+})
+export class ProductComponent {
+  @Input() productName = signal('Default Product');
+}
+```
+
+***
+
+#### 📌 **2. 使用 `@Output()` 和 Signal**
+
+* `@Output()` 可以结合 Signal 使用 `emit()` 来触发事件。
+
+```typescript
+import { Component, EventEmitter, Output, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-like',
+  template: `
+    <button (click)="like()">👍 Like ({{ likes() }})</button>
+  `,
+})
+export class LikeComponent {
+  likes = signal(0);
+  @Output() liked = new EventEmitter<number>();
+
+  like() {
+    this.likes.update(l => l + 1);
+    this.liked.emit(this.likes());
+  }
+}
+```
+
+***
+
+***
+
+#### 🎯 **1. 精准变更检测**
+
+* Signals 通过追踪依赖来优化变更检测，只触发相关部分的更新，避免整个视图重新渲染。
+
+***
+
+#### 🎯 **2. 免去 Zone.js**
+
+* 使用 Signals 时可以跳过 Zone.js 的运行，大幅提升性能。
+
+***
+
+#### 🎯 **3. 直观的数据流**
+
+* 数据流更易于管理，组件可以仅更新需要更新的部分，不再依赖 `@Input` 和 `@Output`。
+
+***
+
+#### 🎯 **4. 简化状态管理**
+
+* Signals 作为轻量级的状态管理工具，可在组件之间共享状态。
+
+***
+
+#### 📌 **1. Signal 结合服务实现全局状态管理**
+
+```typescript
+import { Injectable, signal, computed } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class CounterService {
+  private count = signal(0);
+
+  // 公开只读计算属性
+  currentCount = computed(() => this.count());
+
+  increment() {
+    this.count.update(value => value + 1);
+  }
+
+  reset() {
+    this.count.set(0);
+  }
+}
+```
+
+***
+
+#### 📌 **2. 在组件中使用服务 Signal**
+
+```typescript
+import { Component } from '@angular/core';
+import { CounterService } from './counter.service';
+
+@Component({
+  selector: 'app-counter',
+  template: `
+    <p>Counter: {{ counterService.currentCount() }}</p>
+    <button (click)="counterService.increment()">Increment</button>
+    <button (click)="counterService.reset()">Reset</button>
+  `,
+})
+export class CounterComponent {
+  constructor(public counterService: CounterService) {}
+}
+```
+
+***
+
+#### 📌 **3. Signal 结合 Async Pipe 使用**
+
+```html
+<p>{{ count() | async }}</p>
+```
+
+#### ⚡️ **1. 避免滥用 Effect**
+
+* `Effect` 会在每次依赖变化时执行，避免复杂逻辑直接放入 `Effect`。
+
+#### ⚡️ **2. 小心循环依赖**
+
+* `Computed` 和 `Effect` 可能引发循环依赖，应避免嵌套信号过深。
+
+#### ⚡️ **3. Signal 不支持深层嵌套变更**
+
+* 深层对象需要手动使用 `update()` 进行更改，避免信号无法检测深层对象变更。
+
+***
+
+### 🎉 **总结**
+
+✅ **Angular Signals** 提供了更优的变更检测机制，降低了性能开销。\
+✅ 通过 `signal()`、`computed()` 和 `effect()` 可以轻松实现响应式数据流。\
+✅ Signals 适用于管理状态、优化性能和实现精确 DOM 变更检测。
+
+使用 `Signals` 可以大大提升 Angular 应用的性能，尤其适合需要精确控制数据更新的场景！🚀
