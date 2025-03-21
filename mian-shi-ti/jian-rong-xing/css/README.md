@@ -61,6 +61,11 @@ module.exports = {
 ### **使用 CSS Hack**
 
 * 针对不同浏览器写 CSS Hack，根据需求对特定浏览器进行样式调整。
+* #### 针对IE提供样式
+  *   #### IE条件注释
+
+      这是针对 Internet Explorer 浏览器的一个方法，它使用 HTML 注释来包含特定于 IE 的样式表或样式块。
+  * #### 也可以指定具体的 IE 版本：
 
 ```css
 /* 针对 IE */
@@ -78,19 +83,11 @@ div {
 }
 ```
 
-#### 针对IE提供样式
-
-#### IE条件注释
-
-这是针对 Internet Explorer 浏览器的一个方法，它使用 HTML 注释来包含特定于 IE 的样式表或样式块。
-
 ```
 <!--[if IE]>
 <link rel="stylesheet" type="text/css" href="ie.css" />
 <![endif]-->
 ```
-
-#### 你也可以指定具体的 IE 版本：
 
 ```
 <!--[if lt IE 9]>
@@ -98,15 +95,7 @@ div {
 <![endif]-->
 ```
 
-#### &#x20;媒体查询 Hack
 
-可以通过媒体查询中的特定条件来影响某些版本的 IE，例如：
-
-```
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-   /* IE10+ 样式 */
-}
-```
 
 ### **使用 CSS `@supports` 进行功能检测**
 
