@@ -97,7 +97,7 @@ div {
 
 
 
-### **使用 CSS `@supports` 进行功能检测**
+### **使用 CSS `@supports` 或者**渐进增强 **进行功能检测**
 
 * 检测 CSS 是否支持某个属性，再应用对应样式。
 
@@ -126,6 +126,6 @@ css复制编辑@supports (display: grid) {
     }
     ```
 
-**渐进增强（Progressive Enhancement）** 和 **优雅降级（Graceful Degradation）**
+### **渐进增强（Progressive Enhancement）** 和 **优雅降级（Graceful Degradation）**
 
 &#x20;是现代 Web 开发中用于处理浏览器兼容性和用户体验的两种不同策略。它们比传统的 CSS Hack 更加灵活、可维护，并且符合当前 Web 标准。
