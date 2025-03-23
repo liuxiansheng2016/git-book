@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Js](README.md)
-  * [数据的一些问题](readme/shu-ju-de-yi-xie-wen-ti.md)
+  * [数据类型的一些问题](readme/shu-ju-lei-xing-de-yi-xie-wen-ti.md)
 * [Angular](angular/README.md)
   * [常见的生命周期钩子](angular/chang-jian-de-sheng-ming-zhou-qi-gou-zi.md)
   * [模块](angular/mo-kuai/README.md)
