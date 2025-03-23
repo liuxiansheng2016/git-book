@@ -298,6 +298,21 @@ let theme = user.settings?.theme ?? 'light';
 console.log(theme);  // "light"
 ```
 
+#### isNaN()和Number.isNaN()
+
+#### **`isNaN()`：**
+
+* 会对值进行 **类型转换** 后再判断是否为 `NaN`。
+* 会导致一些非数字值错误地被判断为 `NaN`
+
+```
+console.log(isNaN('hello'));      // true ❗️
+console.log(Number.isNaN('hello'));// false ✅
+
+console.log(isNaN(undefined));    // true ❗️
+console.log(Number.isNaN(undefined));// false ✅
+```
+
 #### **解决**JSON.stringify()**循环引用的方法**
 
 `JSON.stringify()` 不能直接处理 **循环引用**，会抛出 `TypeError`。
@@ -333,6 +348,61 @@ console.log(JSON.stringify([NaN, 'hello']));         // '[null,"hello"]'
 ```
 
 可以在 `JSON.stringify()` 中使用 `replacer` 参数。替换 `undefined` 为 `null` 或其他占位符。值类型和引用类型
+
+#### **`Object.freeze()和 Object.seal()`**
+
+* 完全冻结对象，不允许修改、添加或删除属性。
+* 适用于创建不可变的常量或配置对象。
+
+#### **`Object.seal()`**
+
+* 只禁止添加或删除属性，但允许修改已有属性。
+* 适用于需要防止对象扩展但允许数据更新的场景。
+
+#### **3. 嵌套对象注意事项**
+
+* `Object.freeze()` 和 `Object.seal()` 不会自动冻结或密封嵌套对象，需要手动递归处理。
+
+如果希望冻结嵌套对象，需要进行 **深度冻结**。
+
+```
+function deepFreeze(obj) {
+  Object.keys(obj).forEach(key => {
+    if (typeof obj[key] === 'object' && obj[key] !== null) {
+      deepFreeze(obj[key]);
+    }
+  });
+  return Object.freeze(obj);
+}
+
+const obj = {
+  user: {
+    name: 'Alice',
+    details: {
+      age: 30
+    }
+  }
+};
+
+deepFreeze(obj);
+
+obj.user.name = 'Bob';       // ❗️ 无效
+obj.user.details.age = 40;   // ❗️ 无效
+console.log(obj);
+// 输出：{ user: { name: 'Alice', details: { age: 30 } } }
+
+
+const person = { name: 'John', age: 30 };
+Object.seal(person);
+
+person.age = 35;        // ✅ 修改成功
+person.city = 'Paris';  // ❗️ 无效
+delete person.name;     // ❗️ 无效
+
+console.log(person);
+// 输出：{ name: 'John', age: 35 }
+
+```
 
 **值类型：**
 
