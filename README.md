@@ -36,7 +36,158 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 * 强类型举例： int i = 10; String s = "abcd"; double d = 3.14;
 * 弱类型举例：var i = 10; var s = "abcd"; var d = 3.14;
 
-`instanceof`运算符： 对象 `instanceof` 类 ，如果对象是这个类创建的，返回true，否则为false
+
+
+### 其他问题
+
+#### 使用 `null` 的场景
+
+1. 明确赋值为空对象
+2. 初始化变量或占位符
+
+#### `JSON.stringify()` 处理 `null` 和 `undefined` 的区别？
+
+```
+let obj = { a: null, b: undefined };
+console.log(JSON.stringify(obj)); // '{"a":null}'
+```
+
+#### `instanceof`
+
+对象 `instanceof` 类 ，如果对象是这个类创建的，返回true，否则为false
+
+#### **`instanceof` 通过原型链进行检查**
+
+* `instanceof` 会沿着 **`object` 的原型链** 向上查找，判断 `object.__proto__`（或 `Object.getPrototypeOf(object)`）是否等于 `Constructor.prototype`
+
+```
+function customInstanceOf(obj, Constructor) {
+  let prototype = Object.getPrototypeOf(obj); // 获取 obj 的原型
+  const prototypeOfConstructor = Constructor.prototype; // 获取构造函数的 prototype
+
+  // 循环向上查找原型链
+  while (prototype !== null) {
+    if (prototype === prototypeOfConstructor) {
+      return true;
+    }
+    prototype = Object.getPrototypeOf(prototype); // 沿原型链向上查找
+  }
+  return false;
+}
+
+```
+
+#### `typeof`&#x20;
+
+`typeof` 可以检测 8 种数据类型：
+
+* `undefined`
+* `number`
+* `string`
+* `boolean`
+* `bigint`
+* `symbol`
+* `object`（包括 `null`、数组和对象）
+* `function`
+
+✅ **常见问题：**
+
+* `null` 被检测为 `"object"`
+* `NaN` 被检测为 `"number"`
+* `function` 被检测为 `"function"`
+
+要判断一个值是否为 `NaN`，推荐使用 `Number.isNaN()`
+
+精确判断类型推荐： `Object.prototype.toString.call(value)`&#x20;
+
+#### **`toString()` 的内部机制**
+
+* 每个对象都有 `toString()` 方法，默认继承自 `Object.prototype`。
+* 当 `Object.prototype.toString.call()` 被调用时：
+  1. 如果是基本类型，返回基本类型的封装对象。
+  2. 如果是对象，会调用 `[[Class]]` 内部属性。
+  3. `[[Class]]` 属性是 JavaScript 规范中用来表示对象内部分类的机制。
+  4. 通过 `Object.prototype.toString` 可以访问 `[[Class]]` 的字符串表示。
+
+#### `==` 和 `===`
+
+### `==`
+
+* 进行 **隐式类型转换**（类型不同会尝试转换后再比较）。
+* 只要值相等，不考虑数据类型，也会返回 `true`
+
+```
+console.log(1 == "1");       // true
+console.log(true == 1);      // true
+console.log(false == 0);     // true
+console.log(null == undefined);  // true
+```
+
+**`===`（严格相等/全等）**
+
+* **特点：**
+  * 不进行类型转换，直接比较数据类型和值。
+
+```
+console.log(null == undefined); // true
+
+NaN 与任何值都不相等，包括自身。
+console.log(NaN == NaN);  // false
+```
+
+`Symbol`&#x20;
+
+是 ES6 引入的一种 **基本数据类型**，表示独一无二且不可变的标识符。`Symbol` 通过 `Symbol()` 函数创建，不能用 `new` 关键字实例化。可用来防止属性冲突或者定义不可枚举的私有属性
+
+`Symbol` 属性是默认不可枚举的，不会出现在 `for...in` 和 `Object.keys()` 中。通过 `Object.getOwnPropertySymbols()` 才能访问。
+
+#### **`Symbol.for()` 和 `Symbol.keyFor()`**
+
+* **`Symbol.for()`**：创建一个全局共享的 `Symbol`，如果已存在相同键的 `Symbol`，则返回已有的。
+
+```javascript
+const sym1 = Symbol.for('shared');
+const sym2 = Symbol.for('shared');
+
+console.log(sym1 === sym2);  // true (共享 Symbol)
+```
+
+* **`Symbol.keyFor()`**：获取通过 `Symbol.for()` 创建的 `Symbol` 的键。
+
+```javascript
+const sym = Symbol.for('myKey');
+console.log(Symbol.keyFor(sym));  // 'myKey'
+```
+
+```
+const sym1 = Symbol();
+const sym2 = Symbol();
+
+console.log(sym1 === sym2);  // false (独一无二)
+
+const sym1 = Symbol('foo');
+const sym2 = Symbol('foo');
+
+console.log(sym1 === sym2);  // false
+```
+
+BigInt
+
+`BigInt` 是 ES11（ES2020）引入的新数据类型，用于表示任意精度的整数。s
+
+* 需要进行大整数的精确计算时。
+* 在区块链、加密算法、金融交易系统中。
+* 需要存储超过 `Number.MAX_SAFE_INTEGER` 的数据时。
+
+#### **`BigInt` 和 `Number` 的区别**
+
+| 特性                | `Number`    | `BigInt`       |
+| ----------------- | ----------- | -------------- |
+| 表示范围              | ±(2^53 - 1) | 理论上无限大         |
+| 类型                | 浮点数         | 任意精度的整数        |
+| 运算支持              | 基本数学运算      | 仅支持整数运算        |
+| 兼容性               | 所有浏览器       | ES2020 及以上版本支持 |
+| 是否可以与 `Number` 运算 | ❌ 不可直接混合运算  | ❌ 需要转换         |
 
 ### 值类型和引用类型
 
