@@ -40,6 +40,39 @@ Js的数据类型是弱类型，不是像java那种强类型，变量必须显�
 
 ### 其他问题
 
+#### **原始类型是** **不可变的（Immutable）**
+
+* **不可变**：指的是 **原始类型的值** **一旦创建就无法更改**。
+* &#x20;**值本身** 不可更改，**变量** 可以重新赋值。
+
+```
+let str = 'hello';
+str[0] = 'H';   // 尝试修改字符串
+console.log(str);  // "hello" (未改变)
+
+str = 'world';  // 重新赋值
+console.log(str);  // "world"
+```
+
+#### JavaScript 中原始类型是不可变的，但为什么 String 可以调用 .toUpperCase()？
+
+* 当调用 `str.toUpperCase()` 时，JavaScript 发生了以下步骤：
+  1. **创建包装对象：** `new String(str)` 。
+  2. **调用方法：** 调用包装对象上的方法 `toUpperCase()`。
+  3. **销毁包装对象：** 立即销毁包装对象，只保留返回的结果。
+
+```
+let str = 'hello';
+console.log(str.toUpperCase());  // "HELLO"
+
+// 实际等效于
+let tempStr = new String('hello');
+let result = tempStr.toUpperCase();
+tempStr = null;
+
+console.log(result);  // "HELLO"
+```
+
 #### 使用 `null` 的场景
 
 1. 明确赋值为空对象
@@ -111,7 +144,7 @@ function customInstanceOf(obj, Constructor) {
 
 #### `==` 和 `===`
 
-### `==`
+#### `==`
 
 * 进行 **隐式类型转换**（类型不同会尝试转换后再比较）。
 * 只要值相等，不考虑数据类型，也会返回 `true`
@@ -134,6 +167,17 @@ console.log(null == undefined); // true
 NaN 与任何值都不相等，包括自身。
 console.log(NaN == NaN);  // false
 ```
+
+#### `Object.is()`
+
+#### &#x20;`Object.is()` 是 ES6 引入的一个静态方法，用于判断两个值是否 **严格相等**，但在某些特殊情况下的行为与 `===` 不同。
+
+**`Object.is()` 的特殊处理，**`Object.is()` 和 `===` 在其他场景下的行为是完全相同的。
+
+1. **`NaN` 和 `NaN` 比较：** `Object.is(NaN, NaN)` 返回 `true`，而 `NaN === NaN` 返回 `false`。
+2. **`+0` 和 `-0` 比较：** `Object.is(+0, -0)` 返回 `false`，而 `+0 === -0` 返回 `true`
+
+
 
 `Symbol`&#x20;
 
@@ -173,13 +217,26 @@ console.log(sym1 === sym2);  // false
 
 BigInt
 
-`BigInt` 是 ES11（ES2020）引入的新数据类型，用于表示任意精度的整数。s
+`BigInt` 是 ES11（ES2020）引入的新数据类型，用于表示任意精度的整数。
+
+适用于
 
 * 需要进行大整数的精确计算时。
 * 在区块链、加密算法、金融交易系统中。
 * 需要存储超过 `Number.MAX_SAFE_INTEGER` 的数据时。
 
 #### **`BigInt` 和 `Number` 的区别**
+
+`BigInt` 只支持 **整数运算**，不支持与 `Number` 混合运算。
+
+```
+const bigInt1 = 1234567890123456789012345678901234567890n;
+const bigInt2 = BigInt('1234567890123456789012345678901234567890');
+
+console.log(bigInt1 === bigInt2);  // true
+
+console.log(big1 + 1);  // TypeError: Cannot mix BigInt and other types
+```
 
 | 特性                | `Number`    | `BigInt`       |
 | ----------------- | ----------- | -------------- |
@@ -189,7 +246,93 @@ BigInt
 | 兼容性               | 所有浏览器       | ES2020 及以上版本支持 |
 | 是否可以与 `Number` 运算 | ❌ 不可直接混合运算  | ❌ 需要转换         |
 
-### 值类型和引用类型
+#### 原始值包装对象
+
+* `String` → `string` 的包装对象
+* `Number` → `number` 的包装对象
+* `Boolean` → `boolean` 的包装对象
+
+```
+const strObj = new String('hello');
+
+console.log(typeof strObj);      // "object"
+console.log(strObj instanceof String);  // true
+console.log(strObj == 'hello');  // true (值相等)
+console.log(strObj === 'hello'); // false (引用不同)
+
+```
+
+#### `Object.create(null)` 和 `{}` 的区别
+
+* `Object.create(null)` 创建一个 **纯净的对象**，不继承任何原型链（`Object.prototype`）
+  * 创建安全的字典对象，防止原型污染。
+  * 适合存储键值对的场景，避免继承链污染。
+* 创建的对象 **没有 `__proto__` 属性**，因此无法使用 `toString()`、`hasOwnProperty()` 等方法。
+* 使用 `{}` 创建的对象，默认继承自 `Object.prototype`，有原型方法
+
+```
+const obj = Object.create(null);
+
+console.log(obj.toString);  // undefined
+console.log(Object.getPrototypeOf(obj));  // null
+
+const obj2 = {};
+console.log(obj2.toString());  // [object Object]
+console.log(obj2.hasOwnProperty('key'));  // false
+```
+
+#### `?.` 和 `??` 运算符
+
+`??` 只在 **`null` 或 `undefined`** 时才使用默认值，与 `||` 的区别在于不会将 `false`、`0`、`NaN` 视为 `false`。
+
+`?.` 处理嵌套对象访问
+
+```
+let user = {
+  settings: {
+    theme: null
+  }
+};
+
+let theme = user.settings?.theme ?? 'light';
+console.log(theme);  // "light"
+```
+
+#### **解决**JSON.stringify()**循环引用的方法**
+
+`JSON.stringify()` 不能直接处理 **循环引用**，会抛出 `TypeError`。
+
+* **使用 `JSON.stringify()` 的 `replacer` 参数手动处理：**
+
+```javascript
+javascript复制编辑const obj = {};
+obj.self = obj;
+
+const json = JSON.stringify(obj, (key, value) => {
+  if (value === obj) {
+    return '[Circular Reference]';
+  }
+  return value;
+});
+
+console.log(json);  // '{"self":"[Circular Reference]"}'
+```
+
+在 `JSON.stringify()` 中，`undefined` 会被忽略，转换为 `null` 时出现在数组中。
+
+```
+console.log(JSON.stringify({ a: undefined, b: 'hello' }));  // '{"b":"hello"}'
+console.log(JSON.stringify([undefined, 'hello']));         // '[null,"hello"]'
+```
+
+`NaN` 会被转换为 `null`。
+
+```
+console.log(JSON.stringify({ a: NaN, b: 'hello' }));  // '{"a":null,"b":"hello"}'
+console.log(JSON.stringify([NaN, 'hello']));         // '[null,"hello"]'
+```
+
+可以在 `JSON.stringify()` 中使用 `replacer` 参数。替换 `undefined` 为 `null` 或其他占位符。值类型和引用类型
 
 **值类型：**
 
