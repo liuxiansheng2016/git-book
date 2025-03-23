@@ -479,3 +479,105 @@ console.log(0.1 + 0.2); // 0.30000000000000004
 * 浮点数计算可能会出现精度问题，如 `0.1 + 0.2` 结果为 `0.30000000000000004`。
 
 [更多详细内容](https://2ality.com/2012/01/object-plus-object.html) [参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)
+
+### **将多层嵌套数组平铺成一层数组的方法**
+
+`flat()` 可以将嵌套数组展开到指定的层级，`flat(Infinity)` 可以完全展开多层嵌套数组。
+
+`reduce()` 遍历数组，递归检查是否为数组，如果是则继续展开
+
+```
+function flattenArray(arr) {
+  return arr.reduce(
+    (acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val),
+    []
+  );
+}
+
+const arr = [1, [2, [3, [4, 5]]], 6];
+console.log(flattenArray(arr));  // [1, 2, 3, 4, 5, 6]
+```
+
+`toString()` + `split()`
+
+```
+const arr = [1, [2, [3, [4, 5]]], 6];
+const flattened = arr.toString().split(',').map(Number);
+console.log(flattened);  // [1, 2, 3, 4, 5, 6]
+```
+
+使用 `JSON.stringify()` + `replace()`
+
+```
+const arr = [1, [2, [3, [4, 5]]], 6];
+const flattened = JSON.stringify(arr)
+  .replace(/\[|\]/g, '')   // 去掉方括号
+  .split(',')              // 转换为字符串数组
+  .map(Number);            // 转换回数字
+console.log(flattened);  // [1, 2, 3, 4, 5, 6]
+```
+
+### **`WeakMap` 和 `WeakSet` 的区别**
+
+***
+
+| 特性     | `WeakMap`        | `WeakSet`     |
+| ------ | ---------------- | ------------- |
+| 数据存储   | 键值对（`key-value`） | 仅存储对象         |
+| 键或值    | 只能使用对象作为键        | 只能存储对象        |
+| 引用类型   | 弱引用              | 弱引用           |
+| 是否可迭代  | ❌ 不可迭代           | ❌ 不可迭代        |
+| 垃圾回收行为 | 键被回收时自动释放键值对     | 对象被回收时自动移除    |
+| 常用场景   | 私有数据、缓存、关联数据     | 记录对象状态、避免重复操作 |
+
+通过 `WeakSet`&#x20;
+
+记录哪些对象被访问或处理过，不会影响垃圾回收。
+
+可用于防止对相同对象执行重复操作，例如防止重复发送通知。
+
+```
+const processed = new WeakSet();
+
+function process(obj) {
+  if (processed.has(obj)) {
+    console.log('Already processed');
+    return;
+  }
+
+  // 处理对象
+  processed.add(obj);
+  console.log('Processing...');
+}
+
+const obj1 = { id: 1 };
+process(obj1);  // "Processing..."
+process(obj1);  // "Already processed"
+
+obj1 = null;  // 被垃圾回收，WeakSet 自动移除引用
+
+```
+
+WeakMap
+
+使用 `WeakMap` 来实现 **对象缓存**，当对象被垃圾回收时，缓存数据也随之消失。
+
+将对象的私有数据存储在 `WeakMap` 中，实现数据的 **隐藏和封装**。
+
+```
+const cache = new WeakMap();
+
+function fetchData(obj) {
+  if (!cache.has(obj)) {
+    const data = { value: Math.random() };  // 模拟数据
+    cache.set(obj, data);
+  }
+  return cache.get(obj);
+}
+
+const obj1 = {};
+console.log(fetchData(obj1));  // { value: 0.1234 }
+
+obj1 = null;  // 释放对象，WeakMap 自动清理数据
+
+```
