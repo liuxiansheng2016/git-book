@@ -869,61 +869,7 @@ encodeURI/ decodeURI：url编码解码，常用
 
 encodeURIComponent/ decodeURIComponent：url编码解码，和上面的不同的是，&=?也会被编码
 
-### 字符相加
 
-在JavaScript中，不同类型的值在进行相加操作时，会根据类型的不同进行转换和处理。 // !可将变量转换成boolean类型，null、undefined、NaN以及空字符串('')取反都为true，其余都为false。
-
-#### 示例代码
-
-```javascript
-
-console.log(!null); // true
-console.log(!undefined); // true
-console.log(!NaN); // true
-console.log(!''); // true
-
-// [] + {} "[object Object]"
-console.log([] + {}); // "[object Object]"
-
-// {} + [] => + [] 0
-console.log({} + []); // 0
-
-// 通过Number()将值转换为数字
-console.log(Number(undefined)); // NaN
-console.log(Number({})); // NaN
-
-console.log(1 + 'string'); // '1string'
-console.log(1 + undefined); // NaN
-console.log(1 + null); // 1
-console.log(1 + [2,3]); // "12,3"
-console.log(1 + {name: 'andyyou'}); // "1[object Object]"
-console.log(1 + true); // 2
-
-var a = (2, 3, 5);
-console.log(a); // 5
-
-console.log(Math.max([2,3,4,5])); // NaN
-
-console.log(0.1 + 0.2); // 0.30000000000000004
-```
-
-#### 说明
-
-* `[] + {}` 结果为 `"[object Object]"`，这是因为数组和对象的相加在JavaScript中被转换为字符串操作。
-* `{}` + `[]` 结果为 `0`，因为会被解释为 `+ []`，而空数组转换成数字后为 `0`。
-* `Number(undefined)` 和 `Number({})` 都会返回 `NaN`，因为它们不能被转换成有效的数字。
-* 当数字与字符串相加时，数字会被转换为字符串。
-* 与 `undefined` 相加会返回 `NaN`。
-* 与 `null` 相加时，`null` 被转换为 `0`。
-* 与数组相加时，数组会被转换为字符串。
-* 与对象相加时，对象会被转换为字符串 `[object Object]`。
-* `1 + true` 结果为 `2`，因为 `true` 被转换为 `1`。
-* 逗号运算符返回最后一个表达式的值。
-* `Math.max` 不能直接处理数组，需要使用 `Math.max.apply(null, [2,3,4,5])`。
-* 浮点数计算可能会出现精度问题，如 `0.1 + 0.2` 结果为 `0.30000000000000004`。
-
-[更多详细内容](https://2ality.com/2012/01/object-plus-object.html) [参考博客](https://blog.csdn.net/jian_zi/article/details/105137258)\
-\\
 
 ### 深克隆浅克隆
 
