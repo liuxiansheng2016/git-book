@@ -37,12 +37,28 @@ console.log(result);  // "HELLO"
 
 1. 明确赋值为空对象
 2. 初始化变量或占位符
+3. `null` 和 `undefined` 都不是对象，所以传入它们会抛出 `TypeError`。
 
 ```
 let obj = { name: 'Alice' };
 obj = null;  // 释放引用，等待 GC（垃圾回收）
 
 let response = null;  // 初始化时为空，等待赋值
+```
+
+`Object.create(null)` 创建一个没有原型的对象，适用于存储不受 `Object.prototype` 影响的键值对。
+
+```javascript
+const obj = Object.create(null);
+obj.name = "Alice";
+console.log(obj);  // { name: "Alice" }
+console.log(Object.getPrototypeOf(obj));  // null ✅
+```
+
+`null` 和 `undefined` 都不是对象，所以传入它们会抛出 `TypeError`。
+
+```
+console.log(null.__proto__);  // ❗️ TypeError: Cannot read properties of null
 ```
 
 ### `instanceof`
@@ -92,6 +108,10 @@ function customInstanceOf(obj, Constructor) {
 要判断一个值是否为 `NaN`，推荐使用 `Number.isNaN()`
 
 精确判断类型推荐： `Object.prototype.toString.call(value)`&#x20;
+
+typeof new Number(0)
+
+
 
 ### **`toString()` 的内部机制**
 
@@ -212,13 +232,21 @@ console.log(big1 + 1);  // TypeError: Cannot mix BigInt and other types
 * `Number` → `number` 的包装对象
 * `Boolean` → `boolean` 的包装对象
 
+\== 会进行 隐式类型转换。 在比较时，会将对象转换为原始值，再进行比较。
+
 ```
 const strObj = new String('hello');
 
 console.log(typeof strObj);      // "object"
 console.log(strObj instanceof String);  // true
+
+
 console.log(strObj == 'hello');  // true (值相等)
 console.log(strObj === 'hello'); // false (引用不同)
+
+const numObj = new Number(0);
+console.log(numObj);  // [Number: 0] 
+console.log(typeof numObj);  // "object" 
 ```
 
 ### `Object.create(null)` 和 `{}` 的区别
