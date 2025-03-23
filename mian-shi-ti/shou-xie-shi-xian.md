@@ -1,5 +1,42 @@
 # 手写实现
 
+### **将多层嵌套数组平铺成一层数组的方法**
+
+`flat()` 可以将嵌套数组展开到指定的层级，`flat(Infinity)` 可以完全展开多层嵌套数组。
+
+`reduce()` 遍历数组，递归检查是否为数组，如果是则继续展开
+
+```
+function flattenArray(arr) {
+  return arr.reduce(
+    (acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val),
+    []
+  );
+}
+
+const arr = [1, [2, [3, [4, 5]]], 6];
+console.log(flattenArray(arr));  // [1, 2, 3, 4, 5, 6]
+```
+
+`toString()` + `split()`
+
+```
+const arr = [1, [2, [3, [4, 5]]], 6];
+const flattened = arr.toString().split(',').map(Number);
+console.log(flattened);  // [1, 2, 3, 4, 5, 6]
+```
+
+使用 `JSON.stringify()` + `replace()`
+
+```
+const arr = [1, [2, [3, [4, 5]]], 6];
+const flattened = JSON.stringify(arr)
+  .replace(/\[|\]/g, '')   // 去掉方括号
+  .split(',')              // 转换为字符串数组
+  .map(Number);            // 转换回数字
+console.log(flattened);  // [1, 2, 3, 4, 5, 6]
+```
+
 ### 模拟let
 
 ```
